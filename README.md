@@ -39,6 +39,12 @@ yarn build
 yarn preview
 ```
 
+## 参考文献 / References
+
+- [Audio EQ Cookbook by Robert Bristow-Johnson](https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt) - Biquad filter design equations
+- [Bode Plot - Interactive Pole/Zero Placement | Control Systems Academy](https://controlsystemsacademy.com/0019/0019.html) - Interactive visualization of pole/zero placement
+- [Digital Filter by Paul Falstad](https://www.falstad.com/dfilter/) - Interactive digital filter simulator
+
 ## About This Project
 
 This is an educational learning application and a disposable repository. The codebase does not follow DRY (Don't Repeat Yourself) principles, and code readability has not been prioritized. However, contributions are welcome.
