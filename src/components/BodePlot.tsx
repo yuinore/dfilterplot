@@ -227,43 +227,51 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
   }, [impulseResponse, t]);
 
   // インパルス応答のオプション
-  const impulseOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false as const,
-    scales: {
-      x: {
-        type: 'linear' as const,
-        title: {
-          display: true,
-          text: t('bodePlot.time'),
+  const impulseOptions = useMemo(() => {
+    // y軸の範囲を動的に計算（余白付き）
+    const dataMin = Math.min(...impulseResponse.amplitude);
+    const dataMax = Math.max(...impulseResponse.amplitude);
+    const yMin = Math.min(dataMin, -0.4) - 0.1;
+    const yMax = Math.max(dataMax, 1.4) + 0.1;
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false as const,
+      scales: {
+        x: {
+          type: 'linear' as const,
+          title: {
+            display: true,
+            text: t('bodePlot.time'),
+          },
+        },
+        y: {
+          title: {
+            display: true,
+            text: t('bodePlot.amplitude'),
+          },
+          min: yMin,
+          max: yMax,
         },
       },
-      y: {
-        title: {
-          display: true,
-          text: t('bodePlot.amplitude'),
+      plugins: {
+        legend: {
+          display: false,
         },
-        min: -0.5,
-        max: 1.5,
+        tooltip: {
+          enabled: true,
+          mode: 'nearest' as const,
+          intersect: false,
+        },
       },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        enabled: true,
+      interaction: {
         mode: 'nearest' as const,
+        axis: 'x' as const,
         intersect: false,
       },
-    },
-    interaction: {
-      mode: 'nearest' as const,
-      axis: 'x' as const,
-      intersect: false,
-    },
-  }), [t]);
+    };
+  }, [impulseResponse, t]);
 
   // ステップ応答のグラフデータ
   const stepData = useMemo(() => {
@@ -284,43 +292,51 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
   }, [stepResponse, t]);
 
   // ステップ応答のオプション
-  const stepOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false as const,
-    scales: {
-      x: {
-        type: 'linear' as const,
-        title: {
-          display: true,
-          text: t('bodePlot.time'),
+  const stepOptions = useMemo(() => {
+    // y軸の範囲を動的に計算（余白付き）
+    const dataMin = Math.min(...stepResponse.amplitude);
+    const dataMax = Math.max(...stepResponse.amplitude);
+    const yMin = Math.min(dataMin, -0.4) - 0.1;
+    const yMax = Math.max(dataMax, 1.4) + 0.1;
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false as const,
+      scales: {
+        x: {
+          type: 'linear' as const,
+          title: {
+            display: true,
+            text: t('bodePlot.time'),
+          },
+        },
+        y: {
+          title: {
+            display: true,
+            text: t('bodePlot.amplitude'),
+          },
+          min: yMin,
+          max: yMax,
         },
       },
-      y: {
-        title: {
-          display: true,
-          text: t('bodePlot.amplitude'),
+      plugins: {
+        legend: {
+          display: false,
         },
-        min: -0.5,
-        max: 1.5,
+        tooltip: {
+          enabled: true,
+          mode: 'nearest' as const,
+          intersect: false,
+        },
       },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        enabled: true,
+      interaction: {
         mode: 'nearest' as const,
+        axis: 'x' as const,
         intersect: false,
       },
-    },
-    interaction: {
-      mode: 'nearest' as const,
-      axis: 'x' as const,
-      intersect: false,
-    },
-  }), [t]);
+    };
+  }, [stepResponse, t]);
 
   return (
     <Box sx={{ 

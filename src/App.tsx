@@ -59,7 +59,7 @@ function App() {
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
   const [qFactor, setQFactor] = useState<number>(0.707); // Butterworth Q
 
-  // フィルタ設計が変更されたら極・零点を更新
+  // フィルタ設計が変更されたら極・零点とゲインを更新
   useEffect(() => {
     if (filterType === 'biquad') {
       let result;
@@ -79,6 +79,8 @@ function App() {
       }
       setPoles(result.poles);
       setZeros(result.zeros);
+      // Audio EQ Cookbookに従い、ゲイン (b0/a0) を自動設定
+      setGain(result.gain);
     }
   }, [filterType, biquadType, cutoffFrequency, qFactor]);
 

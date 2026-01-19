@@ -9,8 +9,23 @@ interface GainControlProps {
 export const GainControl = ({ gain, onGainChange }: GainControlProps) => {
   const { t } = useTranslation();
 
-  // ゲインをdBに変換して表示
-  const gainDB = 20 * Math.log10(gain);
+  // dBスケールの範囲: -120dB ～ 0dB
+  const minDB = -120;
+  const maxDB = 0;
+
+  // 線形ゲインをdBに変換
+  const linearToDb = (linear: number): number => {
+    if (linear <= 0) return minDB;
+    return 20 * Math.log10(linear);
+  };
+
+  // dBを線形ゲインに変換
+  const dbToLinear = (db: number): number => {
+    return Math.pow(10, db / 20);
+  };
+
+  // 現在のゲインをdBに変換
+  const gainDB = linearToDb(gain);
 
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
@@ -18,17 +33,16 @@ export const GainControl = ({ gain, onGainChange }: GainControlProps) => {
         {t('gainControl.title')}
       </Typography>
       <Typography variant="body2" gutterBottom>
-        {t('gainControl.gain')}: {gain.toFixed(3)} ({gainDB.toFixed(1)} dB)
+        {t('gainControl.gain')}: {gain.toFixed(6)} ({gainDB.toFixed(1)} dB)
       </Typography>
       <Slider
-        value={gain}
-        onChange={(_, value) => onGainChange(value as number)}
-        min={0.001}
-        max={100}
-        step={0.001}
-        scale={(x) => x}
+        value={gainDB}
+        onChange={(_, value) => onGainChange(dbToLinear(value as number))}
+        min={minDB}
+        max={maxDB}
+        step={0.1}
         valueLabelDisplay="auto"
-        valueLabelFormat={(value) => `${value.toFixed(3)} (${(20 * Math.log10(value)).toFixed(1)} dB)`}
+        valueLabelFormat={(value) => `${value.toFixed(1)} dB`}
       />
     </Paper>
   );

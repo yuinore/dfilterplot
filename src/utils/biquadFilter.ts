@@ -49,6 +49,7 @@ function solveQuadratic(a: number, b: number, c: number): { real: number; imag: 
 
 /**
  * biquad係数から極と零点を計算
+ * Audio EQ Cookbook Eq 3に従い、ゲイン (b0/a0) も返す
  */
 function calculatePolesZeros(
   b0: number,
@@ -57,7 +58,7 @@ function calculatePolesZeros(
   a0: number,
   a1: number,
   a2: number
-): { poles: PoleOrZero[]; zeros: PoleOrZero[] } {
+): { poles: PoleOrZero[]; zeros: PoleOrZero[]; gain: number } {
   // 正規化
   const b0n = b0 / a0;
   const b1n = b1 / a0;
@@ -116,7 +117,10 @@ function calculatePolesZeros(
     }
   }
 
-  return { poles, zeros };
+  // Audio EQ Cookbook Eq 3のゲインファクター (b0/a0)
+  const gain = b0 / a0;
+
+  return { poles, zeros, gain };
 }
 
 /**
@@ -126,6 +130,7 @@ function calculatePolesZeros(
 export function generateLowPassBiquad(cutoffFreq: number, Q: number): {
   poles: PoleOrZero[];
   zeros: PoleOrZero[];
+  gain: number;
 } {
   const w0 = cutoffFreq;
   const cosW0 = Math.cos(w0);
@@ -150,6 +155,7 @@ export function generateLowPassBiquad(cutoffFreq: number, Q: number): {
 export function generateHighPassBiquad(cutoffFreq: number, Q: number): {
   poles: PoleOrZero[];
   zeros: PoleOrZero[];
+  gain: number;
 } {
   const w0 = cutoffFreq;
   const cosW0 = Math.cos(w0);
@@ -174,6 +180,7 @@ export function generateHighPassBiquad(cutoffFreq: number, Q: number): {
 export function generateBandPassBiquad(centerFreq: number, Q: number): {
   poles: PoleOrZero[];
   zeros: PoleOrZero[];
+  gain: number;
 } {
   const w0 = centerFreq;
   const cosW0 = Math.cos(w0);
@@ -198,6 +205,7 @@ export function generateBandPassBiquad(centerFreq: number, Q: number): {
 export function generateBandStopBiquad(notchFreq: number, Q: number): {
   poles: PoleOrZero[];
   zeros: PoleOrZero[];
+  gain: number;
 } {
   const w0 = notchFreq;
   const cosW0 = Math.cos(w0);
