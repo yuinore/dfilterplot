@@ -1,4 +1,7 @@
-// 旧型定義（後方互換性のため残す）
+/**
+ * レガシー型定義（後方互換性のため）
+ * 複素共役ペアは2つのオブジェクトで表現
+ */
 export interface PoleZero {
   id: string;
   real: number;
@@ -8,34 +11,49 @@ export interface PoleZero {
   pairId?: string;
 }
 
-// 新しい型定義：実数の極/零点
+/**
+ * 実数の極/零点
+ */
 export interface PoleZeroReal {
   id: string;
   real: number;
   isPole: boolean;
 }
 
-// 新しい型定義：複素共役ペア
+/**
+ * 複素共役ペア
+ * imagは常に正の値（共役ペアは暗黙的に表現）
+ */
 export interface PoleZeroPair {
   id: string;
-  real: number;  // 実部
-  imag: number;  // 虚部（正の値のみ、共役ペアを暗黙的に表現）
+  real: number;
+  imag: number;
   isPole: boolean;
 }
 
-// 極または零点（ユニオン型）
+/**
+ * 極または零点（ユニオン型）
+ */
 export type PoleOrZero = PoleZeroReal | PoleZeroPair;
 
-// 型ガード
+/**
+ * 型ガード：実数の極/零点かどうかを判定
+ */
 export function isPoleZeroReal(pz: PoleOrZero): pz is PoleZeroReal {
   return !('imag' in pz);
 }
 
+/**
+ * 型ガード：複素共役ペアかどうかを判定
+ */
 export function isPoleZeroPair(pz: PoleOrZero): pz is PoleZeroPair {
   return 'imag' in pz;
 }
 
-// ユーティリティ関数：新型 → 旧型（PoleZero配列）への変換
+/**
+ * 新型 → 旧型への変換（後方互換性のため）
+ * PoleOrZero[] → PoleZero[]
+ */
 export function toPoleZeros(items: PoleOrZero[]): PoleZero[] {
   const result: PoleZero[] = [];
   

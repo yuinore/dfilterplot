@@ -331,72 +331,50 @@ function createBiquadSectionsFromPoleOrZero(
 }
 
 /**
+ * PoleZero[] を PoleOrZero[] に変換するヘルパー関数
+ */
+function convertLegacyPoleZeros(items: PoleZero[]): PoleOrZero[] {
+  const converted: PoleOrZero[] = [];
+  const processed = new Set<string>();
+  
+  for (const item of items) {
+    if (processed.has(item.id)) continue;
+    
+    if (Math.abs(item.imag) > 1e-10 && item.pairId) {
+      // 複素共役ペア（正の虚部のみ保持）
+      if (item.imag > 0) {
+        converted.push({
+          id: item.id,
+          real: item.real,
+          imag: item.imag,
+          isPole: item.isPole,
+        });
+        processed.add(item.id);
+        if (item.pairId) processed.add(item.pairId);
+      }
+    } else {
+      // 実数
+      converted.push({
+        id: item.id,
+        real: item.real,
+        isPole: item.isPole,
+      });
+      processed.add(item.id);
+    }
+  }
+  
+  return converted;
+}
+
+/**
  * 極・零点を双二次セクションに分割（レガシーAPI）
  * PoleZero[] → PoleOrZero[] に変換してから処理
  */
 function createBiquadSections(zeros: PoleZero[], poles: PoleZero[]): BiquadSection[] {
-  // PoleZero[] を PoleOrZero[] に変換
-  const zerosConverted: PoleOrZero[] = [];
-  const polesConverted: PoleOrZero[] = [];
-  
-  const processedZeros = new Set<string>();
-  const processedPoles = new Set<string>();
-  
-  // 零点を変換
-  for (const zero of zeros) {
-    if (processedZeros.has(zero.id)) continue;
-    
-    if (Math.abs(zero.imag) > 1e-10 && zero.pairId) {
-      // 複素共役ペア（正の虚部のみ保持）
-      if (zero.imag > 0) {
-        zerosConverted.push({
-          id: zero.id,
-          real: zero.real,
-          imag: zero.imag,
-          isPole: zero.isPole,
-        });
-        processedZeros.add(zero.id);
-        if (zero.pairId) processedZeros.add(zero.pairId);
-      }
-    } else {
-      // 実数
-      zerosConverted.push({
-        id: zero.id,
-        real: zero.real,
-        isPole: zero.isPole,
-      });
-      processedZeros.add(zero.id);
-    }
-  }
-  
-  // 極を変換
-  for (const pole of poles) {
-    if (processedPoles.has(pole.id)) continue;
-    
-    if (Math.abs(pole.imag) > 1e-10 && pole.pairId) {
-      // 複素共役ペア（正の虚部のみ保持）
-      if (pole.imag > 0) {
-        polesConverted.push({
-          id: pole.id,
-          real: pole.real,
-          imag: pole.imag,
-          isPole: pole.isPole,
-        });
-        processedPoles.add(pole.id);
-        if (pole.pairId) processedPoles.add(pole.pairId);
-      }
-    } else {
-      // 実数
-      polesConverted.push({
-        id: pole.id,
-        real: pole.real,
-        isPole: pole.isPole,
-      });
-      processedPoles.add(pole.id);
-    }
-  }
-  
-  return createBiquadSectionsFromPoleOrZero(zerosConverted, polesConverted);
+  return createBiquadSectionsFromPoleOrZero(
+    convertLegacyPoleZeros(zeros),
+    convertLegacyPoleZeros(poles)
+  );
 }
 
 /**
@@ -443,19 +421,10 @@ export function calculateImpulseResponse(
   let signal = new Array(numPoints).fill(0);
   signal[0] = 1.0; // δ[n]
 
-  // 双二次セクションを作成
+  // 双二次セクションを作成し、カスケード接続で実行
   const sections = createBiquadSections(zeros, poles);
-
-  // デバッグ出力
-  console.log('=== Impulse Response Debug (Biquad Cascade) ===');
-  console.log('Zeros:', zeros);
-  console.log('Poles:', poles);
-  console.log('Biquad sections:', sections);
-
-  // 各セクションをカスケード接続で実行
-  for (let i = 0; i < sections.length; i++) {
-    signal = applyBiquadSection(signal, sections[i]);
-    console.log(`After section ${i}:`, signal.slice(0, 10));
+  for (const section of sections) {
+    signal = applyBiquadSection(signal, section);
   }
 
   // 最大絶対値で正規化
@@ -472,15 +441,6 @@ export function calculateImpulseResponse(
     time.push(n);
     amplitude.push(signal[n]);
   }
-
-  // デバッグ出力
-  console.log('Impulse response (first 10):', signal.slice(0, 10));
-  if (numPoints > 20) {
-    console.log('Impulse response (last 10):', signal.slice(-10));
-  }
-  console.log('Max amplitude (before normalization):', maxAbs);
-  console.log('Max amplitude (after normalization):', Math.max(...signal.map(Math.abs)));
-  console.log('==============================\n');
 
   return { time, amplitude };
 }

@@ -1,4 +1,4 @@
-import type { PoleZero, PoleOrZero, PoleZeroReal, PoleZeroPair } from '../types';
+import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from '../types';
 
 /**
  * 双二次フィルタの極・零点を計算
@@ -48,7 +48,7 @@ function solveQuadratic(a: number, b: number, c: number): { real: number; imag: 
 }
 
 /**
- * biquad係数から極と零点を計算（新型）
+ * biquad係数から極と零点を計算
  */
 function calculatePolesZeros(
   b0: number,
