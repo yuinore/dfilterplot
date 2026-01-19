@@ -80,9 +80,12 @@ function App() {
 
   // 極の移動処理
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
+    // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
+    const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
+    
     setPoles((prevPoles) =>
       prevPoles.map((pole) => {
-        if (pole.id === id) {
+        if (pole.id === actualId) {
           if ('imag' in pole) {
             return { ...pole, real, imag: Math.abs(imag) } as PoleZeroPair;
           } else {
@@ -96,9 +99,12 @@ function App() {
 
   // 零点の移動処理
   const handleZeroMove = useCallback((id: string, real: number, imag: number) => {
+    // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
+    const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
+    
     setZeros((prevZeros) =>
       prevZeros.map((zero) => {
-        if (zero.id === id) {
+        if (zero.id === actualId) {
           if ('imag' in zero) {
             return { ...zero, real, imag: Math.abs(imag) } as PoleZeroPair;
           } else {
@@ -144,12 +150,16 @@ function App() {
 
   // 極を削除
   const handleDeletePole = useCallback((id: string) => {
-    setPoles((prev) => prev.filter((p) => p.id !== id));
+    // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
+    const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
+    setPoles((prev) => prev.filter((p) => p.id !== actualId));
   }, []);
 
   // 零点を削除
   const handleDeleteZero = useCallback((id: string) => {
-    setZeros((prev) => prev.filter((z) => z.id !== id));
+    // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
+    const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
+    setZeros((prev) => prev.filter((z) => z.id !== actualId));
   }, []);
 
   // すべてクリア
