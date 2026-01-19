@@ -21,6 +21,7 @@ import {
   calculateImpulseResponse,
   calculateStepResponse,
 } from '../utils/transferFunction';
+import { FREQUENCY_RESPONSE, BODE_PLOT, TIME_RESPONSE } from '../constants';
 
 // Chart.js の登録
 ChartJS.register(
@@ -46,25 +47,25 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
   // 周波数応答を計算
   const frequencyResponse = useMemo(() => {
     if (logarithmicFrequency) {
-      return calculateFrequencyResponseLog(zeros, poles, 512);
+      return calculateFrequencyResponseLog(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS);
     } else {
-      return calculateFrequencyResponse(zeros, poles, 512);
+      return calculateFrequencyResponse(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS);
     }
   }, [zeros, poles, logarithmicFrequency]);
 
   // 群遅延を計算
   const groupDelayResponse = useMemo(() => {
-    return calculateGroupDelay(zeros, poles, 512, logarithmicFrequency);
+    return calculateGroupDelay(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, logarithmicFrequency);
   }, [zeros, poles, logarithmicFrequency]);
 
   // インパルス応答を計算
   const impulseResponse = useMemo(() => {
-    return calculateImpulseResponse(zeros, poles, 64);
+    return calculateImpulseResponse(zeros, poles, TIME_RESPONSE.NUM_SAMPLES);
   }, [zeros, poles]);
 
   // ステップ応答を計算
   const stepResponse = useMemo(() => {
-    return calculateStepResponse(zeros, poles, 64);
+    return calculateStepResponse(zeros, poles, TIME_RESPONSE.NUM_SAMPLES);
   }, [zeros, poles]);
 
   // 振幅特性のグラフデータ
@@ -146,8 +147,8 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
           display: true,
           text: t('bodePlot.magnitudeDB'),
         },
-        min: -100,
-        max: 40,
+        min: BODE_PLOT.MAGNITUDE_MIN_DB,
+        max: BODE_PLOT.MAGNITUDE_MAX_DB,
       },
     },
   }), [commonOptions, t]);

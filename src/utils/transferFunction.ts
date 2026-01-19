@@ -1,5 +1,6 @@
 import type { PoleZero, FrequencyResponse, PoleOrZero } from '../types';
 import { isPoleZeroPair, toPoleZeros } from '../types';
+import { FREQUENCY_RESPONSE } from '../constants';
 
 /**
  * 複素数クラス
@@ -78,7 +79,7 @@ function evaluateTransferFunction(
 export function calculateFrequencyResponse(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-  numPoints: number = 512
+  numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS
 ): FrequencyResponse {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -133,7 +134,7 @@ export function calculateFrequencyResponse(
 export function calculateFrequencyResponseLog(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-  numPoints: number = 512
+  numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS
 ): FrequencyResponse {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -187,7 +188,7 @@ export function calculateFrequencyResponseLog(
 export function calculateGroupDelay(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-  numPoints: number = 512,
+  numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
   logarithmic: boolean = true
 ): { frequency: number[]; groupDelay: number[] } {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
