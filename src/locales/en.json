@@ -1,0 +1,37 @@
+{
+  "app": {
+    "title": "Digital Filter Plotter"
+  },
+  "header": {
+    "language": "Language"
+  },
+  "complexPlane": {
+    "title": "Complex Plane",
+    "realAxis": "Real Axis",
+    "imagAxis": "Imaginary Axis",
+    "unitCircle": "Unit Circle"
+  },
+  "toolbar": {
+    "addPole": "Add Pole",
+    "addZero": "Add Zero",
+    "clear": "Clear"
+  },
+  "polezero": {
+    "pole": "Pole",
+    "zero": "Zero",
+    "poles": "Poles",
+    "zeros": "Zeros",
+    "delete": "Delete",
+    "real": "Real",
+    "imag": "Imaginary"
+  },
+  "bodePlot": {
+    "title": "Bode Plot",
+    "magnitude": "Magnitude",
+    "phase": "Phase",
+    "frequency": "Frequency (rad/s)",
+    "magnitudeDB": "Magnitude (dB)",
+    "phaseDeg": "Phase (deg)"
+  }
+}
+

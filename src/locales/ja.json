@@ -1,0 +1,37 @@
+{
+  "app": {
+    "title": "デジタルフィルタ可視化"
+  },
+  "header": {
+    "language": "言語"
+  },
+  "complexPlane": {
+    "title": "複素平面",
+    "realAxis": "実軸",
+    "imagAxis": "虚軸",
+    "unitCircle": "単位円"
+  },
+  "toolbar": {
+    "addPole": "極を追加",
+    "addZero": "零点を追加",
+    "clear": "クリア"
+  },
+  "polezero": {
+    "pole": "極",
+    "zero": "零点",
+    "poles": "極",
+    "zeros": "零点",
+    "delete": "削除",
+    "real": "実部",
+    "imag": "虚部"
+  },
+  "bodePlot": {
+    "title": "ボード線図",
+    "magnitude": "振幅特性",
+    "phase": "位相特性",
+    "frequency": "周波数 (rad/s)",
+    "magnitudeDB": "振幅 (dB)",
+    "phaseDeg": "位相 (度)"
+  }
+}
+
