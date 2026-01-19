@@ -2,6 +2,9 @@ import type { PoleZero } from '../types';
 
 /**
  * 双二次フィルタの極・零点を計算
+ * 
+ * Reference: Audio EQ Cookbook by Robert Bristow-Johnson
+ * https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt
  */
 
 let nextId = 1000; // フィルタ設計用のIDは1000から開始
@@ -11,225 +14,228 @@ function getNextId(): string {
 }
 
 /**
- * Low Pass フィルタの極・零点を生成
- * 零点: z = -1（2つ）
- * 極: 単位円内の複素共役ペア
+ * 2次方程式 a*z^2 + b*z + c = 0 の根を求める
+ * z^-2 の形式から z^2 の形式に変換: c + b*z + a*z^2 = 0
  */
-export function generateLowPassBiquad(cutoffFreq: number): {
+function solveQuadratic(a: number, b: number, c: number): { real: number; imag: number }[] {
+  if (Math.abs(a) < 1e-10) {
+    // 1次方程式
+    if (Math.abs(b) < 1e-10) return [];
+    const z = -c / b;
+    return [{ real: z, imag: 0 }];
+  }
+
+  const discriminant = b * b - 4 * a * c;
+  
+  if (discriminant >= 0) {
+    // 実根
+    const sqrtD = Math.sqrt(discriminant);
+    const z1 = (-b + sqrtD) / (2 * a);
+    const z2 = (-b - sqrtD) / (2 * a);
+    return [
+      { real: z1, imag: 0 },
+      { real: z2, imag: 0 },
+    ];
+  } else {
+    // 複素根
+    const realPart = -b / (2 * a);
+    const imagPart = Math.sqrt(-discriminant) / (2 * a);
+    return [
+      { real: realPart, imag: imagPart },
+      { real: realPart, imag: -imagPart },
+    ];
+  }
+}
+
+/**
+ * biquad係数から極と零点を計算
+ */
+function calculatePolesZeros(
+  b0: number,
+  b1: number,
+  b2: number,
+  a0: number,
+  a1: number,
+  a2: number
+): { poles: PoleZero[]; zeros: PoleZero[] } {
+  // 正規化
+  const b0n = b0 / a0;
+  const b1n = b1 / a0;
+  const b2n = b2 / a0;
+  const a1n = a1 / a0;
+  const a2n = a2 / a0;
+
+  // 零点: b0 + b1*z^-1 + b2*z^-2 = 0
+  // => b0*z^2 + b1*z + b2 = 0 (z^-2を掛けて変換)
+  const zeroRoots = solveQuadratic(b2n, b1n, b0n);
+
+  // 極: 1 + a1*z^-1 + a2*z^-2 = 0
+  // => a2 + a1*z + z^2 = 0
+  const poleRoots = solveQuadratic(a2n, a1n, 1);
+
+  const poles: PoleZero[] = [];
+  const zeros: PoleZero[] = [];
+
+  // 極を追加
+  if (poleRoots.length === 2 && Math.abs(poleRoots[0].imag) > 1e-6) {
+    // 複素共役ペア
+    const id1 = getNextId();
+    const id2 = getNextId();
+    poles.push({
+      id: id1,
+      real: poleRoots[0].real,
+      imag: poleRoots[0].imag,
+      isPole: true,
+      pairId: id2,
+    });
+    poles.push({
+      id: id2,
+      real: poleRoots[1].real,
+      imag: poleRoots[1].imag,
+      isPole: true,
+      pairId: id1,
+      isConjugate: true,
+    });
+  } else {
+    // 実数の極
+    for (const root of poleRoots) {
+      poles.push({
+        id: getNextId(),
+        real: root.real,
+        imag: root.imag,
+        isPole: true,
+      });
+    }
+  }
+
+  // 零点を追加
+  if (zeroRoots.length === 2 && Math.abs(zeroRoots[0].imag) > 1e-6) {
+    // 複素共役ペア
+    const id1 = getNextId();
+    const id2 = getNextId();
+    zeros.push({
+      id: id1,
+      real: zeroRoots[0].real,
+      imag: zeroRoots[0].imag,
+      isPole: false,
+      pairId: id2,
+    });
+    zeros.push({
+      id: id2,
+      real: zeroRoots[1].real,
+      imag: zeroRoots[1].imag,
+      isPole: false,
+      pairId: id1,
+      isConjugate: true,
+    });
+  } else {
+    // 実数の零点
+    for (const root of zeroRoots) {
+      zeros.push({
+        id: getNextId(),
+        real: root.real,
+        imag: root.imag,
+        isPole: false,
+      });
+    }
+  }
+
+  return { poles, zeros };
+}
+
+/**
+ * Low Pass フィルタの極・零点を生成
+ * Audio EQ Cookbook: LPF
+ */
+export function generateLowPassBiquad(cutoffFreq: number, Q: number): {
   poles: PoleZero[];
   zeros: PoleZero[];
 } {
-  // Q = 0.707 (Butterworth)
-  const Q = 0.707;
-  const r = 0.9; // 極の半径（単位円内）
-  
-  // 極の角度
-  const angle = cutoffFreq;
-  
-  const poleId1 = getNextId();
-  const poleId2 = getNextId();
-  
-  const poles: PoleZero[] = [
-    {
-      id: poleId1,
-      real: r * Math.cos(angle),
-      imag: r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId2,
-    },
-    {
-      id: poleId2,
-      real: r * Math.cos(angle),
-      imag: -r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId1,
-      isConjugate: true,
-    },
-  ];
+  const w0 = cutoffFreq;
+  const cosW0 = Math.cos(w0);
+  const sinW0 = Math.sin(w0);
+  const alpha = sinW0 / (2 * Q);
 
-  const zeroId1 = getNextId();
-  const zeroId2 = getNextId();
-  
-  const zeros: PoleZero[] = [
-    {
-      id: zeroId1,
-      real: -1,
-      imag: 0,
-      isPole: false,
-    },
-    {
-      id: zeroId2,
-      real: -1,
-      imag: 0,
-      isPole: false,
-    },
-  ];
+  // LPF coefficients
+  const b0 = (1 - cosW0) / 2;
+  const b1 = 1 - cosW0;
+  const b2 = (1 - cosW0) / 2;
+  const a0 = 1 + alpha;
+  const a1 = -2 * cosW0;
+  const a2 = 1 - alpha;
 
-  return { poles, zeros };
+  return calculatePolesZeros(b0, b1, b2, a0, a1, a2);
 }
 
 /**
  * High Pass フィルタの極・零点を生成
- * 零点: z = 1（2つ）
- * 極: 単位円内の複素共役ペア
+ * Audio EQ Cookbook: HPF
  */
-export function generateHighPassBiquad(cutoffFreq: number): {
+export function generateHighPassBiquad(cutoffFreq: number, Q: number): {
   poles: PoleZero[];
   zeros: PoleZero[];
 } {
-  const r = 0.9;
-  const angle = cutoffFreq;
-  
-  const poleId1 = getNextId();
-  const poleId2 = getNextId();
-  
-  const poles: PoleZero[] = [
-    {
-      id: poleId1,
-      real: r * Math.cos(angle),
-      imag: r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId2,
-    },
-    {
-      id: poleId2,
-      real: r * Math.cos(angle),
-      imag: -r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId1,
-      isConjugate: true,
-    },
-  ];
+  const w0 = cutoffFreq;
+  const cosW0 = Math.cos(w0);
+  const sinW0 = Math.sin(w0);
+  const alpha = sinW0 / (2 * Q);
 
-  const zeroId1 = getNextId();
-  const zeroId2 = getNextId();
-  
-  const zeros: PoleZero[] = [
-    {
-      id: zeroId1,
-      real: 1,
-      imag: 0,
-      isPole: false,
-    },
-    {
-      id: zeroId2,
-      real: 1,
-      imag: 0,
-      isPole: false,
-    },
-  ];
+  // HPF coefficients
+  const b0 = (1 + cosW0) / 2;
+  const b1 = -(1 + cosW0);
+  const b2 = (1 + cosW0) / 2;
+  const a0 = 1 + alpha;
+  const a1 = -2 * cosW0;
+  const a2 = 1 - alpha;
 
-  return { poles, zeros };
+  return calculatePolesZeros(b0, b1, b2, a0, a1, a2);
 }
 
 /**
  * Band Pass フィルタの極・零点を生成
- * 零点: z = 1 と z = -1
- * 極: 単位円内の複素共役ペア
+ * Audio EQ Cookbook: BPF (constant 0 dB peak gain)
  */
-export function generateBandPassBiquad(centerFreq: number): {
+export function generateBandPassBiquad(centerFreq: number, Q: number): {
   poles: PoleZero[];
   zeros: PoleZero[];
 } {
-  const r = 0.95;
-  const angle = centerFreq;
-  
-  const poleId1 = getNextId();
-  const poleId2 = getNextId();
-  
-  const poles: PoleZero[] = [
-    {
-      id: poleId1,
-      real: r * Math.cos(angle),
-      imag: r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId2,
-    },
-    {
-      id: poleId2,
-      real: r * Math.cos(angle),
-      imag: -r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId1,
-      isConjugate: true,
-    },
-  ];
+  const w0 = centerFreq;
+  const cosW0 = Math.cos(w0);
+  const sinW0 = Math.sin(w0);
+  const alpha = sinW0 / (2 * Q);
 
-  const zeroId1 = getNextId();
-  const zeroId2 = getNextId();
-  
-  const zeros: PoleZero[] = [
-    {
-      id: zeroId1,
-      real: 1,
-      imag: 0,
-      isPole: false,
-    },
-    {
-      id: zeroId2,
-      real: -1,
-      imag: 0,
-      isPole: false,
-    },
-  ];
+  // BPF coefficients (constant 0 dB peak gain)
+  const b0 = alpha;
+  const b1 = 0;
+  const b2 = -alpha;
+  const a0 = 1 + alpha;
+  const a1 = -2 * cosW0;
+  const a2 = 1 - alpha;
 
-  return { poles, zeros };
+  return calculatePolesZeros(b0, b1, b2, a0, a1, a2);
 }
 
 /**
  * Band Stop (Notch) フィルタの極・零点を生成
- * 零点: 単位円上の複素共役ペア
- * 極: 単位円内の複素共役ペア
+ * Audio EQ Cookbook: notch
  */
-export function generateBandStopBiquad(notchFreq: number): {
+export function generateBandStopBiquad(notchFreq: number, Q: number): {
   poles: PoleZero[];
   zeros: PoleZero[];
 } {
-  const r = 0.95;
-  const angle = notchFreq;
-  
-  const poleId1 = getNextId();
-  const poleId2 = getNextId();
-  
-  const poles: PoleZero[] = [
-    {
-      id: poleId1,
-      real: r * Math.cos(angle),
-      imag: r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId2,
-    },
-    {
-      id: poleId2,
-      real: r * Math.cos(angle),
-      imag: -r * Math.sin(angle),
-      isPole: true,
-      pairId: poleId1,
-      isConjugate: true,
-    },
-  ];
+  const w0 = notchFreq;
+  const cosW0 = Math.cos(w0);
+  const sinW0 = Math.sin(w0);
+  const alpha = sinW0 / (2 * Q);
 
-  const zeroId1 = getNextId();
-  const zeroId2 = getNextId();
-  
-  const zeros: PoleZero[] = [
-    {
-      id: zeroId1,
-      real: Math.cos(angle),
-      imag: Math.sin(angle),
-      isPole: false,
-      pairId: zeroId2,
-    },
-    {
-      id: zeroId2,
-      real: Math.cos(angle),
-      imag: -Math.sin(angle),
-      isPole: false,
-      pairId: zeroId1,
-      isConjugate: true,
-    },
-  ];
+  // Notch filter coefficients
+  const b0 = 1;
+  const b1 = -2 * cosW0;
+  const b2 = 1;
+  const a0 = 1 + alpha;
+  const a1 = -2 * cosW0;
+  const a2 = 1 - alpha;
 
-  return { poles, zeros };
+  return calculatePolesZeros(b0, b1, b2, a0, a1, a2);
 }
 

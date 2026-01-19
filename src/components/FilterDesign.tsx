@@ -22,6 +22,8 @@ interface FilterDesignProps {
   onBiquadTypeChange: (type: BiquadType) => void;
   cutoffFrequency: number;
   onCutoffFrequencyChange: (freq: number) => void;
+  qFactor: number;
+  onQFactorChange: (q: number) => void;
 }
 
 export const FilterDesign = ({
@@ -31,6 +33,8 @@ export const FilterDesign = ({
   onBiquadTypeChange,
   cutoffFrequency,
   onCutoffFrequencyChange,
+  qFactor,
+  onQFactorChange,
 }: FilterDesignProps) => {
   const { t } = useTranslation();
 
@@ -94,6 +98,20 @@ export const FilterDesign = ({
             step={0.01}
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => value.toFixed(3)}
+            sx={{ mb: 2 }}
+          />
+
+          <Typography variant="subtitle2" gutterBottom>
+            {t('filterDesign.qFactor')}: {qFactor.toFixed(2)}
+          </Typography>
+          <Slider
+            value={qFactor}
+            onChange={(_, value) => onQFactorChange(value as number)}
+            min={0.1}
+            max={10}
+            step={0.1}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(value) => value.toFixed(2)}
           />
         </Box>
       )}

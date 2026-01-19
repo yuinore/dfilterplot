@@ -55,6 +55,7 @@ function App() {
   const [filterType, setFilterType] = useState<FilterType>('none');
   const [biquadType, setBiquadType] = useState<BiquadType>('lowpass');
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
+  const [qFactor, setQFactor] = useState<number>(0.707); // Butterworth Q
 
   // フィルタ設計が変更されたら極・零点を更新
   useEffect(() => {
@@ -62,22 +63,22 @@ function App() {
       let result;
       switch (biquadType) {
         case 'lowpass':
-          result = generateLowPassBiquad(cutoffFrequency);
+          result = generateLowPassBiquad(cutoffFrequency, qFactor);
           break;
         case 'highpass':
-          result = generateHighPassBiquad(cutoffFrequency);
+          result = generateHighPassBiquad(cutoffFrequency, qFactor);
           break;
         case 'bandpass':
-          result = generateBandPassBiquad(cutoffFrequency);
+          result = generateBandPassBiquad(cutoffFrequency, qFactor);
           break;
         case 'bandstop':
-          result = generateBandStopBiquad(cutoffFrequency);
+          result = generateBandStopBiquad(cutoffFrequency, qFactor);
           break;
       }
       setPoles(result.poles);
       setZeros(result.zeros);
     }
-  }, [filterType, biquadType, cutoffFrequency]);
+  }, [filterType, biquadType, cutoffFrequency, qFactor]);
 
   // 極の移動処理（複素共役ペアを自動更新）
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
@@ -285,6 +286,8 @@ function App() {
               onBiquadTypeChange={setBiquadType}
               cutoffFrequency={cutoffFrequency}
               onCutoffFrequencyChange={setCutoffFrequency}
+              qFactor={qFactor}
+              onQFactorChange={setQFactor}
             />
           </Box>
           <Box sx={{ 

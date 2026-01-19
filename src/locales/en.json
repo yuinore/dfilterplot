@@ -49,6 +49,7 @@
     "bandPass": "Band Pass",
     "bandStop": "Band Stop",
     "cutoffFrequency": "Cutoff Frequency",
+    "qFactor": "Q Factor",
     "apply": "Apply"
   }
 }
