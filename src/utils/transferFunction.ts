@@ -262,74 +262,144 @@ export function calculateGroupDelay(
 }
 
 /**
- * 極または零点の配列から多項式係数を計算（実数係数）
- * (z - r1)(z - r2)... = z^n + c[n-1]*z^(n-1) + ... + c[1]*z + c[0]
- * 複素共役ペアは (z - (a+jb))(z - (a-jb)) = z^2 - 2a*z + (a^2+b^2) として処理
- * 返り値：係数配列 [c[0], c[1], ..., c[n-1], 1.0]（最高次の係数は1）
+ * 双二次セクション（Biquad Section）の定義
+ * H(z) = (b0 + b1*z^-1 + b2*z^-2) / (1 + a1*z^-1 + a2*z^-2)
  */
-function polynomialFromRoots(roots: PoleZero[]): number[] {
-  if (roots.length === 0) {
-    return [1.0]; // 係数なし = 1
-  }
-
-  // 初期値：1
-  let coeffs = [1.0];
-
-  // 処理済みフラグ
-  const processed = new Array(roots.length).fill(false);
-
-  for (let i = 0; i < roots.length; i++) {
-    if (processed[i]) continue;
-
-    const root = roots[i];
-    const newCoeffs: number[] = [];
-
-    // 複素共役ペアをチェック
-    if (Math.abs(root.imag) > 1e-10 && root.pairId) {
-      // 複素共役ペア：(z - (a+jb))(z - (a-jb)) = z^2 - 2a*z + (a^2+b^2)
-      const a = root.real;
-      const b = Math.abs(root.imag);
-      const secondOrderCoeffs = [a * a + b * b, -2 * a, 1.0]; // [c0, c1, c2]
-
-      // 畳み込み：既存の係数と2次多項式を掛ける
-      for (let k = 0; k < coeffs.length + 2; k++) {
-        newCoeffs[k] = 0;
-      }
-      for (let j = 0; j < coeffs.length; j++) {
-        for (let k = 0; k < 3; k++) {
-          newCoeffs[j + k] += coeffs[j] * secondOrderCoeffs[k];
-        }
-      }
-
-      // ペアの相手もマーク
-      const pairIndex = roots.findIndex((r) => r.id === root.pairId);
-      if (pairIndex !== -1) {
-        processed[pairIndex] = true;
-      }
-    } else {
-      // 実数の根：(z - r) = z - r
-      const r = root.real;
-      
-      for (let k = 0; k < coeffs.length + 1; k++) {
-        newCoeffs[k] = 0;
-      }
-      for (let j = 0; j < coeffs.length; j++) {
-        newCoeffs[j] += coeffs[j] * (-r);  // c[j] * (-r)
-        newCoeffs[j + 1] += coeffs[j];     // c[j] * z
-      }
-    }
-
-    coeffs = newCoeffs;
-    processed[i] = true;
-  }
-
-  return coeffs;
+interface BiquadSection {
+  b0: number;
+  b1: number;
+  b2: number;
+  a1: number;
+  a2: number;
 }
 
 /**
- * インパルス応答を計算（係数ベース）
- * 極・零点から伝達関数係数を計算し、差分方程式を実行
- * H(z) = B(z)/A(z) = (b[0] + b[1]*z^-1 + ...) / (1 + a[1]*z^-1 + ...)
+ * 極・零点を双二次セクションに分割
+ * 複素共役ペア → 2次セクション
+ * 実数の極/零点 → 1次セクション（a2=0, b2=0）
+ */
+function createBiquadSections(zeros: PoleZero[], poles: PoleZero[]): BiquadSection[] {
+  const sections: BiquadSection[] = [];
+  
+  // 処理済みフラグ
+  const processedZeros = new Array(zeros.length).fill(false);
+  const processedPoles = new Array(poles.length).fill(false);
+
+  // 零点と極をペアリングしてセクションを作成
+  let zeroIdx = 0;
+  let poleIdx = 0;
+
+  while (zeroIdx < zeros.length || poleIdx < poles.length) {
+    // 処理済みの零点をスキップ
+    while (zeroIdx < zeros.length && processedZeros[zeroIdx]) {
+      zeroIdx++;
+    }
+
+    // 処理済みの極をスキップ
+    while (poleIdx < poles.length && processedPoles[poleIdx]) {
+      poleIdx++;
+    }
+
+    // すべて処理済みならループを抜ける
+    if (zeroIdx >= zeros.length && poleIdx >= poles.length) {
+      break;
+    }
+
+    let b0 = 1, b1 = 0, b2 = 0;
+    let a1 = 0, a2 = 0;
+
+    // 零点の処理
+    if (zeroIdx < zeros.length) {
+      const zero = zeros[zeroIdx];
+      
+      if (Math.abs(zero.imag) > 1e-10 && zero.pairId) {
+        // 複素共役ペア
+        const r = zero.real;
+        const i = Math.abs(zero.imag);
+        b0 = 1.0;
+        b1 = -2 * r;
+        b2 = r * r + i * i;
+        
+        // ペアの相手もマーク
+        const pairIdx = zeros.findIndex((z) => z.id === zero.pairId);
+        if (pairIdx !== -1) {
+          processedZeros[pairIdx] = true;
+        }
+      } else {
+        // 実数の零点
+        b0 = 1.0;
+        b1 = -zero.real;
+        b2 = 0.0;
+      }
+      
+      processedZeros[zeroIdx] = true;
+      zeroIdx++;
+    }
+
+    // 極の処理
+    if (poleIdx < poles.length) {
+      const pole = poles[poleIdx];
+      
+      if (Math.abs(pole.imag) > 1e-10 && pole.pairId) {
+        // 複素共役ペア
+        const r = pole.real;
+        const i = Math.abs(pole.imag);
+        a1 = -2 * r;
+        a2 = r * r + i * i;
+        
+        // ペアの相手もマーク
+        const pairIdx = poles.findIndex((p) => p.id === pole.pairId);
+        if (pairIdx !== -1) {
+          processedPoles[pairIdx] = true;
+        }
+      } else {
+        // 実数の極
+        a1 = -pole.real;
+        a2 = 0.0;
+      }
+      
+      processedPoles[poleIdx] = true;
+      poleIdx++;
+    }
+
+    sections.push({ b0, b1, b2, a1, a2 });
+  }
+
+  return sections;
+}
+
+/**
+ * 双二次セクションを実行
+ * y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] - a1*y[n-1] - a2*y[n-2]
+ */
+function applyBiquadSection(
+  input: number[],
+  section: BiquadSection
+): number[] {
+  const output = new Array(input.length).fill(0);
+  
+  for (let n = 0; n < input.length; n++) {
+    let sum = section.b0 * input[n];
+    
+    if (n >= 1) {
+      sum += section.b1 * input[n - 1];
+      sum -= section.a1 * output[n - 1];
+    }
+    
+    if (n >= 2) {
+      sum += section.b2 * input[n - 2];
+      sum -= section.a2 * output[n - 2];
+    }
+    
+    output[n] = sum;
+  }
+  
+  return output;
+}
+
+/**
+ * インパルス応答を計算（双二次セクションのカスケード接続）
+ * 極・零点をbiquadセクションに分割し、直列に接続して実行
  */
 export function calculateImpulseResponse(
   zeros: PoleZero[],
@@ -337,72 +407,49 @@ export function calculateImpulseResponse(
   numPoints: number = 128
 ): { time: number[]; amplitude: number[] } {
   const time: number[] = [];
+  
+  // インパルス信号を生成
+  let signal = new Array(numPoints).fill(0);
+  signal[0] = 1.0; // δ[n]
+
+  // 双二次セクションを作成
+  const sections = createBiquadSections(zeros, poles);
+
+  // デバッグ出力
+  console.log('=== Impulse Response Debug (Biquad Cascade) ===');
+  console.log('Zeros:', zeros);
+  console.log('Poles:', poles);
+  console.log('Biquad sections:', sections);
+
+  // 各セクションをカスケード接続で実行
+  for (let i = 0; i < sections.length; i++) {
+    signal = applyBiquadSection(signal, sections[i]);
+    console.log(`After section ${i}:`, signal.slice(0, 10));
+  }
+
+  // 最大絶対値で正規化
+  const maxAbs = Math.max(...signal.map(Math.abs));
+  if (maxAbs > 1e-10) {
+    for (let i = 0; i < signal.length; i++) {
+      signal[i] /= maxAbs;
+    }
+  }
+
+  // 時間軸と振幅を返す
   const amplitude: number[] = [];
-
-  // 零点から分子多項式係数を計算（z の降べきの順）
-  const numeratorCoeffs = polynomialFromRoots(zeros);
-  
-  // 極から分母多項式係数を計算（z の降べきの順）
-  const denominatorCoeffs = polynomialFromRoots(poles);
-
-  // 係数を z^-1 の昇べきの順に変換（差分方程式用）
-  // [c[0], c[1], ..., c[n]] → [c[n], c[n-1], ..., c[0]]
-  const b = [...numeratorCoeffs].reverse();   // 分子係数
-  const a = [...denominatorCoeffs].reverse(); // 分母係数
-
-  // 分母係数を正規化（a[0] = 1 にする）
-  const a0 = a[0];
-  for (let i = 0; i < a.length; i++) {
-    a[i] /= a0;
-  }
-  for (let i = 0; i < b.length; i++) {
-    b[i] /= a0;
-  }
-
-  // DC ゲインを 0 dB に正規化
-  let gain = 1.0;
-  const bSum = b.reduce((sum, val) => sum + val, 0);
-  const aSum = a.reduce((sum, val) => sum + val, 0);
-  if (Math.abs(bSum) > 1e-10 && Math.abs(aSum) > 1e-10) {
-    const dcGain = bSum / aSum;
-    gain = 1.0 / dcGain;
-  }
-
-  // 分子係数にゲインを適用
-  for (let i = 0; i < b.length; i++) {
-    b[i] *= gain;
-  }
-
-  // 差分方程式を実行
-  // y[n] = (b[0]*x[n] + b[1]*x[n-1] + ...) - (a[1]*y[n-1] + a[2]*y[n-2] + ...)
-  // ただし a[0] = 1 と正規化されている前提
-  
-  const x = new Array(numPoints).fill(0); // 入力信号（インパルス）
-  x[0] = 1.0; // δ[n]
-  
-  const y = new Array(numPoints).fill(0); // 出力信号
-
   for (let n = 0; n < numPoints; n++) {
     time.push(n);
-    
-    // 分子部分（FIR）
-    let sum = 0;
-    for (let k = 0; k < b.length; k++) {
-      if (n - k >= 0) {
-        sum += b[k] * x[n - k];
-      }
-    }
-    
-    // 分母部分（IIR、a[0] = 1 なので k=1 から開始）
-    for (let k = 1; k < a.length; k++) {
-      if (n - k >= 0) {
-        sum -= a[k] * y[n - k];
-      }
-    }
-    
-    y[n] = sum;
-    amplitude.push(sum);
+    amplitude.push(signal[n]);
   }
+
+  // デバッグ出力
+  console.log('Impulse response (first 10):', signal.slice(0, 10));
+  if (numPoints > 20) {
+    console.log('Impulse response (last 10):', signal.slice(-10));
+  }
+  console.log('Max amplitude (before normalization):', maxAbs);
+  console.log('Max amplitude (after normalization):', Math.max(...signal.map(Math.abs)));
+  console.log('==============================\n');
 
   return { time, amplitude };
 }
@@ -425,6 +472,14 @@ export function calculateStepResponse(
     time.push(impulse.time[i]);
     cumSum += impulse.amplitude[i];
     amplitude.push(cumSum);
+  }
+
+  // 最大絶対値で正規化
+  const maxAbs = Math.max(...amplitude.map(Math.abs));
+  if (maxAbs > 1e-10) {
+    for (let i = 0; i < amplitude.length; i++) {
+      amplitude[i] /= maxAbs;
+    }
   }
 
   return { time, amplitude };
