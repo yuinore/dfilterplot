@@ -66,12 +66,12 @@ function calculatePolesZeros(
   const a2n = a2 / a0;
 
   // 零点: b0 + b1*z^-1 + b2*z^-2 = 0
-  // => b0*z^2 + b1*z + b2 = 0 (z^-2を掛けて変換)
-  const zeroRoots = solveQuadratic(b2n, b1n, b0n);
+  // z^2を掛けて: b0*z^2 + b1*z + b2 = 0
+  const zeroRoots = solveQuadratic(b0n, b1n, b2n);
 
   // 極: 1 + a1*z^-1 + a2*z^-2 = 0
-  // => a2 + a1*z + z^2 = 0
-  const poleRoots = solveQuadratic(a2n, a1n, 1);
+  // z^2を掛けて: z^2 + a1*z + a2 = 0
+  const poleRoots = solveQuadratic(1, a1n, a2n);
 
   const poles: PoleOrZero[] = [];
   const zeros: PoleOrZero[] = [];
