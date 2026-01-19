@@ -85,6 +85,16 @@
       "type": "演算タイプ",
       "differentiator": "微分",
       "integrator": "積分"
+    },
+    "comb": {
+      "name": "コムフィルタ",
+      "description": "周期的な周波数特性を持つフィルタ",
+      "type": "フィルタタイプ",
+      "feedforward": "フィードフォワード型 (FIR)",
+      "feedback": "フィードバック型 (IIR)",
+      "delay": "遅延",
+      "samples": "サンプル",
+      "gain": "ゲイン"
     }
   },
   "references": {

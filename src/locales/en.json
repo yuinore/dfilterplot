@@ -85,6 +85,16 @@
       "type": "Operation Type",
       "differentiator": "Differentiator",
       "integrator": "Integrator"
+    },
+    "comb": {
+      "name": "Comb Filter",
+      "description": "Filter with periodic frequency response",
+      "type": "Filter Type",
+      "feedforward": "Feedforward (FIR)",
+      "feedback": "Feedback (IIR)",
+      "delay": "Delay",
+      "samples": "samples",
+      "gain": "Gain"
     }
   },
   "references": {
