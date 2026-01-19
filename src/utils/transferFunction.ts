@@ -331,98 +331,72 @@ function createBiquadSectionsFromPoleOrZero(
 }
 
 /**
- * 極・零点を双二次セクションに分割（旧API、後方互換性のため残す）
- * 複素共役ペア → 2次セクション
- * 実数の極/零点 → 1次セクション（a2=0, b2=0）
+ * 極・零点を双二次セクションに分割（レガシーAPI）
+ * PoleZero[] → PoleOrZero[] に変換してから処理
  */
 function createBiquadSections(zeros: PoleZero[], poles: PoleZero[]): BiquadSection[] {
-  const sections: BiquadSection[] = [];
+  // PoleZero[] を PoleOrZero[] に変換
+  const zerosConverted: PoleOrZero[] = [];
+  const polesConverted: PoleOrZero[] = [];
   
-  // 処理済みフラグ
-  const processedZeros = new Array(zeros.length).fill(false);
-  const processedPoles = new Array(poles.length).fill(false);
-
-  // 零点と極をペアリングしてセクションを作成
-  let zeroIdx = 0;
-  let poleIdx = 0;
-
-  while (zeroIdx < zeros.length || poleIdx < poles.length) {
-    // 処理済みの零点をスキップ
-    while (zeroIdx < zeros.length && processedZeros[zeroIdx]) {
-      zeroIdx++;
-    }
-
-    // 処理済みの極をスキップ
-    while (poleIdx < poles.length && processedPoles[poleIdx]) {
-      poleIdx++;
-    }
-
-    // すべて処理済みならループを抜ける
-    if (zeroIdx >= zeros.length && poleIdx >= poles.length) {
-      break;
-    }
-
-    let b0 = 1, b1 = 0, b2 = 0;
-    let a1 = 0, a2 = 0;
-
-    // 零点の処理
-    if (zeroIdx < zeros.length) {
-      const zero = zeros[zeroIdx];
-      
-      if (Math.abs(zero.imag) > 1e-10 && zero.pairId) {
-        // 複素共役ペア
-        const r = zero.real;
-        const i = Math.abs(zero.imag);
-        b0 = 1.0;
-        b1 = -2 * r;
-        b2 = r * r + i * i;
-        
-        // ペアの相手もマーク
-        const pairIdx = zeros.findIndex((z) => z.id === zero.pairId);
-        if (pairIdx !== -1) {
-          processedZeros[pairIdx] = true;
-        }
-      } else {
-        // 実数の零点
-        b0 = 1.0;
-        b1 = -zero.real;
-        b2 = 0.0;
+  const processedZeros = new Set<string>();
+  const processedPoles = new Set<string>();
+  
+  // 零点を変換
+  for (const zero of zeros) {
+    if (processedZeros.has(zero.id)) continue;
+    
+    if (Math.abs(zero.imag) > 1e-10 && zero.pairId) {
+      // 複素共役ペア（正の虚部のみ保持）
+      if (zero.imag > 0) {
+        zerosConverted.push({
+          id: zero.id,
+          real: zero.real,
+          imag: zero.imag,
+          isPole: zero.isPole,
+        });
+        processedZeros.add(zero.id);
+        if (zero.pairId) processedZeros.add(zero.pairId);
       }
-      
-      processedZeros[zeroIdx] = true;
-      zeroIdx++;
+    } else {
+      // 実数
+      zerosConverted.push({
+        id: zero.id,
+        real: zero.real,
+        isPole: zero.isPole,
+      });
+      processedZeros.add(zero.id);
     }
-
-    // 極の処理
-    if (poleIdx < poles.length) {
-      const pole = poles[poleIdx];
-      
-      if (Math.abs(pole.imag) > 1e-10 && pole.pairId) {
-        // 複素共役ペア
-        const r = pole.real;
-        const i = Math.abs(pole.imag);
-        a1 = -2 * r;
-        a2 = r * r + i * i;
-        
-        // ペアの相手もマーク
-        const pairIdx = poles.findIndex((p) => p.id === pole.pairId);
-        if (pairIdx !== -1) {
-          processedPoles[pairIdx] = true;
-        }
-      } else {
-        // 実数の極
-        a1 = -pole.real;
-        a2 = 0.0;
-      }
-      
-      processedPoles[poleIdx] = true;
-      poleIdx++;
-    }
-
-    sections.push({ b0, b1, b2, a1, a2 });
   }
-
-  return sections;
+  
+  // 極を変換
+  for (const pole of poles) {
+    if (processedPoles.has(pole.id)) continue;
+    
+    if (Math.abs(pole.imag) > 1e-10 && pole.pairId) {
+      // 複素共役ペア（正の虚部のみ保持）
+      if (pole.imag > 0) {
+        polesConverted.push({
+          id: pole.id,
+          real: pole.real,
+          imag: pole.imag,
+          isPole: pole.isPole,
+        });
+        processedPoles.add(pole.id);
+        if (pole.pairId) processedPoles.add(pole.pairId);
+      }
+    } else {
+      // 実数
+      polesConverted.push({
+        id: pole.id,
+        real: pole.real,
+        isPole: pole.isPole,
+      });
+      processedPoles.add(pole.id);
+    }
+  }
+  
+  return createBiquadSectionsFromPoleOrZero(zerosConverted, polesConverted);
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { PoleZero } from '../types';
+import type { PoleZero, PoleOrZero, PoleZeroReal, PoleZeroPair } from '../types';
 
 /**
  * 双二次フィルタの極・零点を計算
@@ -48,7 +48,7 @@ function solveQuadratic(a: number, b: number, c: number): { real: number; imag: 
 }
 
 /**
- * biquad係数から極と零点を計算
+ * biquad係数から極と零点を計算（新型）
  */
 function calculatePolesZeros(
   b0: number,
@@ -57,7 +57,7 @@ function calculatePolesZeros(
   a0: number,
   a1: number,
   a2: number
-): { poles: PoleZero[]; zeros: PoleZero[] } {
+): { poles: PoleOrZero[]; zeros: PoleOrZero[] } {
   // 正規化
   const b0n = b0 / a0;
   const b1n = b1 / a0;
@@ -73,70 +73,46 @@ function calculatePolesZeros(
   // => a2 + a1*z + z^2 = 0
   const poleRoots = solveQuadratic(a2n, a1n, 1);
 
-  const poles: PoleZero[] = [];
-  const zeros: PoleZero[] = [];
+  const poles: PoleOrZero[] = [];
+  const zeros: PoleOrZero[] = [];
 
   // 極を追加
   if (poleRoots.length === 2 && Math.abs(poleRoots[0].imag) > 1e-6) {
-    // 複素共役ペア
-    const id1 = getNextId();
-    const id2 = getNextId();
+    // 複素共役ペア（正の虚部のみ保持）
     poles.push({
-      id: id1,
+      id: getNextId(),
       real: poleRoots[0].real,
-      imag: poleRoots[0].imag,
+      imag: Math.abs(poleRoots[0].imag),
       isPole: true,
-      pairId: id2,
-    });
-    poles.push({
-      id: id2,
-      real: poleRoots[1].real,
-      imag: poleRoots[1].imag,
-      isPole: true,
-      pairId: id1,
-      isConjugate: true,
-    });
+    } as PoleZeroPair);
   } else {
     // 実数の極
     for (const root of poleRoots) {
       poles.push({
         id: getNextId(),
         real: root.real,
-        imag: root.imag,
         isPole: true,
-      });
+      } as PoleZeroReal);
     }
   }
 
   // 零点を追加
   if (zeroRoots.length === 2 && Math.abs(zeroRoots[0].imag) > 1e-6) {
-    // 複素共役ペア
-    const id1 = getNextId();
-    const id2 = getNextId();
+    // 複素共役ペア（正の虚部のみ保持）
     zeros.push({
-      id: id1,
+      id: getNextId(),
       real: zeroRoots[0].real,
-      imag: zeroRoots[0].imag,
+      imag: Math.abs(zeroRoots[0].imag),
       isPole: false,
-      pairId: id2,
-    });
-    zeros.push({
-      id: id2,
-      real: zeroRoots[1].real,
-      imag: zeroRoots[1].imag,
-      isPole: false,
-      pairId: id1,
-      isConjugate: true,
-    });
+    } as PoleZeroPair);
   } else {
     // 実数の零点
     for (const root of zeroRoots) {
       zeros.push({
         id: getNextId(),
         real: root.real,
-        imag: root.imag,
         isPole: false,
-      });
+      } as PoleZeroReal);
     }
   }
 
@@ -148,8 +124,8 @@ function calculatePolesZeros(
  * Audio EQ Cookbook: LPF
  */
 export function generateLowPassBiquad(cutoffFreq: number, Q: number): {
-  poles: PoleZero[];
-  zeros: PoleZero[];
+  poles: PoleOrZero[];
+  zeros: PoleOrZero[];
 } {
   const w0 = cutoffFreq;
   const cosW0 = Math.cos(w0);
@@ -172,8 +148,8 @@ export function generateLowPassBiquad(cutoffFreq: number, Q: number): {
  * Audio EQ Cookbook: HPF
  */
 export function generateHighPassBiquad(cutoffFreq: number, Q: number): {
-  poles: PoleZero[];
-  zeros: PoleZero[];
+  poles: PoleOrZero[];
+  zeros: PoleOrZero[];
 } {
   const w0 = cutoffFreq;
   const cosW0 = Math.cos(w0);
@@ -196,8 +172,8 @@ export function generateHighPassBiquad(cutoffFreq: number, Q: number): {
  * Audio EQ Cookbook: BPF (constant 0 dB peak gain)
  */
 export function generateBandPassBiquad(centerFreq: number, Q: number): {
-  poles: PoleZero[];
-  zeros: PoleZero[];
+  poles: PoleOrZero[];
+  zeros: PoleOrZero[];
 } {
   const w0 = centerFreq;
   const cosW0 = Math.cos(w0);
@@ -220,8 +196,8 @@ export function generateBandPassBiquad(centerFreq: number, Q: number): {
  * Audio EQ Cookbook: notch
  */
 export function generateBandStopBiquad(notchFreq: number, Q: number): {
-  poles: PoleZero[];
-  zeros: PoleZero[];
+  poles: PoleOrZero[];
+  zeros: PoleOrZero[];
 } {
   const w0 = notchFreq;
   const cosW0 = Math.cos(w0);

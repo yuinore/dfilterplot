@@ -6,7 +6,8 @@ import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
 import { Settings } from './components/Settings';
 import { FilterDesign, type FilterType, type BiquadType } from './components/FilterDesign';
-import type { PoleZero } from './types';
+import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from './types';
+import { toPoleZeros } from './types';
 import {
   generateLowPassBiquad,
   generateHighPassBiquad,
@@ -34,17 +35,14 @@ function App() {
   };
 
   // 初期の極と零点（デモ用）
-  const [poles, setPoles] = useState<PoleZero[]>(() => {
-    const id1 = getNextId();
-    const id2 = getNextId();
+  const [poles, setPoles] = useState<PoleOrZero[]>(() => {
     return [
-      { id: id1, real: 0.5, imag: 0.5, isPole: true, pairId: id2 },
-      { id: id2, real: 0.5, imag: -0.5, isPole: true, pairId: id1, isConjugate: true },
+      { id: getNextId(), real: 0.5, imag: 0.5, isPole: true } as PoleZeroPair,
     ];
   });
 
-  const [zeros, setZeros] = useState<PoleZero[]>(() => [
-    { id: getNextId(), real: -0.3, imag: 0, isPole: false },
+  const [zeros, setZeros] = useState<PoleOrZero[]>(() => [
+    { id: getNextId(), real: -0.3, isPole: false } as PoleZeroReal,
   ]);
 
   // 設定状態
@@ -80,23 +78,16 @@ function App() {
     }
   }, [filterType, biquadType, cutoffFrequency, qFactor]);
 
-  // 極の移動処理（複素共役ペアを自動更新）
+  // 極の移動処理（新型：共役ペアは単一オブジェクトで管理）
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
     setPoles((prevPoles) => {
       return prevPoles.map((pole) => {
         if (pole.id === id) {
-          const updatedPole = { ...pole, real, imag };
-          // 複素共役ペアがあれば、ペアも更新
-          if (pole.pairId) {
-            return updatedPole;
-          }
-          return updatedPole;
-        }
-        // このポールが移動したポールのペアの場合、複素共役を更新
-        if (pole.pairId === id) {
-          const movingPole = prevPoles.find((p) => p.id === id);
-          if (movingPole) {
-            return { ...pole, real, imag: -imag };
+          // imagを常に正にする（共役ペアの表現として）
+          if ('imag' in pole) {
+            return { ...pole, real, imag: Math.abs(imag) } as PoleZeroPair;
+          } else {
+            return { ...pole, real } as PoleZeroReal;
           }
         }
         return pole;
@@ -104,23 +95,16 @@ function App() {
     });
   }, []);
 
-  // 零点の移動処理（複素共役ペアを自動更新）
+  // 零点の移動処理（新型：共役ペアは単一オブジェクトで管理）
   const handleZeroMove = useCallback((id: string, real: number, imag: number) => {
     setZeros((prevZeros) => {
       return prevZeros.map((zero) => {
         if (zero.id === id) {
-          const updatedZero = { ...zero, real, imag };
-          // 複素共役ペアがあれば、ペアも更新
-          if (zero.pairId) {
-            return updatedZero;
-          }
-          return updatedZero;
-        }
-        // このゼロが移動したゼロのペアの場合、複素共役を更新
-        if (zero.pairId === id) {
-          const movingZero = prevZeros.find((z) => z.id === id);
-          if (movingZero) {
-            return { ...zero, real, imag: -imag };
+          // imagを常に正にする（共役ペアの表現として）
+          if ('imag' in zero) {
+            return { ...zero, real, imag: Math.abs(imag) } as PoleZeroPair;
+          } else {
+            return { ...zero, real } as PoleZeroReal;
           }
         }
         return zero;
@@ -130,100 +114,54 @@ function App() {
 
   // 極ペアを追加（複素共役ペア）
   const handleAddPolePair = useCallback(() => {
-    const id1 = getNextId();
-    const id2 = getNextId();
-    const pole1: PoleZero = {
-      id: id1,
+    const polePair: PoleZeroPair = {
+      id: getNextId(),
       real: 0.7,
-      imag: 0.3,
+      imag: 0.3,  // 正の値のみ
       isPole: true,
-      pairId: id2,
     };
-    const pole2: PoleZero = {
-      id: id2,
-      real: 0.7,
-      imag: -0.3,
-      isPole: true,
-      pairId: id1,
-      isConjugate: true,
-    };
-    setPoles((prev) => [...prev, pole1, pole2]);
+    setPoles((prev) => [...prev, polePair]);
   }, []);
 
   // 極を追加（実軸上に配置）
   const handleAddPoleReal = useCallback(() => {
-    const newId = getNextId();
-    const newPole: PoleZero = {
-      id: newId,
+    const poleReal: PoleZeroReal = {
+      id: getNextId(),
       real: 0.7,
-      imag: 0,
       isPole: true,
     };
-    setPoles((prev) => [...prev, newPole]);
+    setPoles((prev) => [...prev, poleReal]);
   }, []);
 
   // 零点ペアを追加（複素共役ペア）
   const handleAddZeroPair = useCallback(() => {
-    const id1 = getNextId();
-    const id2 = getNextId();
-    const zero1: PoleZero = {
-      id: id1,
+    const zeroPair: PoleZeroPair = {
+      id: getNextId(),
       real: -0.7,
-      imag: 0.3,
+      imag: 0.3,  // 正の値のみ
       isPole: false,
-      pairId: id2,
     };
-    const zero2: PoleZero = {
-      id: id2,
-      real: -0.7,
-      imag: -0.3,
-      isPole: false,
-      pairId: id1,
-      isConjugate: true,
-    };
-    setZeros((prev) => [...prev, zero1, zero2]);
+    setZeros((prev) => [...prev, zeroPair]);
   }, []);
 
   // 零点を追加（実軸上に配置）
   const handleAddZeroReal = useCallback(() => {
-    const newId = getNextId();
-    const newZero: PoleZero = {
-      id: newId,
+    const zeroReal: PoleZeroReal = {
+      id: getNextId(),
       real: -0.7,
-      imag: 0,
       isPole: false,
     };
-    setZeros((prev) => [...prev, newZero]);
+    setZeros((prev) => [...prev, zeroReal]);
   }, []);
 
-  // 極を削除（複素共役ペアも削除）
+  // 極を削除（新型：共役ペアは単一オブジェクトなので単純に削除）
   const handleDeletePole = useCallback((id: string) => {
-    setPoles((prev) => {
-      const pole = prev.find((p) => p.id === id);
-      if (!pole) return prev;
-      
-      // 複素共役ペアがある場合、ペアも削除
-      if (pole.pairId) {
-        return prev.filter((p) => p.id !== id && p.id !== pole.pairId);
-      }
-      
-      return prev.filter((p) => p.id !== id);
-    });
+    setPoles((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
-  // 零点を削除（複素共役ペアも削除）
+  // 零点を削除（新型：共役ペアは単一オブジェクトなので単純に削除）
   const handleDeleteZero = useCallback((id: string) => {
-    setZeros((prev) => {
-      const zero = prev.find((z) => z.id === id);
-      if (!zero) return prev;
-      
-      // 複素共役ペアがある場合、ペアも削除
-      if (zero.pairId) {
-        return prev.filter((z) => z.id !== id && z.id !== zero.pairId);
-      }
-      
-      return prev.filter((z) => z.id !== id);
-    });
+    setZeros((prev) => prev.filter((z) => z.id !== id));
   }, []);
 
   // すべてクリア
@@ -256,15 +194,15 @@ function App() {
             minWidth: { xs: '100%', lg: '400px' }
           }}>
             <ComplexPlane 
-              poles={poles} 
-              zeros={zeros}
+              poles={toPoleZeros(poles)} 
+              zeros={toPoleZeros(zeros)}
               enableSnap={enableSnap}
               onPoleMove={handlePoleMove}
               onZeroMove={handleZeroMove}
             />
             <Toolbar
-              poles={poles}
-              zeros={zeros}
+              poles={toPoleZeros(poles)}
+              zeros={toPoleZeros(zeros)}
               onAddPolePair={handleAddPolePair}
               onAddPoleReal={handleAddPoleReal}
               onAddZeroPair={handleAddZeroPair}
@@ -296,8 +234,8 @@ function App() {
             minWidth: { xs: '100%', lg: '400px' }
           }}>
             <BodePlot 
-              poles={poles} 
-              zeros={zeros}
+              poles={toPoleZeros(poles)} 
+              zeros={toPoleZeros(zeros)}
               logarithmicFrequency={logarithmicFrequency}
             />
           </Box>
