@@ -39,6 +39,12 @@ yarn build
 yarn preview
 ```
 
+## About This Project
+
+This is an educational learning application and a disposable repository. The codebase does not follow DRY (Don't Repeat Yourself) principles, and code readability has not been prioritized. However, contributions are welcome.
+
+このプロジェクトは教育用の学習アプリケーションであり、使い捨てのリポジトリです。コードベースは DRY 原則に従っておらず、コードの可読性も優先されていません。ただし、コントリビューションは歓迎します。
+
 ## ライセンス
 
 MIT
