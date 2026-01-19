@@ -56,10 +56,13 @@
     "title": "Filter Design",
     "filterType": "Filter Type",
     "biquad": "Biquad Filter",
+    "calculus": "Calculus",
     "lowPass": "Low Pass",
     "highPass": "High Pass",
     "bandPass": "Band Pass",
     "bandStop": "Band Stop",
+    "differentiator": "Differentiator",
+    "integrator": "Integrator",
     "cutoffFrequency": "Cutoff Frequency",
     "qFactor": "Q Factor",
     "apply": "Apply"

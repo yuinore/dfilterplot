@@ -56,10 +56,13 @@
     "title": "フィルタ設計",
     "filterType": "フィルタの種類",
     "biquad": "双二次フィルタ",
+    "calculus": "微積分",
     "lowPass": "Low Pass",
     "highPass": "High Pass",
     "bandPass": "Band Pass",
     "bandStop": "Band Stop",
+    "differentiator": "微分",
+    "integrator": "積分",
     "cutoffFrequency": "カットオフ周波数",
     "qFactor": "Q 値",
     "apply": "適用"

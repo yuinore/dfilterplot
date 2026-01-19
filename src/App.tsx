@@ -5,7 +5,7 @@ import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
 import { Settings } from './components/Settings';
-import { FilterDesign, type FilterType, type BiquadType } from './components/FilterDesign';
+import { FilterDesign, type FilterType, type BiquadType, type CalculusType } from './components/FilterDesign';
 import { GainControl } from './components/GainControl';
 import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from './types';
 import { toPoleZeros } from './types';
@@ -14,6 +14,8 @@ import {
   generateHighPassBiquad,
   generateBandPassBiquad,
   generateBandStopBiquad,
+  generateDifferentiator,
+  generateIntegrator,
 } from './utils/biquadFilter';
 import { BODE_PLOT } from './constants';
 
@@ -56,6 +58,7 @@ function App() {
   // フィルタ設計状態
   const [filterType, setFilterType] = useState<FilterType>('none');
   const [biquadType, setBiquadType] = useState<BiquadType>('lowpass');
+  const [calculusType, setCalculusType] = useState<CalculusType>('differentiator');
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
   const [qFactor, setQFactor] = useState<number>(0.707); // Butterworth Q
 
@@ -81,8 +84,21 @@ function App() {
       setZeros(result.zeros);
       // Audio EQ Cookbookに従い、ゲイン (b0/a0) を自動設定
       setGain(result.gain);
+    } else if (filterType === 'calculus') {
+      let result;
+      switch (calculusType) {
+        case 'differentiator':
+          result = generateDifferentiator();
+          break;
+        case 'integrator':
+          result = generateIntegrator();
+          break;
+      }
+      setPoles(result.poles);
+      setZeros(result.zeros);
+      setGain(result.gain);
     }
-  }, [filterType, biquadType, cutoffFrequency, qFactor]);
+  }, [filterType, biquadType, calculusType, cutoffFrequency, qFactor]);
 
   // 極の移動処理
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
@@ -232,6 +248,8 @@ function App() {
               onFilterTypeChange={setFilterType}
               biquadType={biquadType}
               onBiquadTypeChange={setBiquadType}
+              calculusType={calculusType}
+              onCalculusTypeChange={setCalculusType}
               cutoffFrequency={cutoffFrequency}
               onCutoffFrequencyChange={setCutoffFrequency}
               qFactor={qFactor}

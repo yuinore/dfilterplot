@@ -223,3 +223,55 @@ export function generateBandStopBiquad(notchFreq: number, Q: number): {
   return calculatePolesZeros(b0, b1, b2, a0, a1, a2);
 }
 
+/**
+ * 微分フィルタを生成
+ * H(z) = 1 - z^-1
+ * 零点: z = 1, 極: なし
+ */
+export function generateDifferentiator(): {
+  poles: PoleOrZero[];
+  zeros: PoleOrZero[];
+  gain: number;
+} {
+  const poles: PoleOrZero[] = [];
+  const zeros: PoleOrZero[] = [];
+  
+  // 零点: z = 1
+  zeros.push({
+    id: getNextId(),
+    real: 1.0,
+    isPole: false,
+  } as PoleZeroReal);
+  
+  // ゲイン = 1
+  const gain = 1.0;
+  
+  return { poles, zeros, gain };
+}
+
+/**
+ * 積分フィルタを生成
+ * H(z) = 1 / (1 - z^-1) = z / (z - 1)
+ * 零点: なし, 極: z = 1
+ */
+export function generateIntegrator(): {
+  poles: PoleOrZero[];
+  zeros: PoleOrZero[];
+  gain: number;
+} {
+  const poles: PoleOrZero[] = [];
+  const zeros: PoleOrZero[] = [];
+  
+  // 極: z = 1（単位円上なので不安定）
+  poles.push({
+    id: getNextId(),
+    real: 1.0,
+    isPole: true,
+  } as PoleZeroReal);
+  
+  // ゲイン = 1
+  const gain = 1.0;
+  
+  return { poles, zeros, gain };
+}
+

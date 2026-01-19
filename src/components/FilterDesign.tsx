@@ -12,14 +12,17 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-export type FilterType = 'none' | 'biquad';
+export type FilterType = 'none' | 'biquad' | 'calculus';
 export type BiquadType = 'lowpass' | 'highpass' | 'bandpass' | 'bandstop';
+export type CalculusType = 'differentiator' | 'integrator';
 
 interface FilterDesignProps {
   filterType: FilterType;
   onFilterTypeChange: (type: FilterType) => void;
   biquadType: BiquadType;
   onBiquadTypeChange: (type: BiquadType) => void;
+  calculusType: CalculusType;
+  onCalculusTypeChange: (type: CalculusType) => void;
   cutoffFrequency: number;
   onCutoffFrequencyChange: (freq: number) => void;
   qFactor: number;
@@ -32,6 +35,8 @@ export const FilterDesign = ({
   onFilterTypeChange,
   biquadType,
   onBiquadTypeChange,
+  calculusType,
+  onCalculusTypeChange,
   cutoffFrequency,
   onCutoffFrequencyChange,
   qFactor,
@@ -77,6 +82,7 @@ export const FilterDesign = ({
         >
           <MenuItem value="none">-</MenuItem>
           <MenuItem value="biquad">{t('filterDesign.biquad')}</MenuItem>
+          <MenuItem value="calculus">{t('filterDesign.calculus')}</MenuItem>
         </Select>
       </FormControl>
 
@@ -138,6 +144,33 @@ export const FilterDesign = ({
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => value.toFixed(2)}
           />
+        </Box>
+      )}
+
+      {filterType === 'calculus' && (
+        <Box>
+          <Typography variant="subtitle2" gutterBottom>
+            {t('filterDesign.filterType')}
+          </Typography>
+          <ToggleButtonGroup
+            value={calculusType}
+            exclusive
+            onChange={(_, newType) => {
+              if (newType !== null) {
+                onCalculusTypeChange(newType);
+              }
+            }}
+            aria-label="calculus filter type"
+            fullWidth
+            sx={{ mb: 2 }}
+          >
+            <ToggleButton value="differentiator" size="small">
+              {t('filterDesign.differentiator')}
+            </ToggleButton>
+            <ToggleButton value="integrator" size="small">
+              {t('filterDesign.integrator')}
+            </ToggleButton>
+          </ToggleButtonGroup>
         </Box>
       )}
     </Paper>
