@@ -81,6 +81,7 @@ export const BodePlot = ({ poles, zeros }: BodePlotProps) => {
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: false,
     scales: {
       x: {
         type: 'logarithmic' as const,
@@ -96,6 +97,16 @@ export const BodePlot = ({ poles, zeros }: BodePlotProps) => {
       legend: {
         display: false,
       },
+      tooltip: {
+        enabled: true,
+        mode: 'nearest' as const,
+        intersect: false,
+      },
+    },
+    interaction: {
+      mode: 'nearest' as const,
+      axis: 'x' as const,
+      intersect: false,
     },
   };
 

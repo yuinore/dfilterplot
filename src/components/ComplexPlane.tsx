@@ -1,6 +1,6 @@
 import { Paper, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { PoleZero } from '../types';
 
 interface ComplexPlaneProps {
@@ -41,13 +41,13 @@ export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPl
     };
   };
 
-  const handleMouseDown = (id: string, isPole: boolean) => (e: React.MouseEvent<SVGGElement>) => {
+  const handleMouseDown = useCallback((id: string, isPole: boolean) => (e: React.MouseEvent<SVGGElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDraggingItem({ id, isPole });
-  };
+  }, []);
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!draggingItem) return;
 
     const { x: svgX, y: svgY } = getSvgCoordinates(e.clientX, e.clientY);
@@ -59,11 +59,11 @@ export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPl
     } else {
       onZeroMove?.(draggingItem.id, real, imag);
     }
-  };
+  }, [draggingItem, onPoleMove, onZeroMove]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setDraggingItem(null);
-  };
+  }, []);
 
   useEffect(() => {
     if (draggingItem) {
@@ -74,7 +74,7 @@ export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPl
         window.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [draggingItem, poles, zeros]);
+  }, [draggingItem, handleMouseMove, handleMouseUp]);
 
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
@@ -83,9 +83,16 @@ export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPl
       </Typography>
       <svg
         ref={svgRef}
-        width={width}
-        height={height}
-        style={{ border: '1px solid #ccc', background: '#fafafa' }}
+        width="100%"
+        height="auto"
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{ 
+          border: '1px solid #ccc', 
+          background: '#fafafa',
+          maxWidth: '600px',
+          maxHeight: '600px',
+        }}
       >
         {/* グリッド線 */}
         <defs>

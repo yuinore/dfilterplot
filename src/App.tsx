@@ -1,5 +1,5 @@
 import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
@@ -40,7 +40,7 @@ function App() {
   ]);
 
   // 極の移動処理（複素共役ペアを自動更新）
-  const handlePoleMove = (id: string, real: number, imag: number) => {
+  const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
     setPoles((prevPoles) => {
       return prevPoles.map((pole) => {
         if (pole.id === id) {
@@ -61,10 +61,10 @@ function App() {
         return pole;
       });
     });
-  };
+  }, []);
 
   // 零点の移動処理（複素共役ペアを自動更新）
-  const handleZeroMove = (id: string, real: number, imag: number) => {
+  const handleZeroMove = useCallback((id: string, real: number, imag: number) => {
     setZeros((prevZeros) => {
       return prevZeros.map((zero) => {
         if (zero.id === id) {
@@ -85,10 +85,10 @@ function App() {
         return zero;
       });
     });
-  };
+  }, []);
 
   // 極を追加（実軸上に配置）
-  const handleAddPole = () => {
+  const handleAddPole = useCallback(() => {
     const newId = getNextId();
     const newPole: PoleZero = {
       id: newId,
@@ -97,10 +97,10 @@ function App() {
       isPole: true,
     };
     setPoles((prev) => [...prev, newPole]);
-  };
+  }, []);
 
   // 零点を追加（実軸上に配置）
-  const handleAddZero = () => {
+  const handleAddZero = useCallback(() => {
     const newId = getNextId();
     const newZero: PoleZero = {
       id: newId,
@@ -109,10 +109,10 @@ function App() {
       isPole: false,
     };
     setZeros((prev) => [...prev, newZero]);
-  };
+  }, []);
 
   // 極を削除（複素共役ペアも削除）
-  const handleDeletePole = (id: string) => {
+  const handleDeletePole = useCallback((id: string) => {
     setPoles((prev) => {
       const pole = prev.find((p) => p.id === id);
       if (!pole) return prev;
@@ -124,10 +124,10 @@ function App() {
       
       return prev.filter((p) => p.id !== id);
     });
-  };
+  }, []);
 
   // 零点を削除（複素共役ペアも削除）
-  const handleDeleteZero = (id: string) => {
+  const handleDeleteZero = useCallback((id: string) => {
     setZeros((prev) => {
       const zero = prev.find((z) => z.id === id);
       if (!zero) return prev;
@@ -139,13 +139,13 @@ function App() {
       
       return prev.filter((z) => z.id !== id);
     });
-  };
+  }, []);
 
   // すべてクリア
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setPoles([]);
     setZeros([]);
-  };
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -156,13 +156,20 @@ function App() {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            p: { xs: 1, sm: 2, md: 3 },
             display: 'flex',
-            gap: 3,
+            flexDirection: { xs: 'column', lg: 'row' },
+            gap: { xs: 2, md: 3 },
             overflow: 'auto',
           }}
         >
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 2,
+            minWidth: { xs: '100%', lg: '400px' }
+          }}>
             <ComplexPlane 
               poles={poles} 
               zeros={zeros}
@@ -179,7 +186,11 @@ function App() {
               onClear={handleClear}
             />
           </Box>
-          <Box sx={{ flex: 1, minHeight: 0 }}>
+          <Box sx={{ 
+            flex: 1, 
+            minHeight: { xs: '600px', lg: 0 },
+            minWidth: { xs: '100%', lg: '400px' }
+          }}>
             <BodePlot poles={poles} zeros={zeros} />
           </Box>
         </Box>
