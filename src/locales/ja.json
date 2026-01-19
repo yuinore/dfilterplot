@@ -37,7 +37,8 @@
   },
   "settings": {
     "title": "設定",
-    "enableSnap": "スナップを有効にする"
+    "enableSnap": "スナップを有効にする",
+    "logarithmicFrequency": "対数スケール（周波数軸）"
   }
 }
 

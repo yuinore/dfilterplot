@@ -42,6 +42,7 @@ function App() {
 
   // 設定状態
   const [enableSnap, setEnableSnap] = useState(false);
+  const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
 
   // 極の移動処理（複素共役ペアを自動更新）
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
@@ -239,6 +240,8 @@ function App() {
             <Settings
               enableSnap={enableSnap}
               onEnableSnapChange={setEnableSnap}
+              logarithmicFrequency={logarithmicFrequency}
+              onLogarithmicFrequencyChange={setLogarithmicFrequency}
             />
           </Box>
           <Box sx={{ 
@@ -246,7 +249,11 @@ function App() {
             minHeight: { xs: '600px', lg: 0 },
             minWidth: { xs: '100%', lg: '400px' }
           }}>
-            <BodePlot poles={poles} zeros={zeros} />
+            <BodePlot 
+              poles={poles} 
+              zeros={zeros}
+              logarithmicFrequency={logarithmicFrequency}
+            />
           </Box>
         </Box>
       </Box>

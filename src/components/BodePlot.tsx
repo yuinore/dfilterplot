@@ -14,7 +14,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PoleZero } from '../types';
-import { calculateFrequencyResponseLog } from '../utils/transferFunction';
+import { calculateFrequencyResponse, calculateFrequencyResponseLog } from '../utils/transferFunction';
 
 // Chart.js の登録
 ChartJS.register(
@@ -31,15 +31,20 @@ ChartJS.register(
 interface BodePlotProps {
   poles: PoleZero[];
   zeros: PoleZero[];
+  logarithmicFrequency: boolean;
 }
 
-export const BodePlot = ({ poles, zeros }: BodePlotProps) => {
+export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) => {
   const { t } = useTranslation();
 
   // 周波数応答を計算
   const frequencyResponse = useMemo(() => {
-    return calculateFrequencyResponseLog(zeros, poles, 512);
-  }, [zeros, poles]);
+    if (logarithmicFrequency) {
+      return calculateFrequencyResponseLog(zeros, poles, 512);
+    } else {
+      return calculateFrequencyResponse(zeros, poles, 512);
+    }
+  }, [zeros, poles, logarithmicFrequency]);
 
   // 振幅特性のグラフデータ
   const magnitudeData = useMemo(() => {
@@ -78,18 +83,18 @@ export const BodePlot = ({ poles, zeros }: BodePlotProps) => {
   }, [frequencyResponse, t]);
 
   // 共通のグラフオプション
-  const commonOptions = {
+  const commonOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
     scales: {
       x: {
-        type: 'logarithmic' as const,
+        type: (logarithmicFrequency ? 'logarithmic' : 'linear') as const,
         title: {
           display: true,
           text: t('bodePlot.frequency'),
         },
-        min: 0.001,
+        min: logarithmicFrequency ? 0.001 : 0,
         max: Math.PI,
       },
     },
@@ -108,10 +113,10 @@ export const BodePlot = ({ poles, zeros }: BodePlotProps) => {
       axis: 'x' as const,
       intersect: false,
     },
-  };
+  }), [logarithmicFrequency, t]);
 
   // 振幅特性のオプション
-  const magnitudeOptions = {
+  const magnitudeOptions = useMemo(() => ({
     ...commonOptions,
     scales: {
       ...commonOptions.scales,
@@ -122,10 +127,10 @@ export const BodePlot = ({ poles, zeros }: BodePlotProps) => {
         },
       },
     },
-  };
+  }), [commonOptions, t]);
 
   // 位相特性のオプション
-  const phaseOptions = {
+  const phaseOptions = useMemo(() => ({
     ...commonOptions,
     scales: {
       ...commonOptions.scales,
@@ -138,7 +143,7 @@ export const BodePlot = ({ poles, zeros }: BodePlotProps) => {
         max: 180,
       },
     },
-  };
+  }), [commonOptions, t]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, height: '100%' }}>

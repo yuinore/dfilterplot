@@ -37,7 +37,8 @@
   },
   "settings": {
     "title": "Settings",
-    "enableSnap": "Enable Snap to Grid"
+    "enableSnap": "Enable Snap to Grid",
+    "logarithmicFrequency": "Logarithmic Scale (Frequency Axis)"
   }
 }
 
