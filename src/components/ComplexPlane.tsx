@@ -33,13 +33,22 @@ export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove 
   const fromSvgX = (svgX: number): number => (svgX - centerX) / scale;
   const fromSvgY = (svgY: number): number => (centerY - svgY) / scale;
 
-  // SVG 要素内の座標を取得
+  // SVG 要素内の座標を取得（viewBox座標系に変換）
   const getSvgCoordinates = (clientX: number, clientY: number): { x: number; y: number } => {
     if (!svgRef.current) return { x: 0, y: 0 };
     const rect = svgRef.current.getBoundingClientRect();
+    
+    // クライアント座標からSVG要素内の相対座標を取得
+    const relativeX = clientX - rect.left;
+    const relativeY = clientY - rect.top;
+    
+    // スケーリング係数を計算（viewBox座標系に変換）
+    const scaleX = width / rect.width;
+    const scaleY = height / rect.height;
+    
     return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
+      x: relativeX * scaleX,
+      y: relativeY * scaleY,
     };
   };
 
@@ -98,19 +107,22 @@ export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove 
       <Typography variant="h6" gutterBottom>
         {t('complexPlane.title')}
       </Typography>
-      <svg
-        ref={svgRef}
-        width="100%"
-        height="auto"
-        viewBox={`0 0 ${width} ${height}`}
-        preserveAspectRatio="xMidYMid meet"
-        style={{ 
-          border: '1px solid #ccc', 
-          background: '#fafafa',
+      <div
+        style={{
+          aspectRatio: '1 / 1',
           maxWidth: '600px',
-          maxHeight: '600px',
+          width: '100%',
+          border: '1px solid #ccc',
+          background: '#fafafa',
         }}
       >
+        <svg
+          ref={svgRef}
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
         {/* グリッド線 */}
         <defs>
           <pattern
@@ -232,7 +244,8 @@ export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove 
             />
           </g>
         ))}
-      </svg>
+        </svg>
+      </div>
     </Paper>
   );
 };
