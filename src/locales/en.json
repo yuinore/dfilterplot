@@ -31,9 +31,15 @@
     "title": "Bode Plot",
     "magnitude": "Magnitude",
     "phase": "Phase",
+    "groupDelay": "Group Delay",
+    "impulseResponse": "Impulse Response",
+    "stepResponse": "Step Response",
     "frequency": "Frequency (rad/s)",
     "magnitudeDB": "Magnitude (dB)",
-    "phaseDeg": "Phase (deg)"
+    "phaseDeg": "Phase (deg)",
+    "delaySamples": "Delay (samples)",
+    "time": "Time (samples)",
+    "amplitude": "Amplitude"
   },
   "settings": {
     "title": "Settings",

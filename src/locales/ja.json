@@ -31,9 +31,15 @@
     "title": "ボード線図",
     "magnitude": "振幅特性",
     "phase": "位相特性",
+    "groupDelay": "群遅延",
+    "impulseResponse": "インパルス応答",
+    "stepResponse": "ステップ応答",
     "frequency": "周波数 (rad/s)",
     "magnitudeDB": "振幅 (dB)",
-    "phaseDeg": "位相 (度)"
+    "phaseDeg": "位相 (度)",
+    "delaySamples": "遅延 (サンプル)",
+    "time": "時間 (サンプル)",
+    "amplitude": "振幅"
   },
   "settings": {
     "title": "設定",

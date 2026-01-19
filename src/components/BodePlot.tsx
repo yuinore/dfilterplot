@@ -14,7 +14,13 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PoleZero } from '../types';
-import { calculateFrequencyResponse, calculateFrequencyResponseLog } from '../utils/transferFunction';
+import {
+  calculateFrequencyResponse,
+  calculateFrequencyResponseLog,
+  calculateGroupDelay,
+  calculateImpulseResponse,
+  calculateStepResponse,
+} from '../utils/transferFunction';
 
 // Chart.js の登録
 ChartJS.register(
@@ -45,6 +51,21 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
       return calculateFrequencyResponse(zeros, poles, 512);
     }
   }, [zeros, poles, logarithmicFrequency]);
+
+  // 群遅延を計算
+  const groupDelayResponse = useMemo(() => {
+    return calculateGroupDelay(zeros, poles, 512, logarithmicFrequency);
+  }, [zeros, poles, logarithmicFrequency]);
+
+  // インパルス応答を計算
+  const impulseResponse = useMemo(() => {
+    return calculateImpulseResponse(zeros, poles, 64);
+  }, [zeros, poles]);
+
+  // ステップ応答を計算
+  const stepResponse = useMemo(() => {
+    return calculateStepResponse(zeros, poles, 64);
+  }, [zeros, poles]);
 
   // 振幅特性のグラフデータ
   const magnitudeData = useMemo(() => {
@@ -147,6 +168,152 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
     },
   }), [commonOptions, t]);
 
+  // 群遅延のグラフデータ
+  const groupDelayData = useMemo(() => {
+    return {
+      labels: groupDelayResponse.frequency,
+      datasets: [
+        {
+          label: t('bodePlot.groupDelay'),
+          data: groupDelayResponse.groupDelay,
+          borderColor: 'rgb(211, 47, 47)',
+          backgroundColor: 'rgba(211, 47, 47, 0.1)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.1,
+        },
+      ],
+    };
+  }, [groupDelayResponse, t]);
+
+  // 群遅延のオプション
+  const groupDelayOptions = useMemo(() => ({
+    ...commonOptions,
+    scales: {
+      ...commonOptions.scales,
+      y: {
+        title: {
+          display: true,
+          text: t('bodePlot.delaySamples'),
+        },
+      },
+    },
+  }), [commonOptions, t]);
+
+  // インパルス応答のグラフデータ
+  const impulseData = useMemo(() => {
+    return {
+      labels: impulseResponse.time,
+      datasets: [
+        {
+          label: t('bodePlot.impulseResponse'),
+          data: impulseResponse.amplitude,
+          borderColor: 'rgb(123, 31, 162)',
+          backgroundColor: 'rgb(123, 31, 162)',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.1,
+        },
+      ],
+    };
+  }, [impulseResponse, t]);
+
+  // インパルス応答のオプション
+  const impulseOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false as const,
+    scales: {
+      x: {
+        type: 'linear' as const,
+        title: {
+          display: true,
+          text: t('bodePlot.time'),
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: t('bodePlot.amplitude'),
+        },
+        min: -0.5,
+        max: 1.5,
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+        mode: 'nearest' as const,
+        intersect: false,
+      },
+    },
+    interaction: {
+      mode: 'nearest' as const,
+      axis: 'x' as const,
+      intersect: false,
+    },
+  }), [t]);
+
+  // ステップ応答のグラフデータ
+  const stepData = useMemo(() => {
+    return {
+      labels: stepResponse.time,
+      datasets: [
+        {
+          label: t('bodePlot.stepResponse'),
+          data: stepResponse.amplitude,
+          borderColor: 'rgb(245, 124, 0)',
+          backgroundColor: 'rgb(245, 124, 0)',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.1,
+        },
+      ],
+    };
+  }, [stepResponse, t]);
+
+  // ステップ応答のオプション
+  const stepOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false as const,
+    scales: {
+      x: {
+        type: 'linear' as const,
+        title: {
+          display: true,
+          text: t('bodePlot.time'),
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: t('bodePlot.amplitude'),
+        },
+        min: -0.5,
+        max: 1.5,
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+        mode: 'nearest' as const,
+        intersect: false,
+      },
+    },
+    interaction: {
+      mode: 'nearest' as const,
+      axis: 'x' as const,
+      intersect: false,
+    },
+  }), [t]);
+
   return (
     <Box sx={{ 
       display: 'flex', 
@@ -169,6 +336,33 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
         </Typography>
         <Box sx={{ height: 'calc(100% - 40px)' }}>
           <Line data={phaseData} options={phaseOptions} />
+        </Box>
+      </Paper>
+
+      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
+        <Typography variant="h6" gutterBottom>
+          {t('bodePlot.groupDelay')}
+        </Typography>
+        <Box sx={{ height: 'calc(100% - 40px)' }}>
+          <Line data={groupDelayData} options={groupDelayOptions} />
+        </Box>
+      </Paper>
+
+      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
+        <Typography variant="h6" gutterBottom>
+          {t('bodePlot.impulseResponse')}
+        </Typography>
+        <Box sx={{ height: 'calc(100% - 40px)' }}>
+          <Line data={impulseData} options={impulseOptions} />
+        </Box>
+      </Paper>
+
+      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
+        <Typography variant="h6" gutterBottom>
+          {t('bodePlot.stepResponse')}
+        </Typography>
+        <Box sx={{ height: 'calc(100% - 40px)' }}>
+          <Line data={stepData} options={stepOptions} />
         </Box>
       </Paper>
     </Box>

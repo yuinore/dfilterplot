@@ -173,3 +173,166 @@ export function calculateFrequencyResponseLog(
   };
 }
 
+/**
+ * 群遅延を計算
+ * Group delay = -d(phase)/dω
+ */
+export function calculateGroupDelay(
+  zeros: PoleZero[],
+  poles: PoleZero[],
+  numPoints: number = 512,
+  logarithmic: boolean = true
+): { frequency: number[]; groupDelay: number[] } {
+  const frequencies: number[] = [];
+  const groupDelays: number[] = [];
+
+  // ゲインを自動調整
+  let gain = 1.0;
+  if (zeros.length > 0 || poles.length > 0) {
+    const z0 = new Complex(1, 0);
+    const h0 = evaluateTransferFunction(z0, zeros, poles, 1.0);
+    const mag0 = h0.magnitude();
+    if (mag0 > 1e-10) {
+      gain = 1.0 / mag0;
+    }
+  }
+
+  // 周波数範囲の設定
+  const omegaMin = logarithmic ? Math.log10(1e-3) : 0;
+  const omegaMax = logarithmic ? Math.log10(Math.PI) : Math.PI;
+
+  // 位相を計算
+  const phases: number[] = [];
+  for (let i = 0; i < numPoints; i++) {
+    let omega: number;
+    if (logarithmic) {
+      const logOmega = omegaMin + ((omegaMax - omegaMin) * i) / (numPoints - 1);
+      omega = Math.pow(10, logOmega);
+    } else {
+      omega = omegaMin + ((omegaMax - omegaMin) * i) / (numPoints - 1);
+    }
+    frequencies.push(omega);
+
+    const z = Complex.fromPolar(1, omega);
+    const h = evaluateTransferFunction(z, zeros, poles, gain);
+    phases.push(h.phase());
+  }
+
+  // 位相アンラッピング: -π から π の境界でのジャンプを補正
+  const unwrappedPhases: number[] = [phases[0]];
+  let cumulativeOffset = 0;
+  
+  for (let i = 1; i < numPoints; i++) {
+    const phaseDiff = phases[i] - phases[i - 1];
+    
+    // 位相差が π より大きい場合（-π から π へのジャンプ）
+    if (phaseDiff > Math.PI) {
+      cumulativeOffset -= 2 * Math.PI;
+    }
+    // 位相差が -π より小さい場合（π から -π へのジャンプ）
+    else if (phaseDiff < -Math.PI) {
+      cumulativeOffset += 2 * Math.PI;
+    }
+    
+    unwrappedPhases.push(phases[i] + cumulativeOffset);
+  }
+
+  // 群遅延 = -d(phase)/dω を数値微分で計算（アンラップされた位相を使用）
+  for (let i = 0; i < numPoints; i++) {
+    let groupDelay: number;
+    
+    if (i === 0) {
+      // 前方差分
+      groupDelay = -(unwrappedPhases[i + 1] - unwrappedPhases[i]) / (frequencies[i + 1] - frequencies[i]);
+    } else if (i === numPoints - 1) {
+      // 後方差分
+      groupDelay = -(unwrappedPhases[i] - unwrappedPhases[i - 1]) / (frequencies[i] - frequencies[i - 1]);
+    } else {
+      // 中心差分
+      groupDelay = -(unwrappedPhases[i + 1] - unwrappedPhases[i - 1]) / (frequencies[i + 1] - frequencies[i - 1]);
+    }
+    
+    groupDelays.push(groupDelay);
+  }
+
+  return {
+    frequency: frequencies,
+    groupDelay: groupDelays,
+  };
+}
+
+/**
+ * インパルス応答を計算
+ * h[n] = Σ (residues_k * pole_k^n) for n >= 0
+ */
+export function calculateImpulseResponse(
+  zeros: PoleZero[],
+  poles: PoleZero[],
+  numPoints: number = 128
+): { time: number[]; amplitude: number[] } {
+  const time: number[] = [];
+  const amplitude: number[] = [];
+
+  // ゲインを自動調整
+  let gain = 1.0;
+  if (zeros.length > 0 || poles.length > 0) {
+    const z0 = new Complex(1, 0);
+    const h0 = evaluateTransferFunction(z0, zeros, poles, 1.0);
+    const mag0 = h0.magnitude();
+    if (mag0 > 1e-10) {
+      gain = 1.0 / mag0;
+    }
+  }
+
+  // 簡易実装: z変換の逆変換を周波数領域から時間領域へ変換
+  // h[n] を IFFT で近似計算
+  const N = 512;
+  const freqResponse: Complex[] = [];
+  
+  for (let k = 0; k < N; k++) {
+    const omega = (2 * Math.PI * k) / N;
+    const z = Complex.fromPolar(1, omega);
+    const h = evaluateTransferFunction(z, zeros, poles, gain);
+    freqResponse.push(h);
+  }
+
+  // 簡易IFFT（DFT）
+  for (let n = 0; n < numPoints; n++) {
+    time.push(n);
+    let sum = new Complex(0, 0);
+    
+    for (let k = 0; k < N; k++) {
+      const angle = (2 * Math.PI * k * n) / N;
+      const exponential = new Complex(Math.cos(angle), -Math.sin(angle));
+      sum = sum.add(freqResponse[k].multiply(exponential));
+    }
+    
+    amplitude.push(sum.real / N);
+  }
+
+  return { time, amplitude };
+}
+
+/**
+ * ステップ応答を計算
+ * s[n] = Σ h[k] for k = 0 to n
+ */
+export function calculateStepResponse(
+  zeros: PoleZero[],
+  poles: PoleZero[],
+  numPoints: number = 128
+): { time: number[]; amplitude: number[] } {
+  const impulse = calculateImpulseResponse(zeros, poles, numPoints);
+  const time: number[] = [];
+  const amplitude: number[] = [];
+
+  let cumSum = 0;
+  for (let i = 0; i < impulse.time.length; i++) {
+    time.push(impulse.time[i]);
+    cumSum += impulse.amplitude[i];
+    amplitude.push(cumSum);
+  }
+
+  return { time, amplitude };
+}
+
