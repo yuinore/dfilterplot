@@ -101,6 +101,15 @@
       "description": "過去N個のサンプルの平均を出力する最も単純なローパスFIRフィルタ。ノイズ除去や平滑化に使用されます。",
       "length": "窓長",
       "samples": "サンプル"
+    },
+    "butterworth": {
+      "name": "バターワースフィルタ",
+      "description": "通過域において最大限フラットな振幅特性を持つIIRフィルタ。モノトニックな減衰特性と線形に近い位相特性を持ちます。",
+      "type": "フィルタタイプ",
+      "lowPass": "ローパス",
+      "highPass": "ハイパス",
+      "order": "次数",
+      "cutoffFrequency": "カットオフ周波数"
     }
   },
   "references": {

@@ -101,6 +101,15 @@
       "description": "The simplest lowpass FIR filter that outputs the average of the past N samples. Used for noise reduction and smoothing.",
       "length": "Window Length",
       "samples": "samples"
+    },
+    "butterworth": {
+      "name": "Butterworth Filter",
+      "description": "IIR filter with maximally flat magnitude response in the passband. Features monotonic attenuation and nearly linear phase response.",
+      "type": "Filter Type",
+      "lowPass": "Low Pass",
+      "highPass": "High Pass",
+      "order": "Order",
+      "cutoffFrequency": "Cutoff Frequency"
     }
   },
   "references": {

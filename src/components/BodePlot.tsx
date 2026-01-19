@@ -232,8 +232,8 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
     // y軸の範囲を動的に計算
     const { min: yMin, max: yMax } = calculateTimeResponseAxisRange(
       impulseResponse.amplitude,
-      -0.5,
-      1.5
+      -0.1,
+      0.1
     );
 
     return {
@@ -298,8 +298,8 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
     // y軸の範囲を動的に計算
     const { min: yMin, max: yMax } = calculateTimeResponseAxisRange(
       stepResponse.amplitude,
-      -0.5,
-      1.5
+      -0.1,
+      0.1
     );
 
     return {
