@@ -150,11 +150,11 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
   return (
     <Box sx={{ 
       display: 'flex', 
-      flexDirection: { xs: 'column', md: 'row' }, 
+      flexDirection: 'column', 
       gap: 2, 
       height: '100%' 
     }}>
-      <Paper elevation={3} sx={{ p: 2, flex: 1, minHeight: 0 }}>
+      <Paper elevation={3} sx={{ p: 2, height: '300px' }}>
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.magnitude')}
         </Typography>
@@ -163,7 +163,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
         </Box>
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 2, flex: 1, minHeight: 0 }}>
+      <Paper elevation={3} sx={{ p: 2, height: '300px' }}>
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.phase')}
         </Typography>
