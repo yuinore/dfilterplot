@@ -10,8 +10,11 @@ interface CombFilterResult {
 }
 
 /**
- * M次の根を計算する
+ * M次の根を計算する（PoleOrZero形式で直接生成）
  * z^M = a の解を求める
+ * 
+ * z_k = |a|^(1/M) * exp(j * (θ + 2πk) / M), k = 0, 1, ..., M-1
+ * ここで θ は a の偏角
  * 
  * @param a 係数
  * @param M 次数（遅延サンプル数）
@@ -24,12 +27,14 @@ function calculateMthRoots(a: number, M: number): PoleOrZero[] {
   const magnitude = Math.pow(Math.abs(a), 1 / M);
   const baseAngle = a >= 0 ? 0 : Math.PI; // a が負の場合は π
   
+  // k = 0 から M-1 まで
+  // 上半平面（0 < angle < π）の根のみを処理し、共役ペアとして登録
   for (let k = 0; k < M; k++) {
     const angle = (baseAngle + 2 * Math.PI * k) / M;
     const real = magnitude * Math.cos(angle);
     const imag = magnitude * Math.sin(angle);
     
-    // 実軸上の根の場合
+    // 実軸上の根（imag ≈ 0）
     if (Math.abs(imag) < 1e-10) {
       roots.push({
         type: 'real',
@@ -37,49 +42,18 @@ function calculateMthRoots(a: number, M: number): PoleOrZero[] {
         real,
         isPole: false,
       } as PoleZeroReal);
-    } else {
-      // 複素共役ペアを探す
-      let foundConjugate = false;
-      for (let j = k + 1; j < M; j++) {
-        const angle2 = (baseAngle + 2 * Math.PI * j) / M;
-        const real2 = magnitude * Math.cos(angle2);
-        const imag2 = magnitude * Math.sin(angle2);
-        
-        // 共役ペアを見つけた
-        if (Math.abs(real - real2) < 1e-10 && Math.abs(imag + imag2) < 1e-10) {
-          roots.push({
-            type: 'pair',
-            id: `comb_${k}`,
-            real,
-            imag: Math.abs(imag),
-            isPole: false,
-          } as PoleZeroPair);
-          foundConjugate = true;
-          break;
-        }
-      }
-      
-      // 共役ペアが既に追加されている場合はスキップ
-      if (!foundConjugate) {
-        // 既に追加されているかチェック
-        const alreadyAdded = roots.some(
-          (r) =>
-            r.type === 'pair' &&
-            Math.abs(r.real - real) < 1e-10 &&
-            Math.abs((r as PoleZeroPair).imag - Math.abs(imag)) < 1e-10
-        );
-        
-        if (!alreadyAdded) {
-          roots.push({
-            type: 'pair',
-            id: `comb_${k}`,
-            real,
-            imag: Math.abs(imag),
-            isPole: false,
-          } as PoleZeroPair);
-        }
-      }
     }
+    // 上半平面の根のみ処理（0 < imag）
+    else if (imag > 1e-10) {
+      roots.push({
+        type: 'pair',
+        id: `comb_${k}`,
+        real,
+        imag: Math.abs(imag),
+        isPole: false,
+      } as PoleZeroPair);
+    }
+    // 下半平面の根（imag < 0）は上半平面の共役なのでスキップ
   }
   
   return roots;

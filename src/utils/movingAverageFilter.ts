@@ -28,36 +28,35 @@ export function generateMovingAverageFilter(length: number): MovingAverageFilter
   const poles: PoleOrZero[] = [];
   
   // 零点: 1のN乗根（z^N = 1）のうち、z=1 を除く
-  // z = exp(j * 2π * k / N) for k = 1, 2, ..., N-1
+  // z_k = exp(j * 2πk / N) for k = 1, 2, ..., N-1
+  // k と N-k は共役ペア: exp(j*2πk/N) と exp(j*2π(N-k)/N) = exp(-j*2πk/N)
+  // 上半平面（0 < angle < π、つまり k < N/2）のみ処理
   for (let k = 1; k < length; k++) {
     const angle = (2 * Math.PI * k) / length;
-    const real = Math.cos(angle);
-    const imag = Math.sin(angle);
     
-    // 実軸上の零点の場合（k = N/2 の場合、z = -1）
-    if (Math.abs(imag) < 1e-10) {
+    // 実軸上の零点（k = N/2 の場合、z = -1）
+    if (k * 2 === length) {
       zeros.push({
         type: 'real',
         id: `ma_zero_${k}`,
-        real,
+        real: -1,
         isPole: false,
       } as PoleZeroReal);
-    } else {
-      // 複素共役ペアを探す
-      // k と N-k は共役ペア（exp(j*θ) と exp(-j*θ) = exp(j*(2π-θ))）
-      const conjugateK = length - k;
-      
-      if (k < conjugateK) {
-        // まだペアを追加していない場合のみ追加
-        zeros.push({
-          type: 'pair',
-          id: `ma_zero_${k}`,
-          real,
-          imag: Math.abs(imag),
-          isPole: false,
-        } as PoleZeroPair);
-      }
     }
+    // 上半平面の零点のみ処理（k < N/2）
+    else if (k * 2 < length) {
+      const real = Math.cos(angle);
+      const imag = Math.sin(angle);
+      
+      zeros.push({
+        type: 'pair',
+        id: `ma_zero_${k}`,
+        real,
+        imag: Math.abs(imag),
+        isPole: false,
+      } as PoleZeroPair);
+    }
+    // k > N/2 は下半平面なのでスキップ（上半平面の共役）
   }
   
   // 極: 原点に N-1 個
