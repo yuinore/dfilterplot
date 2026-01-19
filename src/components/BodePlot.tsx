@@ -40,34 +40,35 @@ interface BodePlotProps {
   zeros: PoleOrZero[];
   logarithmicFrequency: boolean;
   octaves: number;
+  gain: number;
 }
 
-export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves }: BodePlotProps) => {
+export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: BodePlotProps) => {
   const { t } = useTranslation();
 
   // 周波数応答を計算
   const frequencyResponse = useMemo(() => {
     if (logarithmicFrequency) {
-      return calculateFrequencyResponseLog(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, octaves);
+      return calculateFrequencyResponseLog(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, octaves, gain);
     } else {
-      return calculateFrequencyResponse(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS);
+      return calculateFrequencyResponse(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, gain);
     }
-  }, [zeros, poles, logarithmicFrequency, octaves]);
+  }, [zeros, poles, logarithmicFrequency, octaves, gain]);
 
   // 群遅延を計算
   const groupDelayResponse = useMemo(() => {
-    return calculateGroupDelay(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, logarithmicFrequency, octaves);
-  }, [zeros, poles, logarithmicFrequency, octaves]);
+    return calculateGroupDelay(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, logarithmicFrequency, octaves, gain);
+  }, [zeros, poles, logarithmicFrequency, octaves, gain]);
 
   // インパルス応答を計算
   const impulseResponse = useMemo(() => {
-    return calculateImpulseResponse(zeros, poles, TIME_RESPONSE.NUM_SAMPLES);
-  }, [zeros, poles]);
+    return calculateImpulseResponse(zeros, poles, TIME_RESPONSE.NUM_SAMPLES, gain);
+  }, [zeros, poles, gain]);
 
   // ステップ応答を計算
   const stepResponse = useMemo(() => {
-    return calculateStepResponse(zeros, poles, TIME_RESPONSE.NUM_SAMPLES);
-  }, [zeros, poles]);
+    return calculateStepResponse(zeros, poles, TIME_RESPONSE.NUM_SAMPLES, gain);
+  }, [zeros, poles, gain]);
 
   // 振幅特性のグラフデータ
   const magnitudeData = useMemo(() => {

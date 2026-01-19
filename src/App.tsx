@@ -6,6 +6,7 @@ import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
 import { Settings } from './components/Settings';
 import { FilterDesign, type FilterType, type BiquadType } from './components/FilterDesign';
+import { GainControl } from './components/GainControl';
 import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from './types';
 import { toPoleZeros } from './types';
 import {
@@ -50,6 +51,7 @@ function App() {
   const [enableSnap, setEnableSnap] = useState(true);
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
+  const [gain, setGain] = useState<number>(1.0);
 
   // フィルタ設計状態
   const [filterType, setFilterType] = useState<FilterType>('none');
@@ -200,6 +202,10 @@ function App() {
               onPoleMove={handlePoleMove}
               onZeroMove={handleZeroMove}
             />
+            <GainControl
+              gain={gain}
+              onGainChange={setGain}
+            />
             <Toolbar
               poles={toPoleZeros(poles)}
               zeros={toPoleZeros(zeros)}
@@ -241,6 +247,7 @@ function App() {
               zeros={zeros}
               logarithmicFrequency={logarithmicFrequency}
               octaves={octaves}
+              gain={gain}
             />
           </Box>
         </Box>

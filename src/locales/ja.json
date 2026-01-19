@@ -48,6 +48,10 @@
     "logarithmicFrequency": "対数スケール（周波数軸）",
     "octaves": "オクターブ数"
   },
+  "gainControl": {
+    "title": "ゲイン調整",
+    "gain": "比例係数"
+  },
   "filterDesign": {
     "title": "フィルタ設計",
     "filterType": "フィルタの種類",

@@ -48,6 +48,10 @@
     "logarithmicFrequency": "Logarithmic Scale (Frequency Axis)",
     "octaves": "Octaves"
   },
+  "gainControl": {
+    "title": "Gain Control",
+    "gain": "Gain Factor"
+  },
   "filterDesign": {
     "title": "Filter Design",
     "filterType": "Filter Type",

@@ -79,7 +79,8 @@ function evaluateTransferFunction(
 export function calculateFrequencyResponse(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-  numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS
+  numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
+  userGain: number = 1.0
 ): FrequencyResponse {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -88,17 +89,8 @@ export function calculateFrequencyResponse(
   const magnitudes: number[] = [];
   const phases: number[] = [];
 
-  // ゲインを自動調整（DC ゲインを 0 dB に正規化）
-  let gain = 1.0;
-  if (zerosExpanded.length > 0 || polesExpanded.length > 0) {
-    // ω = 0 での応答を計算
-    const z0 = new Complex(1, 0); // e^(j*0) = 1
-    const h0 = evaluateTransferFunction(z0, zerosExpanded, polesExpanded, 1.0);
-    const mag0 = h0.magnitude();
-    if (mag0 > 1e-10) {
-      gain = 1.0 / mag0;
-    }
-  }
+  // ユーザー指定のゲインを使用
+  const gain = userGain;
 
   // 周波数範囲: 0 から π (正規化周波数)
   for (let i = 0; i < numPoints; i++) {
@@ -135,7 +127,8 @@ export function calculateFrequencyResponseLog(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
   numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
-  octaves: number = BODE_PLOT.DEFAULT_OCTAVES
+  octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
+  userGain: number = 1.0
 ): FrequencyResponse {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -144,16 +137,8 @@ export function calculateFrequencyResponseLog(
   const magnitudes: number[] = [];
   const phases: number[] = [];
 
-  // ゲインを自動調整
-  let gain = 1.0;
-  if (zerosExpanded.length > 0 || polesExpanded.length > 0) {
-    const z0 = new Complex(1, 0);
-    const h0 = evaluateTransferFunction(z0, zerosExpanded, polesExpanded, 1.0);
-    const mag0 = h0.magnitude();
-    if (mag0 > 1e-10) {
-      gain = 1.0 / mag0;
-    }
-  }
+  // ユーザー指定のゲインを使用
+  const gain = userGain;
 
   // 対数周波数範囲: π / 2^octaves から π（ナイキスト周波数）
   const omegaMax = Math.PI;
@@ -193,7 +178,8 @@ export function calculateGroupDelay(
   poles: PoleOrZero[],
   numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
   logarithmic: boolean = true,
-  octaves: number = BODE_PLOT.DEFAULT_OCTAVES
+  octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
+  userGain: number = 1.0
 ): { frequency: number[]; groupDelay: number[] } {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -201,16 +187,8 @@ export function calculateGroupDelay(
   const frequencies: number[] = [];
   const groupDelays: number[] = [];
 
-  // ゲインを自動調整
-  let gain = 1.0;
-  if (zerosExpanded.length > 0 || polesExpanded.length > 0) {
-    const z0 = new Complex(1, 0);
-    const h0 = evaluateTransferFunction(z0, zerosExpanded, polesExpanded, 1.0);
-    const mag0 = h0.magnitude();
-    if (mag0 > 1e-10) {
-      gain = 1.0 / mag0;
-    }
-  }
+  // ユーザー指定のゲインを使用（群遅延は振幅に依存しないが、一貫性のため）
+  const gain = userGain;
 
   // 周波数範囲の設定
   let omegaMin: number;
@@ -390,7 +368,8 @@ function applyBiquadSection(
 export function calculateImpulseResponse(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-  numPoints: number = 128
+  numPoints: number = 128,
+  userGain: number = 1.0
 ): { time: number[]; amplitude: number[] } {
   const time: number[] = [];
   
@@ -404,12 +383,9 @@ export function calculateImpulseResponse(
     signal = applyBiquadSection(signal, section);
   }
 
-  // 最大絶対値で正規化
-  const maxAbs = Math.max(...signal.map(Math.abs));
-  if (maxAbs > 1e-10) {
-    for (let i = 0; i < signal.length; i++) {
-      signal[i] /= maxAbs;
-    }
+  // ユーザー指定のゲインを適用
+  for (let i = 0; i < signal.length; i++) {
+    signal[i] *= userGain;
   }
 
   // 時間軸と振幅を返す
@@ -429,9 +405,11 @@ export function calculateImpulseResponse(
 export function calculateStepResponse(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-  numPoints: number = 128
+  numPoints: number = 128,
+  userGain: number = 1.0
 ): { time: number[]; amplitude: number[] } {
-  const impulse = calculateImpulseResponse(zeros, poles, numPoints);
+  // ユーザー指定のゲインでインパルス応答を計算
+  const impulse = calculateImpulseResponse(zeros, poles, numPoints, userGain);
   const time: number[] = [];
   const amplitude: number[] = [];
 
@@ -440,14 +418,6 @@ export function calculateStepResponse(
     time.push(impulse.time[i]);
     cumSum += impulse.amplitude[i];
     amplitude.push(cumSum);
-  }
-
-  // 最大絶対値で正規化
-  const maxAbs = Math.max(...amplitude.map(Math.abs));
-  if (maxAbs > 1e-10) {
-    for (let i = 0; i < amplitude.length; i++) {
-      amplitude[i] /= maxAbs;
-    }
   }
 
   return { time, amplitude };
