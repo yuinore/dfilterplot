@@ -3,6 +3,7 @@ import { useMemo, useState, useRef } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
+import { BodePlot } from './components/BodePlot';
 import type { PoleZero } from './types';
 
 function App() {
@@ -178,7 +179,9 @@ function App() {
               onClear={handleClear}
             />
           </Box>
-          <Box sx={{ flex: 1 }}>Bode Plot (Coming soon)</Box>
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <BodePlot poles={poles} zeros={zeros} />
+          </Box>
         </Box>
       </Box>
     </ThemeProvider>
