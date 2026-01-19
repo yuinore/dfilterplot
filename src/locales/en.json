@@ -95,6 +95,12 @@
       "delay": "Delay",
       "samples": "samples",
       "gain": "Gain"
+    },
+    "movingAverage": {
+      "name": "Moving Average Filter",
+      "description": "The simplest lowpass FIR filter that outputs the average of the past N samples. Used for noise reduction and smoothing.",
+      "length": "Window Length",
+      "samples": "samples"
     }
   },
   "references": {

@@ -95,6 +95,12 @@
       "delay": "遅延",
       "samples": "サンプル",
       "gain": "ゲイン"
+    },
+    "movingAverage": {
+      "name": "移動平均フィルタ",
+      "description": "過去N個のサンプルの平均を出力する最も単純なローパスFIRフィルタ。ノイズ除去や平滑化に使用されます。",
+      "length": "窓長",
+      "samples": "サンプル"
     }
   },
   "references": {
