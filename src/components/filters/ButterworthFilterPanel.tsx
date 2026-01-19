@@ -1,13 +1,47 @@
 import { Box, Typography, ToggleButtonGroup, ToggleButton, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
+import type { FrequencyUnit } from '../Settings';
 
 interface ButterworthFilterPanelProps {
   onChange: (params: { type: string; order: number; cutoffFrequency: number }) => void;
   logarithmicFrequency?: boolean;
+  frequencyUnit?: FrequencyUnit;
 }
 
-export const ButterworthFilterPanel = ({ onChange, logarithmicFrequency = false }: ButterworthFilterPanelProps) => {
+/**
+ * 角周波数（rad/s）を指定された単位に変換
+ */
+function convertFrequencyToDisplay(omega: number, unit: FrequencyUnit = 'radians'): number {
+  if (unit === 'radians') {
+    return omega;
+  }
+  const sampleRate = unit === '44100' ? 44100 : 48000;
+  return (omega * sampleRate) / (2 * Math.PI);
+}
+
+/**
+ * 表示単位から角周波数（rad/s）に変換
+ */
+function convertFrequencyFromDisplay(freq: number, unit: FrequencyUnit = 'radians'): number {
+  if (unit === 'radians') {
+    return freq;
+  }
+  const sampleRate = unit === '44100' ? 44100 : 48000;
+  return (freq * 2 * Math.PI) / sampleRate;
+}
+
+/**
+ * 周波数単位のラベルを取得
+ */
+function getFrequencyLabel(unit: FrequencyUnit = 'radians'): string {
+  if (unit === 'radians') {
+    return 'rad/s';
+  }
+  return 'Hz';
+}
+
+export const ButterworthFilterPanel = ({ onChange, logarithmicFrequency = false, frequencyUnit = 'radians' }: ButterworthFilterPanelProps) => {
   const { t } = useTranslation();
   const [type, setType] = useState<string>('lowpass');
   const [order, setOrder] = useState<number>(4);
@@ -18,24 +52,34 @@ export const ButterworthFilterPanel = ({ onChange, logarithmicFrequency = false 
     onChange({ type, order, cutoffFrequency });
   }, [type, order, cutoffFrequency, onChange]);
 
-  // 対数スケールの変換関数
-  const minFreq = 0.001 * Math.PI;
-  const maxFreq = Math.PI;
-  const logMin = Math.log10(minFreq);
-  const logMax = Math.log10(maxFreq);
+  // スライダーの範囲（rad/s）
+  const minFreqRad = 0.001 * Math.PI;
+  const maxFreqRad = Math.PI;
+  
+  // 表示単位に変換
+  const minFreqDisplay = convertFrequencyToDisplay(minFreqRad, frequencyUnit);
+  const maxFreqDisplay = convertFrequencyToDisplay(maxFreqRad, frequencyUnit);
+  
+  // 対数スケール用
+  const logMin = Math.log10(minFreqDisplay);
+  const logMax = Math.log10(maxFreqDisplay);
 
-  const getSliderValue = (freq: number): number => {
+  const getSliderValue = (freqRad: number): number => {
+    const freqDisplay = convertFrequencyToDisplay(freqRad, frequencyUnit);
     if (logarithmicFrequency) {
-      return Math.log10(freq);
+      return Math.log10(freqDisplay);
     }
-    return freq;
+    return freqDisplay;
   };
 
   const getFreqFromSlider = (sliderValue: number): number => {
+    let freqDisplay: number;
     if (logarithmicFrequency) {
-      return Math.pow(10, sliderValue);
+      freqDisplay = Math.pow(10, sliderValue);
+    } else {
+      freqDisplay = sliderValue;
     }
-    return sliderValue;
+    return convertFrequencyFromDisplay(freqDisplay, frequencyUnit);
   };
 
   return (
@@ -78,17 +122,17 @@ export const ButterworthFilterPanel = ({ onChange, logarithmicFrequency = false 
       />
 
       <Typography variant="subtitle2" gutterBottom>
-        {t('filters.butterworth.cutoffFrequency')}: {cutoffFrequency.toFixed(3)} (rad/s)
+        {t('filters.butterworth.cutoffFrequency')}: {convertFrequencyToDisplay(cutoffFrequency, frequencyUnit).toFixed(frequencyUnit === 'radians' ? 3 : 1)} ({getFrequencyLabel(frequencyUnit)})
       </Typography>
       <Slider
         value={getSliderValue(cutoffFrequency)}
         onChange={(_, value) => setCutoffFrequency(getFreqFromSlider(value as number))}
-        min={logarithmicFrequency ? logMin : minFreq}
-        max={logarithmicFrequency ? logMax : maxFreq}
-        step={logarithmicFrequency ? 0.01 : 0.001}
+        min={logarithmicFrequency ? logMin : minFreqDisplay}
+        max={logarithmicFrequency ? logMax : maxFreqDisplay}
+        step={logarithmicFrequency ? 0.01 : (frequencyUnit === 'radians' ? 0.001 : 10)}
         scale={logarithmicFrequency ? ((x) => Math.pow(10, x)) : undefined}
         valueLabelDisplay="auto"
-        valueLabelFormat={(value) => value.toFixed(3)}
+        valueLabelFormat={(value) => value.toFixed(frequencyUnit === 'radians' ? 3 : 0)}
       />
 
       <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>

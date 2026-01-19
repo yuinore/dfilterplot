@@ -35,7 +35,7 @@
     "groupDelay": "群遅延",
     "impulseResponse": "インパルス応答",
     "stepResponse": "ステップ応答",
-    "frequency": "周波数 (rad/s)",
+    "frequency": "周波数",
     "magnitudeDB": "振幅 (dB)",
     "phaseDeg": "位相 (度)",
     "delaySamples": "遅延 (サンプル)",
@@ -46,7 +46,9 @@
     "title": "設定",
     "enableSnap": "スナップを有効にする",
     "logarithmicFrequency": "対数スケール（周波数軸）",
-    "octaves": "オクターブ数"
+    "octaves": "オクターブ数",
+    "frequencyUnit": "周波数軸の単位とサンプリング周波数",
+    "radians": "角周波数 (rad/s)"
   },
   "gainControl": {
     "title": "ゲイン調整",

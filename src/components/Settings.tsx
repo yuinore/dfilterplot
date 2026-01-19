@@ -1,6 +1,8 @@
-import { Paper, Typography, FormControlLabel, Switch, Box, Slider } from '@mui/material';
+import { Paper, Typography, FormControlLabel, Switch, Box, Slider, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { BODE_PLOT } from '../constants';
+
+export type FrequencyUnit = 'radians' | '44100' | '48000';
 
 interface SettingsProps {
   enableSnap: boolean;
@@ -9,6 +11,8 @@ interface SettingsProps {
   onLogarithmicFrequencyChange: (enabled: boolean) => void;
   octaves: number;
   onOctavesChange: (octaves: number) => void;
+  frequencyUnit: FrequencyUnit;
+  onFrequencyUnitChange: (unit: FrequencyUnit) => void;
 }
 
 export const Settings = ({ 
@@ -17,7 +21,9 @@ export const Settings = ({
   logarithmicFrequency,
   onLogarithmicFrequencyChange,
   octaves,
-  onOctavesChange
+  onOctavesChange,
+  frequencyUnit,
+  onFrequencyUnitChange
 }: SettingsProps) => {
   const { t } = useTranslation();
 
@@ -48,6 +54,33 @@ export const Settings = ({
         label={t('settings.logarithmicFrequency')}
         sx={{ display: 'block', mb: 2 }}
       />
+      <Box sx={{ mt: 2, mb: 2 }}>
+        <Typography variant="body2" gutterBottom>
+          {t('settings.frequencyUnit')}
+        </Typography>
+        <ToggleButtonGroup
+          value={frequencyUnit}
+          exclusive
+          onChange={(_, value) => {
+            if (value !== null) {
+              onFrequencyUnitChange(value);
+            }
+          }}
+          fullWidth
+          size="small"
+          sx={{ mb: 1 }}
+        >
+          <ToggleButton value="radians">
+            {t('settings.radians')}
+          </ToggleButton>
+          <ToggleButton value="44100">
+            44.1kHz
+          </ToggleButton>
+          <ToggleButton value="48000">
+            48kHz
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
       <Box sx={{ mt: 2 }}>
         <Typography variant="body2" gutterBottom>
           {t('settings.octaves')}: {octaves}

@@ -1,5 +1,6 @@
 import type { PoleOrZero } from '../types';
 import type { ComponentType } from 'react';
+import type { FrequencyUnit } from '../components/Settings';
 
 /**
  * フィルタ生成結果
@@ -16,6 +17,7 @@ export interface FilterGenerationResult {
 export interface FilterPanelProps {
   onChange: (params: Record<string, any>) => void;
   logarithmicFrequency?: boolean;
+  frequencyUnit?: FrequencyUnit;
 }
 
 /**

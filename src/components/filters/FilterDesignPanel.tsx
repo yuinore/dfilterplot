@@ -3,15 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
 import { FilterRegistry } from '../../filters';
 import type { FilterDesignBase } from '../../filters/base';
+import type { FrequencyUnit } from '../Settings';
 
 interface FilterDesignPanelProps {
   onFilterChange: (filterId: string, params: Record<string, any>) => void;
   logarithmicFrequency: boolean;
+  frequencyUnit: FrequencyUnit;
 }
 
 export const FilterDesignPanel = ({ 
   onFilterChange, 
-  logarithmicFrequency 
+  logarithmicFrequency,
+  frequencyUnit
 }: FilterDesignPanelProps) => {
   const { t } = useTranslation();
   const [selectedFilterId, setSelectedFilterId] = useState<string>('none');
@@ -66,6 +69,7 @@ export const FilterDesignPanel = ({
           <selectedFilter.PanelComponent
             onChange={handleParamsChange}
             logarithmicFrequency={logarithmicFrequency}
+            frequencyUnit={frequencyUnit}
           />
         </Box>
       )}

@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PoleOrZero } from '../types';
+import type { FrequencyUnit } from './Settings';
 import {
   calculateFrequencyResponse,
   calculateFrequencyResponseLog,
@@ -42,9 +43,37 @@ interface BodePlotProps {
   logarithmicFrequency: boolean;
   octaves: number;
   gain: number;
+  frequencyUnit: FrequencyUnit;
 }
 
-export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: BodePlotProps) => {
+/**
+ * 角周波数（rad/s）を指定された単位に変換
+ * @param omega 角周波数（rad/s）
+ * @param unit 単位
+ * @returns 変換後の周波数
+ */
+function convertFrequency(omega: number, unit: FrequencyUnit): number {
+  if (unit === 'radians') {
+    return omega;
+  }
+  // ω = 2π * f / Fs => f = (ω * Fs) / (2π)
+  const sampleRate = unit === '44100' ? 44100 : 48000;
+  return (omega * sampleRate) / (2 * Math.PI);
+}
+
+/**
+ * 周波数単位のラベルを取得
+ * @param unit 単位
+ * @returns ラベル文字列
+ */
+function getFrequencyLabel(unit: FrequencyUnit): string {
+  if (unit === 'radians') {
+    return 'rad/s';
+  }
+  return 'Hz';
+}
+
+export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, frequencyUnit }: BodePlotProps) => {
   const { t } = useTranslation();
 
   // 周波数応答を計算
@@ -73,8 +102,9 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
 
   // 振幅特性のグラフデータ
   const magnitudeData = useMemo(() => {
+    const convertedFrequency = frequencyResponse.frequency.map(f => convertFrequency(f, frequencyUnit));
     return {
-      labels: frequencyResponse.frequency,
+      labels: convertedFrequency,
       datasets: [
         {
           label: t('bodePlot.magnitude'),
@@ -87,12 +117,13 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
         },
       ],
     };
-  }, [frequencyResponse, t]);
+  }, [frequencyResponse, t, frequencyUnit]);
 
   // 位相特性のグラフデータ
   const phaseData = useMemo(() => {
+    const convertedFrequency = frequencyResponse.frequency.map(f => convertFrequency(f, frequencyUnit));
     return {
-      labels: frequencyResponse.frequency,
+      labels: convertedFrequency,
       datasets: [
         {
           label: t('bodePlot.phase'),
@@ -105,12 +136,20 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
         },
       ],
     };
-  }, [frequencyResponse, t]);
+  }, [frequencyResponse, t, frequencyUnit]);
 
   // 共通のグラフオプション
   const commonOptions = useMemo(() => {
-    // オクターブ数に応じたx軸の最小値を計算
-    const xMin = logarithmicFrequency ? Math.PI / Math.pow(2, octaves) : 0;
+    // 角周波数の範囲を計算
+    const omegaMin = logarithmicFrequency ? Math.PI / Math.pow(2, octaves) : 0;
+    const omegaMax = Math.PI;
+    
+    // 指定された単位に変換
+    const xMin = convertFrequency(omegaMin, frequencyUnit);
+    const xMax = convertFrequency(omegaMax, frequencyUnit);
+    
+    // 軸ラベルを生成
+    const frequencyLabel = `${t('bodePlot.frequency')} (${getFrequencyLabel(frequencyUnit)})`;
     
     return {
       responsive: true,
@@ -121,10 +160,10 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
           type: logarithmicFrequency ? ('logarithmic' as const) : ('linear' as const),
           title: {
             display: true,
-            text: t('bodePlot.frequency'),
+            text: frequencyLabel,
           },
           min: xMin,
-          max: Math.PI,
+          max: xMax,
         },
       },
       plugins: {
@@ -143,7 +182,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
         intersect: false,
       },
     };
-  }, [logarithmicFrequency, octaves, t]);
+  }, [logarithmicFrequency, octaves, t, frequencyUnit]);
 
   // 振幅特性のオプション
   const magnitudeOptions = useMemo(() => ({
@@ -179,8 +218,9 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
 
   // 群遅延のグラフデータ
   const groupDelayData = useMemo(() => {
+    const convertedFrequency = groupDelayResponse.frequency.map(f => convertFrequency(f, frequencyUnit));
     return {
-      labels: groupDelayResponse.frequency,
+      labels: convertedFrequency,
       datasets: [
         {
           label: t('bodePlot.groupDelay'),
@@ -193,7 +233,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
         },
       ],
     };
-  }, [groupDelayResponse, t]);
+  }, [groupDelayResponse, t, frequencyUnit]);
 
   // 群遅延のオプション
   const groupDelayOptions = useMemo(() => ({

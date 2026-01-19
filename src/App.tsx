@@ -4,7 +4,7 @@ import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
-import { Settings } from './components/Settings';
+import { Settings, type FrequencyUnit } from './components/Settings';
 import { FilterDesignPanel } from './components/filters/FilterDesignPanel';
 import { GainControl } from './components/GainControl';
 import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from './types';
@@ -47,6 +47,7 @@ function App() {
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
   const [gain, setGain] = useState<number>(1.0);
+  const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('radians');
 
   // フィルタ設計の変更を処理
   const handleFilterChange = useCallback((filterId: string, params: Record<string, any>) => {
@@ -205,10 +206,13 @@ function App() {
               onLogarithmicFrequencyChange={setLogarithmicFrequency}
               octaves={octaves}
               onOctavesChange={setOctaves}
+              frequencyUnit={frequencyUnit}
+              onFrequencyUnitChange={setFrequencyUnit}
             />
             <FilterDesignPanel
               onFilterChange={handleFilterChange}
               logarithmicFrequency={logarithmicFrequency}
+              frequencyUnit={frequencyUnit}
             />
           </Box>
           <Box sx={{ 
@@ -222,6 +226,7 @@ function App() {
               logarithmicFrequency={logarithmicFrequency}
               octaves={octaves}
               gain={gain}
+              frequencyUnit={frequencyUnit}
             />
           </Box>
         </Box>

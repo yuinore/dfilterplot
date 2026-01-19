@@ -35,7 +35,7 @@
     "groupDelay": "Group Delay",
     "impulseResponse": "Impulse Response",
     "stepResponse": "Step Response",
-    "frequency": "Frequency (rad/s)",
+    "frequency": "Frequency",
     "magnitudeDB": "Magnitude (dB)",
     "phaseDeg": "Phase (deg)",
     "delaySamples": "Delay (samples)",
@@ -46,7 +46,9 @@
     "title": "Settings",
     "enableSnap": "Enable Snap to Grid",
     "logarithmicFrequency": "Logarithmic Scale (Frequency Axis)",
-    "octaves": "Octaves"
+    "octaves": "Octaves",
+    "frequencyUnit": "Frequency Unit & Sample Rate",
+    "radians": "Angular Frequency (rad/s)"
   },
   "gainControl": {
     "title": "Gain Control",
