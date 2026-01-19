@@ -1,11 +1,18 @@
 import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
-import { useMemo, useState, useRef, useCallback } from 'react';
+import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
 import { Settings } from './components/Settings';
+import { FilterDesign, type FilterType, type BiquadType } from './components/FilterDesign';
 import type { PoleZero } from './types';
+import {
+  generateLowPassBiquad,
+  generateHighPassBiquad,
+  generateBandPassBiquad,
+  generateBandStopBiquad,
+} from './utils/biquadFilter';
 
 function App() {
   const theme = useMemo(
@@ -43,6 +50,34 @@ function App() {
   // 設定状態
   const [enableSnap, setEnableSnap] = useState(true);
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
+
+  // フィルタ設計状態
+  const [filterType, setFilterType] = useState<FilterType>('none');
+  const [biquadType, setBiquadType] = useState<BiquadType>('lowpass');
+  const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
+
+  // フィルタ設計が変更されたら極・零点を更新
+  useEffect(() => {
+    if (filterType === 'biquad') {
+      let result;
+      switch (biquadType) {
+        case 'lowpass':
+          result = generateLowPassBiquad(cutoffFrequency);
+          break;
+        case 'highpass':
+          result = generateHighPassBiquad(cutoffFrequency);
+          break;
+        case 'bandpass':
+          result = generateBandPassBiquad(cutoffFrequency);
+          break;
+        case 'bandstop':
+          result = generateBandStopBiquad(cutoffFrequency);
+          break;
+      }
+      setPoles(result.poles);
+      setZeros(result.zeros);
+    }
+  }, [filterType, biquadType, cutoffFrequency]);
 
   // 極の移動処理（複素共役ペアを自動更新）
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
@@ -242,6 +277,14 @@ function App() {
               onEnableSnapChange={setEnableSnap}
               logarithmicFrequency={logarithmicFrequency}
               onLogarithmicFrequencyChange={setLogarithmicFrequency}
+            />
+            <FilterDesign
+              filterType={filterType}
+              onFilterTypeChange={setFilterType}
+              biquadType={biquadType}
+              onBiquadTypeChange={setBiquadType}
+              cutoffFrequency={cutoffFrequency}
+              onCutoffFrequencyChange={setCutoffFrequency}
             />
           </Box>
           <Box sx={{ 

@@ -39,6 +39,17 @@
     "title": "Settings",
     "enableSnap": "Enable Snap to Grid",
     "logarithmicFrequency": "Logarithmic Scale (Frequency Axis)"
+  },
+  "filterDesign": {
+    "title": "Filter Design",
+    "filterType": "Filter Type",
+    "biquad": "Biquad Filter",
+    "lowPass": "Low Pass",
+    "highPass": "High Pass",
+    "bandPass": "Band Pass",
+    "bandStop": "Band Stop",
+    "cutoffFrequency": "Cutoff Frequency",
+    "apply": "Apply"
   }
 }
 

@@ -154,7 +154,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
       gap: 2, 
       height: '100%' 
     }}>
-      <Paper elevation={3} sx={{ p: 2, height: '300px' }}>
+      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.magnitude')}
         </Typography>
@@ -163,7 +163,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
         </Box>
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 2, height: '300px' }}>
+      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.phase')}
         </Typography>

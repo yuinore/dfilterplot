@@ -39,6 +39,17 @@
     "title": "設定",
     "enableSnap": "スナップを有効にする",
     "logarithmicFrequency": "対数スケール（周波数軸）"
+  },
+  "filterDesign": {
+    "title": "フィルタ設計",
+    "filterType": "フィルタの種類",
+    "biquad": "双二次フィルタ",
+    "lowPass": "Low Pass",
+    "highPass": "High Pass",
+    "bandPass": "Band Pass",
+    "bandStop": "Band Stop",
+    "cutoffFrequency": "カットオフ周波数",
+    "apply": "適用"
   }
 }
 
