@@ -49,7 +49,7 @@
     "bandPass": "Band Pass",
     "bandStop": "Band Stop",
     "cutoffFrequency": "カットオフ周波数",
-    "qFactor": "Q ファクター",
+    "qFactor": "Q 値",
     "apply": "適用"
   }
 }
