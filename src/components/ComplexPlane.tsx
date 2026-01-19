@@ -1,6 +1,7 @@
-import { Box, Paper, Typography } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { PoleZero } from '../types';
+import { useEffect, useRef, useState } from 'react';
+import type { PoleZero } from '../types';
 
 interface ComplexPlaneProps {
   poles: PoleZero[];
@@ -9,17 +10,71 @@ interface ComplexPlaneProps {
   onZeroMove?: (id: string, real: number, imag: number) => void;
 }
 
-export const ComplexPlane = ({ poles, zeros }: ComplexPlaneProps) => {
+export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPlaneProps) => {
   const { t } = useTranslation();
   const width = 500;
   const height = 500;
   const centerX = width / 2;
   const centerY = height / 2;
   const scale = 200; // 1 unit = 200 pixels
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [draggingItem, setDraggingItem] = useState<{
+    id: string;
+    isPole: boolean;
+  } | null>(null);
 
   // 複素平面の座標を SVG 座標に変換
   const toSvgX = (real: number): number => centerX + real * scale;
   const toSvgY = (imag: number): number => centerY - imag * scale;
+
+  // SVG 座標を複素平面の座標に変換
+  const fromSvgX = (svgX: number): number => (svgX - centerX) / scale;
+  const fromSvgY = (svgY: number): number => (centerY - svgY) / scale;
+
+  // SVG 要素内の座標を取得
+  const getSvgCoordinates = (clientX: number, clientY: number): { x: number; y: number } => {
+    if (!svgRef.current) return { x: 0, y: 0 };
+    const rect = svgRef.current.getBoundingClientRect();
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  };
+
+  const handleMouseDown = (id: string, isPole: boolean) => (e: React.MouseEvent<SVGGElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDraggingItem({ id, isPole });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!draggingItem) return;
+
+    const { x: svgX, y: svgY } = getSvgCoordinates(e.clientX, e.clientY);
+    const real = fromSvgX(svgX);
+    const imag = fromSvgY(svgY);
+
+    if (draggingItem.isPole) {
+      onPoleMove?.(draggingItem.id, real, imag);
+    } else {
+      onZeroMove?.(draggingItem.id, real, imag);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setDraggingItem(null);
+  };
+
+  useEffect(() => {
+    if (draggingItem) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [draggingItem, poles, zeros]);
 
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
@@ -27,6 +82,7 @@ export const ComplexPlane = ({ poles, zeros }: ComplexPlaneProps) => {
         {t('complexPlane.title')}
       </Typography>
       <svg
+        ref={svgRef}
         width={width}
         height={height}
         style={{ border: '1px solid #ccc', background: '#fafafa' }}
@@ -106,7 +162,7 @@ export const ComplexPlane = ({ poles, zeros }: ComplexPlaneProps) => {
 
         {/* 零点 (○) */}
         {zeros.map((zero) => (
-          <g key={zero.id}>
+          <g key={zero.id} onMouseDown={handleMouseDown(zero.id, false)}>
             <circle
               cx={toSvgX(zero.real)}
               cy={toSvgY(zero.imag)}
@@ -121,7 +177,7 @@ export const ComplexPlane = ({ poles, zeros }: ComplexPlaneProps) => {
 
         {/* 極 (×) */}
         {poles.map((pole) => (
-          <g key={pole.id}>
+          <g key={pole.id} onMouseDown={handleMouseDown(pole.id, true)}>
             <line
               x1={toSvgX(pole.real) - 8}
               y1={toSvgY(pole.imag) - 8}
@@ -130,7 +186,7 @@ export const ComplexPlane = ({ poles, zeros }: ComplexPlaneProps) => {
               stroke="#c62828"
               strokeWidth="3"
               strokeLinecap="round"
-              style={{ cursor: 'move' }}
+              style={{ cursor: 'move', pointerEvents: 'none' }}
             />
             <line
               x1={toSvgX(pole.real) - 8}
@@ -140,6 +196,14 @@ export const ComplexPlane = ({ poles, zeros }: ComplexPlaneProps) => {
               stroke="#c62828"
               strokeWidth="3"
               strokeLinecap="round"
+              style={{ cursor: 'move', pointerEvents: 'none' }}
+            />
+            {/* 透明な円でクリック領域を拡大 */}
+            <circle
+              cx={toSvgX(pole.real)}
+              cy={toSvgY(pole.imag)}
+              r={10}
+              fill="transparent"
               style={{ cursor: 'move' }}
             />
           </g>
