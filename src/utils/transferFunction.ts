@@ -262,8 +262,74 @@ export function calculateGroupDelay(
 }
 
 /**
- * インパルス応答を計算
- * h[n] = Σ (residues_k * pole_k^n) for n >= 0
+ * 極または零点の配列から多項式係数を計算（実数係数）
+ * (z - r1)(z - r2)... = z^n + c[n-1]*z^(n-1) + ... + c[1]*z + c[0]
+ * 複素共役ペアは (z - (a+jb))(z - (a-jb)) = z^2 - 2a*z + (a^2+b^2) として処理
+ * 返り値：係数配列 [c[0], c[1], ..., c[n-1], 1.0]（最高次の係数は1）
+ */
+function polynomialFromRoots(roots: PoleZero[]): number[] {
+  if (roots.length === 0) {
+    return [1.0]; // 係数なし = 1
+  }
+
+  // 初期値：1
+  let coeffs = [1.0];
+
+  // 処理済みフラグ
+  const processed = new Array(roots.length).fill(false);
+
+  for (let i = 0; i < roots.length; i++) {
+    if (processed[i]) continue;
+
+    const root = roots[i];
+    const newCoeffs: number[] = [];
+
+    // 複素共役ペアをチェック
+    if (Math.abs(root.imag) > 1e-10 && root.pairId) {
+      // 複素共役ペア：(z - (a+jb))(z - (a-jb)) = z^2 - 2a*z + (a^2+b^2)
+      const a = root.real;
+      const b = Math.abs(root.imag);
+      const secondOrderCoeffs = [a * a + b * b, -2 * a, 1.0]; // [c0, c1, c2]
+
+      // 畳み込み：既存の係数と2次多項式を掛ける
+      for (let k = 0; k < coeffs.length + 2; k++) {
+        newCoeffs[k] = 0;
+      }
+      for (let j = 0; j < coeffs.length; j++) {
+        for (let k = 0; k < 3; k++) {
+          newCoeffs[j + k] += coeffs[j] * secondOrderCoeffs[k];
+        }
+      }
+
+      // ペアの相手もマーク
+      const pairIndex = roots.findIndex((r) => r.id === root.pairId);
+      if (pairIndex !== -1) {
+        processed[pairIndex] = true;
+      }
+    } else {
+      // 実数の根：(z - r) = z - r
+      const r = root.real;
+      
+      for (let k = 0; k < coeffs.length + 1; k++) {
+        newCoeffs[k] = 0;
+      }
+      for (let j = 0; j < coeffs.length; j++) {
+        newCoeffs[j] += coeffs[j] * (-r);  // c[j] * (-r)
+        newCoeffs[j + 1] += coeffs[j];     // c[j] * z
+      }
+    }
+
+    coeffs = newCoeffs;
+    processed[i] = true;
+  }
+
+  return coeffs;
+}
+
+/**
+ * インパルス応答を計算（係数ベース）
+ * 極・零点から伝達関数係数を計算し、差分方程式を実行
+ * H(z) = B(z)/A(z) = (b[0] + b[1]*z^-1 + ...) / (1 + a[1]*z^-1 + ...)
  */
 export function calculateImpulseResponse(
   zeros: PoleZero[],
@@ -273,41 +339,69 @@ export function calculateImpulseResponse(
   const time: number[] = [];
   const amplitude: number[] = [];
 
-  // ゲインを自動調整
-  let gain = 1.0;
-  if (zeros.length > 0 || poles.length > 0) {
-    const z0 = new Complex(1, 0);
-    const h0 = evaluateTransferFunction(z0, zeros, poles, 1.0);
-    const mag0 = h0.magnitude();
-    if (mag0 > 1e-10) {
-      gain = 1.0 / mag0;
-    }
-  }
-
-  // 簡易実装: z変換の逆変換を周波数領域から時間領域へ変換
-  // h[n] を IFFT で近似計算
-  const N = 512;
-  const freqResponse: Complex[] = [];
+  // 零点から分子多項式係数を計算（z の降べきの順）
+  const numeratorCoeffs = polynomialFromRoots(zeros);
   
-  for (let k = 0; k < N; k++) {
-    const omega = (2 * Math.PI * k) / N;
-    const z = Complex.fromPolar(1, omega);
-    const h = evaluateTransferFunction(z, zeros, poles, gain);
-    freqResponse.push(h);
+  // 極から分母多項式係数を計算（z の降べきの順）
+  const denominatorCoeffs = polynomialFromRoots(poles);
+
+  // 係数を z^-1 の昇べきの順に変換（差分方程式用）
+  // [c[0], c[1], ..., c[n]] → [c[n], c[n-1], ..., c[0]]
+  const b = [...numeratorCoeffs].reverse();   // 分子係数
+  const a = [...denominatorCoeffs].reverse(); // 分母係数
+
+  // 分母係数を正規化（a[0] = 1 にする）
+  const a0 = a[0];
+  for (let i = 0; i < a.length; i++) {
+    a[i] /= a0;
+  }
+  for (let i = 0; i < b.length; i++) {
+    b[i] /= a0;
   }
 
-  // 簡易IFFT（DFT）
+  // DC ゲインを 0 dB に正規化
+  let gain = 1.0;
+  const bSum = b.reduce((sum, val) => sum + val, 0);
+  const aSum = a.reduce((sum, val) => sum + val, 0);
+  if (Math.abs(bSum) > 1e-10 && Math.abs(aSum) > 1e-10) {
+    const dcGain = bSum / aSum;
+    gain = 1.0 / dcGain;
+  }
+
+  // 分子係数にゲインを適用
+  for (let i = 0; i < b.length; i++) {
+    b[i] *= gain;
+  }
+
+  // 差分方程式を実行
+  // y[n] = (b[0]*x[n] + b[1]*x[n-1] + ...) - (a[1]*y[n-1] + a[2]*y[n-2] + ...)
+  // ただし a[0] = 1 と正規化されている前提
+  
+  const x = new Array(numPoints).fill(0); // 入力信号（インパルス）
+  x[0] = 1.0; // δ[n]
+  
+  const y = new Array(numPoints).fill(0); // 出力信号
+
   for (let n = 0; n < numPoints; n++) {
     time.push(n);
-    let sum = new Complex(0, 0);
     
-    for (let k = 0; k < N; k++) {
-      const angle = (2 * Math.PI * k * n) / N;
-      const exponential = new Complex(Math.cos(angle), -Math.sin(angle));
-      sum = sum.add(freqResponse[k].multiply(exponential));
+    // 分子部分（FIR）
+    let sum = 0;
+    for (let k = 0; k < b.length; k++) {
+      if (n - k >= 0) {
+        sum += b[k] * x[n - k];
+      }
     }
     
-    amplitude.push(sum.real / N);
+    // 分母部分（IIR、a[0] = 1 なので k=1 から開始）
+    for (let k = 1; k < a.length; k++) {
+      if (n - k >= 0) {
+        sum -= a[k] * y[n - k];
+      }
+    }
+    
+    y[n] = sum;
+    amplitude.push(sum);
   }
 
   return { time, amplitude };
