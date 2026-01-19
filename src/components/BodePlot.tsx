@@ -39,24 +39,25 @@ interface BodePlotProps {
   poles: PoleOrZero[];
   zeros: PoleOrZero[];
   logarithmicFrequency: boolean;
+  octaves: number;
 }
 
-export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) => {
+export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves }: BodePlotProps) => {
   const { t } = useTranslation();
 
   // 周波数応答を計算
   const frequencyResponse = useMemo(() => {
     if (logarithmicFrequency) {
-      return calculateFrequencyResponseLog(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS);
+      return calculateFrequencyResponseLog(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, octaves);
     } else {
       return calculateFrequencyResponse(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS);
     }
-  }, [zeros, poles, logarithmicFrequency]);
+  }, [zeros, poles, logarithmicFrequency, octaves]);
 
   // 群遅延を計算
   const groupDelayResponse = useMemo(() => {
-    return calculateGroupDelay(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, logarithmicFrequency);
-  }, [zeros, poles, logarithmicFrequency]);
+    return calculateGroupDelay(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, logarithmicFrequency, octaves);
+  }, [zeros, poles, logarithmicFrequency, octaves]);
 
   // インパルス応答を計算
   const impulseResponse = useMemo(() => {
@@ -105,37 +106,42 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
   }, [frequencyResponse, t]);
 
   // 共通のグラフオプション
-  const commonOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false as const,
-    scales: {
-      x: {
-        type: logarithmicFrequency ? ('logarithmic' as const) : ('linear' as const),
-        title: {
-          display: true,
-          text: t('bodePlot.frequency'),
+  const commonOptions = useMemo(() => {
+    // オクターブ数に応じたx軸の最小値を計算
+    const xMin = logarithmicFrequency ? Math.PI / Math.pow(2, octaves) : 0;
+    
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false as const,
+      scales: {
+        x: {
+          type: logarithmicFrequency ? ('logarithmic' as const) : ('linear' as const),
+          title: {
+            display: true,
+            text: t('bodePlot.frequency'),
+          },
+          min: xMin,
+          max: Math.PI,
         },
-        min: logarithmicFrequency ? 0.001 : 0,
-        max: Math.PI,
       },
-    },
-    plugins: {
-      legend: {
-        display: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          enabled: true,
+          mode: 'nearest' as const,
+          intersect: false,
+        },
       },
-      tooltip: {
-        enabled: true,
+      interaction: {
         mode: 'nearest' as const,
+        axis: 'x' as const,
         intersect: false,
       },
-    },
-    interaction: {
-      mode: 'nearest' as const,
-      axis: 'x' as const,
-      intersect: false,
-    },
-  }), [logarithmicFrequency, t]);
+    };
+  }, [logarithmicFrequency, octaves, t]);
 
   // 振幅特性のオプション
   const magnitudeOptions = useMemo(() => ({

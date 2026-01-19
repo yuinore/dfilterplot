@@ -24,6 +24,7 @@ interface FilterDesignProps {
   onCutoffFrequencyChange: (freq: number) => void;
   qFactor: number;
   onQFactorChange: (q: number) => void;
+  logarithmicFrequency: boolean;
 }
 
 export const FilterDesign = ({
@@ -35,8 +36,31 @@ export const FilterDesign = ({
   onCutoffFrequencyChange,
   qFactor,
   onQFactorChange,
+  logarithmicFrequency,
 }: FilterDesignProps) => {
   const { t } = useTranslation();
+
+  // 対数スケールのための変換関数
+  // 最小値は10オクターブの範囲（π/1024 ≈ 0.00307）に合わせる
+  const minFreq = 0.001 * Math.PI;
+  const maxFreq = Math.PI;
+  const logMin = Math.log10(minFreq);
+  const logMax = Math.log10(maxFreq);
+
+  // 対数スケールの場合の値変換
+  const getSliderValue = (freq: number) => {
+    if (logarithmicFrequency) {
+      return Math.log10(freq);
+    }
+    return freq;
+  };
+
+  const getFreqFromSlider = (sliderValue: number) => {
+    if (logarithmicFrequency) {
+      return Math.pow(10, sliderValue);
+    }
+    return sliderValue;
+  };
 
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
@@ -91,11 +115,12 @@ export const FilterDesign = ({
             {t('filterDesign.cutoffFrequency')}: {cutoffFrequency.toFixed(3)} (rad/s)
           </Typography>
           <Slider
-            value={cutoffFrequency}
-            onChange={(_, value) => onCutoffFrequencyChange(value as number)}
-            min={0.01}
-            max={Math.PI}
-            step={0.01}
+            value={getSliderValue(cutoffFrequency)}
+            onChange={(_, value) => onCutoffFrequencyChange(getFreqFromSlider(value as number))}
+            min={logarithmicFrequency ? logMin : minFreq}
+            max={logarithmicFrequency ? logMax : maxFreq}
+            step={logarithmicFrequency ? 0.01 : 0.001}
+            scale={logarithmicFrequency ? ((x) => Math.pow(10, x)) : undefined}
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => value.toFixed(3)}
             sx={{ mb: 2 }}

@@ -7,7 +7,7 @@
  */
 export const FREQUENCY_RESPONSE = {
   /** 周波数応答の計算ポイント数 */
-  NUM_POINTS: 512,
+  NUM_POINTS: 2048,
 } as const;
 
 /**
@@ -15,9 +15,13 @@ export const FREQUENCY_RESPONSE = {
  */
 export const BODE_PLOT = {
   /** 振幅特性の最小値 (dB) */
-  MAGNITUDE_MIN_DB: -100,
+  MAGNITUDE_MIN_DB: -40,
   /** 振幅特性の最大値 (dB) */
   MAGNITUDE_MAX_DB: 40,
+  /** オクターブ数の選択肢 */
+  OCTAVE_OPTIONS: [2, 4, 6, 8, 10] as const,
+  /** デフォルトのオクターブ数（音声信号処理で一般的な範囲） */
+  DEFAULT_OCTAVES: 10,
 } as const;
 
 /**

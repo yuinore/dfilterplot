@@ -45,7 +45,8 @@
   "settings": {
     "title": "設定",
     "enableSnap": "スナップを有効にする",
-    "logarithmicFrequency": "対数スケール（周波数軸）"
+    "logarithmicFrequency": "対数スケール（周波数軸）",
+    "octaves": "オクターブ数"
   },
   "filterDesign": {
     "title": "フィルタ設計",

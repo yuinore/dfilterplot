@@ -1,18 +1,23 @@
-import { Paper, Typography, FormControlLabel, Switch } from '@mui/material';
+import { Paper, Typography, FormControlLabel, Switch, Box, Slider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { BODE_PLOT } from '../constants';
 
 interface SettingsProps {
   enableSnap: boolean;
   onEnableSnapChange: (enabled: boolean) => void;
   logarithmicFrequency: boolean;
   onLogarithmicFrequencyChange: (enabled: boolean) => void;
+  octaves: number;
+  onOctavesChange: (octaves: number) => void;
 }
 
 export const Settings = ({ 
   enableSnap, 
   onEnableSnapChange,
   logarithmicFrequency,
-  onLogarithmicFrequencyChange 
+  onLogarithmicFrequencyChange,
+  octaves,
+  onOctavesChange
 }: SettingsProps) => {
   const { t } = useTranslation();
 
@@ -41,8 +46,23 @@ export const Settings = ({
           />
         }
         label={t('settings.logarithmicFrequency')}
-        sx={{ display: 'block' }}
+        sx={{ display: 'block', mb: 2 }}
       />
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="body2" gutterBottom>
+          {t('settings.octaves')}: {octaves}
+        </Typography>
+        <Slider
+          value={octaves}
+          onChange={(_, value) => onOctavesChange(value as number)}
+          min={Math.min(...BODE_PLOT.OCTAVE_OPTIONS)}
+          max={Math.max(...BODE_PLOT.OCTAVE_OPTIONS)}
+          step={null}
+          marks={BODE_PLOT.OCTAVE_OPTIONS.map(v => ({ value: v, label: v.toString() }))}
+          valueLabelDisplay="auto"
+          disabled={!logarithmicFrequency}
+        />
+      </Box>
     </Paper>
   );
 };

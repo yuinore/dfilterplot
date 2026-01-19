@@ -1,6 +1,6 @@
 import type { PoleZero, FrequencyResponse, PoleOrZero } from '../types';
 import { isPoleZeroPair, toPoleZeros } from '../types';
-import { FREQUENCY_RESPONSE } from '../constants';
+import { FREQUENCY_RESPONSE, BODE_PLOT } from '../constants';
 
 /**
  * 複素数クラス
@@ -134,7 +134,8 @@ export function calculateFrequencyResponse(
 export function calculateFrequencyResponseLog(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-  numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS
+  numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
+  octaves: number = BODE_PLOT.DEFAULT_OCTAVES
 ): FrequencyResponse {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -154,12 +155,14 @@ export function calculateFrequencyResponseLog(
     }
   }
 
-  // 対数周波数範囲: 10^-3 から π
-  const omegaMin = Math.log10(1e-3);
-  const omegaMax = Math.log10(Math.PI);
+  // 対数周波数範囲: π / 2^octaves から π（ナイキスト周波数）
+  const omegaMax = Math.PI;
+  const omegaMin = Math.PI / Math.pow(2, octaves);
+  const logOmegaMin = Math.log10(omegaMin);
+  const logOmegaMax = Math.log10(omegaMax);
 
   for (let i = 0; i < numPoints; i++) {
-    const logOmega = omegaMin + ((omegaMax - omegaMin) * i) / (numPoints - 1);
+    const logOmega = logOmegaMin + ((logOmegaMax - logOmegaMin) * i) / (numPoints - 1);
     const omega = Math.pow(10, logOmega);
     frequencies.push(omega);
 
@@ -189,7 +192,8 @@ export function calculateGroupDelay(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
   numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
-  logarithmic: boolean = true
+  logarithmic: boolean = true,
+  octaves: number = BODE_PLOT.DEFAULT_OCTAVES
 ): { frequency: number[]; groupDelay: number[] } {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -209,8 +213,17 @@ export function calculateGroupDelay(
   }
 
   // 周波数範囲の設定
-  const omegaMin = logarithmic ? Math.log10(1e-3) : 0;
-  const omegaMax = logarithmic ? Math.log10(Math.PI) : Math.PI;
+  let omegaMin: number;
+  let omegaMax: number;
+  if (logarithmic) {
+    const maxFreq = Math.PI;
+    const minFreq = Math.PI / Math.pow(2, octaves);
+    omegaMin = Math.log10(minFreq);
+    omegaMax = Math.log10(maxFreq);
+  } else {
+    omegaMin = 0;
+    omegaMax = Math.PI;
+  }
 
   // 位相を計算
   const phases: number[] = [];

@@ -14,6 +14,7 @@ import {
   generateBandPassBiquad,
   generateBandStopBiquad,
 } from './utils/biquadFilter';
+import { BODE_PLOT } from './constants';
 
 function App() {
   const theme = useMemo(
@@ -48,6 +49,7 @@ function App() {
   // 設定状態
   const [enableSnap, setEnableSnap] = useState(true);
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
+  const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
 
   // フィルタ設計状態
   const [filterType, setFilterType] = useState<FilterType>('none');
@@ -214,6 +216,8 @@ function App() {
               onEnableSnapChange={setEnableSnap}
               logarithmicFrequency={logarithmicFrequency}
               onLogarithmicFrequencyChange={setLogarithmicFrequency}
+              octaves={octaves}
+              onOctavesChange={setOctaves}
             />
             <FilterDesign
               filterType={filterType}
@@ -224,6 +228,7 @@ function App() {
               onCutoffFrequencyChange={setCutoffFrequency}
               qFactor={qFactor}
               onQFactorChange={setQFactor}
+              logarithmicFrequency={logarithmicFrequency}
             />
           </Box>
           <Box sx={{ 
@@ -235,6 +240,7 @@ function App() {
               poles={poles} 
               zeros={zeros}
               logarithmicFrequency={logarithmicFrequency}
+              octaves={octaves}
             />
           </Box>
         </Box>
