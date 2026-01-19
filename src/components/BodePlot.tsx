@@ -22,6 +22,7 @@ import {
   calculateStepResponse,
 } from '../utils/transferFunction';
 import { FREQUENCY_RESPONSE, BODE_PLOT, TIME_RESPONSE } from '../constants';
+import { calculateTimeResponseAxisRange } from '../utils/chartUtils';
 
 // Chart.js の登録
 ChartJS.register(
@@ -228,11 +229,12 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
 
   // インパルス応答のオプション
   const impulseOptions = useMemo(() => {
-    // y軸の範囲を動的に計算（余白付き）
-    const dataMin = Math.min(...impulseResponse.amplitude);
-    const dataMax = Math.max(...impulseResponse.amplitude);
-    const yMin = Math.min(dataMin, -0.4) - 0.1;
-    const yMax = Math.max(dataMax, 1.4) + 0.1;
+    // y軸の範囲を動的に計算
+    const { min: yMin, max: yMax } = calculateTimeResponseAxisRange(
+      impulseResponse.amplitude,
+      -0.5,
+      1.5
+    );
 
     return {
       responsive: true,
@@ -293,11 +295,12 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain }: 
 
   // ステップ応答のオプション
   const stepOptions = useMemo(() => {
-    // y軸の範囲を動的に計算（余白付き）
-    const dataMin = Math.min(...stepResponse.amplitude);
-    const dataMax = Math.max(...stepResponse.amplitude);
-    const yMin = Math.min(dataMin, -0.4) - 0.1;
-    const yMax = Math.max(dataMax, 1.4) + 0.1;
+    // y軸の範囲を動的に計算
+    const { min: yMin, max: yMax } = calculateTimeResponseAxisRange(
+      stepResponse.amplitude,
+      -0.5,
+      1.5
+    );
 
     return {
       responsive: true,
