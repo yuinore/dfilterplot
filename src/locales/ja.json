@@ -34,6 +34,10 @@
     "frequency": "周波数 (rad/s)",
     "magnitudeDB": "振幅 (dB)",
     "phaseDeg": "位相 (度)"
+  },
+  "settings": {
+    "title": "設定",
+    "enableSnap": "スナップを有効にする"
   }
 }
 

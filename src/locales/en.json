@@ -34,6 +34,10 @@
     "frequency": "Frequency (rad/s)",
     "magnitudeDB": "Magnitude (dB)",
     "phaseDeg": "Phase (deg)"
+  },
+  "settings": {
+    "title": "Settings",
+    "enableSnap": "Enable Snap to Grid"
   }
 }
 

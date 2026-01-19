@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
+import { Settings } from './components/Settings';
 import type { PoleZero } from './types';
 
 function App() {
@@ -38,6 +39,9 @@ function App() {
   const [zeros, setZeros] = useState<PoleZero[]>(() => [
     { id: getNextId(), real: -0.3, imag: 0, isPole: false },
   ]);
+
+  // 設定状態
+  const [enableSnap, setEnableSnap] = useState(false);
 
   // 極の移動処理（複素共役ペアを自動更新）
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
@@ -230,6 +234,10 @@ function App() {
               onDeletePole={handleDeletePole}
               onDeleteZero={handleDeleteZero}
               onClear={handleClear}
+            />
+            <Settings
+              enableSnap={enableSnap}
+              onEnableSnapChange={setEnableSnap}
             />
           </Box>
           <Box sx={{ 
