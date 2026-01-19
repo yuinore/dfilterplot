@@ -41,7 +41,7 @@ function App() {
   ]);
 
   // 設定状態
-  const [enableSnap, setEnableSnap] = useState(false);
+  const [enableSnap, setEnableSnap] = useState(true);
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
 
   // 極の移動処理（複素共役ペアを自動更新）
