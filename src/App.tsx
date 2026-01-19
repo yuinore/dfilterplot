@@ -222,8 +222,8 @@ function App() {
             minWidth: { xs: '100%', lg: '400px' }
           }}>
             <BodePlot 
-              poles={toPoleZeros(poles)} 
-              zeros={toPoleZeros(zeros)}
+              poles={poles} 
+              zeros={zeros}
               logarithmicFrequency={logarithmicFrequency}
             />
           </Box>

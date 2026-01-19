@@ -13,7 +13,7 @@ import {
   LogarithmicScale,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import type { PoleZero } from '../types';
+import type { PoleOrZero } from '../types';
 import {
   calculateFrequencyResponse,
   calculateFrequencyResponseLog,
@@ -35,8 +35,8 @@ ChartJS.register(
 );
 
 interface BodePlotProps {
-  poles: PoleZero[];
-  zeros: PoleZero[];
+  poles: PoleOrZero[];
+  zeros: PoleOrZero[];
   logarithmicFrequency: boolean;
 }
 

@@ -1,5 +1,5 @@
 import type { PoleZero, FrequencyResponse, PoleOrZero } from '../types';
-import { isPoleZeroPair } from '../types';
+import { isPoleZeroPair, toPoleZeros } from '../types';
 
 /**
  * 複素数クラス
@@ -76,20 +76,23 @@ function evaluateTransferFunction(
  * z = e^(jω) として H(e^(jω)) を評価
  */
 export function calculateFrequencyResponse(
-  zeros: PoleZero[],
-  poles: PoleZero[],
+  zeros: PoleOrZero[],
+  poles: PoleOrZero[],
   numPoints: number = 512
 ): FrequencyResponse {
+  // PoleOrZero[] を展開して計算用のPoleZero[]に変換
+  const zerosExpanded = toPoleZeros(zeros);
+  const polesExpanded = toPoleZeros(poles);
   const frequencies: number[] = [];
   const magnitudes: number[] = [];
   const phases: number[] = [];
 
   // ゲインを自動調整（DC ゲインを 0 dB に正規化）
   let gain = 1.0;
-  if (zeros.length > 0 || poles.length > 0) {
+  if (zerosExpanded.length > 0 || polesExpanded.length > 0) {
     // ω = 0 での応答を計算
     const z0 = new Complex(1, 0); // e^(j*0) = 1
-    const h0 = evaluateTransferFunction(z0, zeros, poles, 1.0);
+    const h0 = evaluateTransferFunction(z0, zerosExpanded, polesExpanded, 1.0);
     const mag0 = h0.magnitude();
     if (mag0 > 1e-10) {
       gain = 1.0 / mag0;
@@ -105,7 +108,7 @@ export function calculateFrequencyResponse(
     const z = Complex.fromPolar(1, omega);
 
     // H(e^(jω)) を計算
-    const h = evaluateTransferFunction(z, zeros, poles, gain);
+    const h = evaluateTransferFunction(z, zerosExpanded, polesExpanded, gain);
 
     // 振幅 (dB)
     const magnitude = h.magnitude();
@@ -128,19 +131,22 @@ export function calculateFrequencyResponse(
  * 対数周波数スケールで周波数応答を計算
  */
 export function calculateFrequencyResponseLog(
-  zeros: PoleZero[],
-  poles: PoleZero[],
+  zeros: PoleOrZero[],
+  poles: PoleOrZero[],
   numPoints: number = 512
 ): FrequencyResponse {
+  // PoleOrZero[] を展開して計算用のPoleZero[]に変換
+  const zerosExpanded = toPoleZeros(zeros);
+  const polesExpanded = toPoleZeros(poles);
   const frequencies: number[] = [];
   const magnitudes: number[] = [];
   const phases: number[] = [];
 
   // ゲインを自動調整
   let gain = 1.0;
-  if (zeros.length > 0 || poles.length > 0) {
+  if (zerosExpanded.length > 0 || polesExpanded.length > 0) {
     const z0 = new Complex(1, 0);
-    const h0 = evaluateTransferFunction(z0, zeros, poles, 1.0);
+    const h0 = evaluateTransferFunction(z0, zerosExpanded, polesExpanded, 1.0);
     const mag0 = h0.magnitude();
     if (mag0 > 1e-10) {
       gain = 1.0 / mag0;
@@ -157,7 +163,7 @@ export function calculateFrequencyResponseLog(
     frequencies.push(omega);
 
     const z = Complex.fromPolar(1, omega);
-    const h = evaluateTransferFunction(z, zeros, poles, gain);
+    const h = evaluateTransferFunction(z, zerosExpanded, polesExpanded, gain);
 
     const magnitude = h.magnitude();
     const magnitudeDB = magnitude > 1e-10 ? 20 * Math.log10(magnitude) : -200;
@@ -179,19 +185,22 @@ export function calculateFrequencyResponseLog(
  * Group delay = -d(phase)/dω
  */
 export function calculateGroupDelay(
-  zeros: PoleZero[],
-  poles: PoleZero[],
+  zeros: PoleOrZero[],
+  poles: PoleOrZero[],
   numPoints: number = 512,
   logarithmic: boolean = true
 ): { frequency: number[]; groupDelay: number[] } {
+  // PoleOrZero[] を展開して計算用のPoleZero[]に変換
+  const zerosExpanded = toPoleZeros(zeros);
+  const polesExpanded = toPoleZeros(poles);
   const frequencies: number[] = [];
   const groupDelays: number[] = [];
 
   // ゲインを自動調整
   let gain = 1.0;
-  if (zeros.length > 0 || poles.length > 0) {
+  if (zerosExpanded.length > 0 || polesExpanded.length > 0) {
     const z0 = new Complex(1, 0);
-    const h0 = evaluateTransferFunction(z0, zeros, poles, 1.0);
+    const h0 = evaluateTransferFunction(z0, zerosExpanded, polesExpanded, 1.0);
     const mag0 = h0.magnitude();
     if (mag0 > 1e-10) {
       gain = 1.0 / mag0;
@@ -215,7 +224,7 @@ export function calculateGroupDelay(
     frequencies.push(omega);
 
     const z = Complex.fromPolar(1, omega);
-    const h = evaluateTransferFunction(z, zeros, poles, gain);
+    const h = evaluateTransferFunction(z, zerosExpanded, polesExpanded, gain);
     phases.push(h.phase());
   }
 
@@ -330,52 +339,6 @@ function createBiquadSectionsFromPoleOrZero(
   return sections;
 }
 
-/**
- * PoleZero[] を PoleOrZero[] に変換するヘルパー関数
- */
-function convertLegacyPoleZeros(items: PoleZero[]): PoleOrZero[] {
-  const converted: PoleOrZero[] = [];
-  const processed = new Set<string>();
-  
-  for (const item of items) {
-    if (processed.has(item.id)) continue;
-    
-    if (Math.abs(item.imag) > 1e-10 && item.pairId) {
-      // 複素共役ペア（正の虚部のみ保持）
-      if (item.imag > 0) {
-        converted.push({
-          id: item.id,
-          real: item.real,
-          imag: item.imag,
-          isPole: item.isPole,
-        });
-        processed.add(item.id);
-        if (item.pairId) processed.add(item.pairId);
-      }
-    } else {
-      // 実数
-      converted.push({
-        id: item.id,
-        real: item.real,
-        isPole: item.isPole,
-      });
-      processed.add(item.id);
-    }
-  }
-  
-  return converted;
-}
-
-/**
- * 極・零点を双二次セクションに分割（レガシーAPI）
- * PoleZero[] → PoleOrZero[] に変換してから処理
- */
-function createBiquadSections(zeros: PoleZero[], poles: PoleZero[]): BiquadSection[] {
-  return createBiquadSectionsFromPoleOrZero(
-    convertLegacyPoleZeros(zeros),
-    convertLegacyPoleZeros(poles)
-  );
-}
 
 /**
  * 双二次セクションを実行
@@ -411,8 +374,8 @@ function applyBiquadSection(
  * 極・零点をbiquadセクションに分割し、直列に接続して実行
  */
 export function calculateImpulseResponse(
-  zeros: PoleZero[],
-  poles: PoleZero[],
+  zeros: PoleOrZero[],
+  poles: PoleOrZero[],
   numPoints: number = 128
 ): { time: number[]; amplitude: number[] } {
   const time: number[] = [];
@@ -422,7 +385,7 @@ export function calculateImpulseResponse(
   signal[0] = 1.0; // δ[n]
 
   // 双二次セクションを作成し、カスケード接続で実行
-  const sections = createBiquadSections(zeros, poles);
+  const sections = createBiquadSectionsFromPoleOrZero(zeros, poles);
   for (const section of sections) {
     signal = applyBiquadSection(signal, section);
   }
@@ -450,8 +413,8 @@ export function calculateImpulseResponse(
  * s[n] = Σ h[k] for k = 0 to n
  */
 export function calculateStepResponse(
-  zeros: PoleZero[],
-  poles: PoleZero[],
+  zeros: PoleOrZero[],
+  poles: PoleOrZero[],
   numPoints: number = 128
 ): { time: number[]; amplitude: number[] } {
   const impulse = calculateImpulseResponse(zeros, poles, numPoints);
