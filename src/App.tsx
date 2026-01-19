@@ -221,6 +221,7 @@ function App() {
             <ComplexPlane 
               poles={poles} 
               zeros={zeros}
+              enableSnap={enableSnap}
               onPoleMove={handlePoleMove}
               onZeroMove={handleZeroMove}
             />

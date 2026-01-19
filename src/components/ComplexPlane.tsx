@@ -2,15 +2,17 @@ import { Paper, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { PoleZero } from '../types';
+import { applySnap } from '../utils/snapUtils';
 
 interface ComplexPlaneProps {
   poles: PoleZero[];
   zeros: PoleZero[];
+  enableSnap: boolean;
   onPoleMove?: (id: string, real: number, imag: number) => void;
   onZeroMove?: (id: string, real: number, imag: number) => void;
 }
 
-export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPlaneProps) => {
+export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove }: ComplexPlaneProps) => {
   const { t } = useTranslation();
   const width = 500;
   const height = 500;
@@ -51,24 +53,30 @@ export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPl
     if (!draggingItem) return;
 
     const { x: svgX, y: svgY } = getSvgCoordinates(e.clientX, e.clientY);
-    const real = fromSvgX(svgX);
+    let real = fromSvgX(svgX);
     let imag = fromSvgY(svgY);
 
-    // 実軸上の点（ペアがない点）は虚部を0に固定
+    // 実軸上の点（ペアがない点）かどうかをチェック
+    let isRealAxisOnly = false;
     if (draggingItem.isPole) {
       const pole = poles.find(p => p.id === draggingItem.id);
-      if (pole && !pole.pairId) {
-        imag = 0;
-      }
-      onPoleMove?.(draggingItem.id, real, imag);
+      isRealAxisOnly = !!(pole && !pole.pairId);
     } else {
       const zero = zeros.find(z => z.id === draggingItem.id);
-      if (zero && !zero.pairId) {
-        imag = 0;
-      }
+      isRealAxisOnly = !!(zero && !zero.pairId);
+    }
+
+    // スナップを適用
+    const snapped = applySnap(real, imag, enableSnap, isRealAxisOnly);
+    real = snapped.real;
+    imag = snapped.imag;
+
+    if (draggingItem.isPole) {
+      onPoleMove?.(draggingItem.id, real, imag);
+    } else {
       onZeroMove?.(draggingItem.id, real, imag);
     }
-  }, [draggingItem, poles, zeros, onPoleMove, onZeroMove]);
+  }, [draggingItem, poles, zeros, enableSnap, onPoleMove, onZeroMove]);
 
   const handleMouseUp = useCallback(() => {
     setDraggingItem(null);
