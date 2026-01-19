@@ -39,6 +39,64 @@ yarn build
 yarn preview
 ```
 
+## アーキテクチャ / Architecture
+
+### フィルタ設計の拡張性
+
+新しいフィルタを追加する場合：
+
+1. **UIコンポーネントの作成** (`src/components/filters/MyFilterPanel.tsx`)
+   ```typescript
+   import type { FilterPanelProps } from '../../filters/base';
+   
+   export const MyFilterPanel = ({ onChange, logarithmicFrequency }: FilterPanelProps) => {
+     const [myParam, setMyParam] = useState(defaultValue);
+     
+     useEffect(() => {
+       onChange({ myParam });
+     }, [myParam, onChange]);
+     
+     return <Box>{/* UI要素 */}</Box>;
+   };
+   ```
+
+2. **フィルタクラスの作成** (`src/filters/myfilter.ts`)
+   ```typescript
+   import type { FilterDesignBase } from './base';
+   import { MyFilterPanel } from '../components/filters/MyFilterPanel';
+   
+   export class MyFilterDesign implements FilterDesignBase {
+     id = 'myfilter';
+     nameKey = 'filters.myfilter.name';
+     PanelComponent = MyFilterPanel;
+     
+     generate(params) {
+       // フィルタ生成ロジック
+       return { poles, zeros, gain };
+     }
+   }
+   ```
+
+3. **フィルタの登録** (`src/filters/index.ts`)
+   ```typescript
+   import { MyFilterDesign } from './myfilter';
+   FilterRegistry.register(new MyFilterDesign());
+   ```
+
+4. **翻訳の追加** (`src/locales/ja.json`, `src/locales/en.json`)
+   ```json
+   "filters": {
+     "myfilter": {
+       "name": "My Filter"
+     }
+   }
+   ```
+
+**設計思想:**
+- **1フィルタ = 1UIコンポーネント = 1ファイル** でスケーラビリティを確保
+- 各フィルタは専用のUIコンポーネントを持ち、完全に独立
+- FilterRegistryによる自動検出でアプリケーションコードの変更不要
+
 ## 参考文献 / References
 
 - [Audio EQ Cookbook by Robert Bristow-Johnson](https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt) - Biquad filter design equations

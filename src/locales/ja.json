@@ -67,6 +67,26 @@
     "qFactor": "Q 値",
     "apply": "適用"
   },
+  "filters": {
+    "biquad": {
+      "name": "双二次フィルタ",
+      "description": "Audio EQ Cookbookに基づく双二次フィルタ",
+      "type": "フィルタタイプ",
+      "lowPass": "Low Pass",
+      "highPass": "High Pass",
+      "bandPass": "Band Pass",
+      "bandStop": "Band Stop",
+      "cutoffFrequency": "カットオフ周波数",
+      "qFactor": "Q 値"
+    },
+    "calculus": {
+      "name": "微積分",
+      "description": "微分・積分フィルタ",
+      "type": "演算タイプ",
+      "differentiator": "微分",
+      "integrator": "積分"
+    }
+  },
   "references": {
     "title": "参考文献",
     "audioEqCookbook": "双二次フィルタの設計式を提供する標準的なリファレンス。バイリニア変換を用いた各種フィルタ（LPF、HPF、BPF、Notchなど）の係数計算式を掲載。",

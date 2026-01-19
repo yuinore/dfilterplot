@@ -1,22 +1,15 @@
 import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
-import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
 import { Settings } from './components/Settings';
-import { FilterDesign, type FilterType, type BiquadType, type CalculusType } from './components/FilterDesign';
+import { FilterDesignPanel } from './components/filters/FilterDesignPanel';
 import { GainControl } from './components/GainControl';
 import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from './types';
 import { toPoleZeros } from './types';
-import {
-  generateLowPassBiquad,
-  generateHighPassBiquad,
-  generateBandPassBiquad,
-  generateBandStopBiquad,
-  generateDifferentiator,
-  generateIntegrator,
-} from './utils/biquadFilter';
+import { FilterRegistry } from './filters';
 import { BODE_PLOT } from './constants';
 
 function App() {
@@ -55,50 +48,20 @@ function App() {
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
   const [gain, setGain] = useState<number>(1.0);
 
-  // フィルタ設計状態
-  const [filterType, setFilterType] = useState<FilterType>('none');
-  const [biquadType, setBiquadType] = useState<BiquadType>('lowpass');
-  const [calculusType, setCalculusType] = useState<CalculusType>('differentiator');
-  const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
-  const [qFactor, setQFactor] = useState<number>(0.707); // Butterworth Q
+  // フィルタ設計の変更を処理
+  const handleFilterChange = useCallback((filterId: string, params: Record<string, any>) => {
+    if (filterId === 'none') {
+      return;
+    }
 
-  // フィルタ設計が変更されたら極・零点とゲインを更新
-  useEffect(() => {
-    if (filterType === 'biquad') {
-      let result;
-      switch (biquadType) {
-        case 'lowpass':
-          result = generateLowPassBiquad(cutoffFrequency, qFactor);
-          break;
-        case 'highpass':
-          result = generateHighPassBiquad(cutoffFrequency, qFactor);
-          break;
-        case 'bandpass':
-          result = generateBandPassBiquad(cutoffFrequency, qFactor);
-          break;
-        case 'bandstop':
-          result = generateBandStopBiquad(cutoffFrequency, qFactor);
-          break;
-      }
-      setPoles(result.poles);
-      setZeros(result.zeros);
-      // Audio EQ Cookbookに従い、ゲイン (b0/a0) を自動設定
-      setGain(result.gain);
-    } else if (filterType === 'calculus') {
-      let result;
-      switch (calculusType) {
-        case 'differentiator':
-          result = generateDifferentiator();
-          break;
-        case 'integrator':
-          result = generateIntegrator();
-          break;
-      }
+    const filter = FilterRegistry.get(filterId);
+    if (filter) {
+      const result = filter.generate(params);
       setPoles(result.poles);
       setZeros(result.zeros);
       setGain(result.gain);
     }
-  }, [filterType, biquadType, calculusType, cutoffFrequency, qFactor]);
+  }, []);
 
   // 極の移動処理
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
@@ -243,17 +206,8 @@ function App() {
               octaves={octaves}
               onOctavesChange={setOctaves}
             />
-            <FilterDesign
-              filterType={filterType}
-              onFilterTypeChange={setFilterType}
-              biquadType={biquadType}
-              onBiquadTypeChange={setBiquadType}
-              calculusType={calculusType}
-              onCalculusTypeChange={setCalculusType}
-              cutoffFrequency={cutoffFrequency}
-              onCutoffFrequencyChange={setCutoffFrequency}
-              qFactor={qFactor}
-              onQFactorChange={setQFactor}
+            <FilterDesignPanel
+              onFilterChange={handleFilterChange}
               logarithmicFrequency={logarithmicFrequency}
             />
           </Box>

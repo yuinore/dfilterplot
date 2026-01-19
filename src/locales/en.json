@@ -67,6 +67,26 @@
     "qFactor": "Q Factor",
     "apply": "Apply"
   },
+  "filters": {
+    "biquad": {
+      "name": "Biquad Filter",
+      "description": "Biquad filter based on Audio EQ Cookbook",
+      "type": "Filter Type",
+      "lowPass": "Low Pass",
+      "highPass": "High Pass",
+      "bandPass": "Band Pass",
+      "bandStop": "Band Stop",
+      "cutoffFrequency": "Cutoff Frequency",
+      "qFactor": "Q Factor"
+    },
+    "calculus": {
+      "name": "Calculus",
+      "description": "Differentiator and Integrator filters",
+      "type": "Operation Type",
+      "differentiator": "Differentiator",
+      "integrator": "Integrator"
+    }
+  },
   "references": {
     "title": "References",
     "audioEqCookbook": "Standard reference for biquad filter design equations. Provides coefficient calculation formulas for various filter types (LPF, HPF, BPF, Notch, etc.) using the Bilinear Transform.",
