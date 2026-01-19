@@ -125,6 +125,8 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
           display: true,
           text: t('bodePlot.magnitudeDB'),
         },
+        min: -100,
+        max: 40,
       },
     },
   }), [commonOptions, t]);
