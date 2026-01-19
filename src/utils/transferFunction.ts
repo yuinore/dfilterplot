@@ -1,4 +1,5 @@
-import type { PoleZero, FrequencyResponse } from '../types';
+import type { PoleZero, FrequencyResponse, PoleOrZero } from '../types';
+import { isPoleZeroPair } from '../types';
 
 /**
  * 複素数クラス
@@ -274,7 +275,63 @@ interface BiquadSection {
 }
 
 /**
- * 極・零点を双二次セクションに分割
+ * 極・零点を双二次セクションに分割（新しいAPI）
+ * 複素共役ペア → 2次セクション
+ * 実数の極/零点 → 1次セクション（a2=0, b2=0）
+ */
+function createBiquadSectionsFromPoleOrZero(
+  zeros: PoleOrZero[],
+  poles: PoleOrZero[]
+): BiquadSection[] {
+  const sections: BiquadSection[] = [];
+  
+  // 零点と極を同時に処理してセクションを作成
+  const maxLength = Math.max(zeros.length, poles.length);
+  
+  for (let i = 0; i < maxLength; i++) {
+    let b0 = 1, b1 = 0, b2 = 0;
+    let a1 = 0, a2 = 0;
+    
+    // 零点の処理
+    if (i < zeros.length) {
+      const zero = zeros[i];
+      
+      if (isPoleZeroPair(zero)) {
+        // 複素共役ペア: (z - (r+ji))(z - (r-ji)) = z^2 - 2r*z + (r^2+i^2)
+        b0 = 1.0;
+        b1 = -2 * zero.real;
+        b2 = zero.real * zero.real + zero.imag * zero.imag;
+      } else {
+        // 実数: (z - r) = z - r
+        b0 = 1.0;
+        b1 = -zero.real;
+        b2 = 0.0;
+      }
+    }
+    
+    // 極の処理
+    if (i < poles.length) {
+      const pole = poles[i];
+      
+      if (isPoleZeroPair(pole)) {
+        // 複素共役ペア: 分母 = z^2 - 2r*z + (r^2+i^2)
+        a1 = -2 * pole.real;
+        a2 = pole.real * pole.real + pole.imag * pole.imag;
+      } else {
+        // 実数: 分母 = z - r
+        a1 = -pole.real;
+        a2 = 0.0;
+      }
+    }
+    
+    sections.push({ b0, b1, b2, a1, a2 });
+  }
+  
+  return sections;
+}
+
+/**
+ * 極・零点を双二次セクションに分割（旧API、後方互換性のため残す）
  * 複素共役ペア → 2次セクション
  * 実数の極/零点 → 1次セクション（a2=0, b2=0）
  */
