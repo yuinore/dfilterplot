@@ -87,8 +87,30 @@ function App() {
     });
   }, []);
 
+  // 極ペアを追加（複素共役ペア）
+  const handleAddPolePair = useCallback(() => {
+    const id1 = getNextId();
+    const id2 = getNextId();
+    const pole1: PoleZero = {
+      id: id1,
+      real: 0.7,
+      imag: 0.3,
+      isPole: true,
+      pairId: id2,
+    };
+    const pole2: PoleZero = {
+      id: id2,
+      real: 0.7,
+      imag: -0.3,
+      isPole: true,
+      pairId: id1,
+      isConjugate: true,
+    };
+    setPoles((prev) => [...prev, pole1, pole2]);
+  }, []);
+
   // 極を追加（実軸上に配置）
-  const handleAddPole = useCallback(() => {
+  const handleAddPoleReal = useCallback(() => {
     const newId = getNextId();
     const newPole: PoleZero = {
       id: newId,
@@ -99,8 +121,30 @@ function App() {
     setPoles((prev) => [...prev, newPole]);
   }, []);
 
+  // 零点ペアを追加（複素共役ペア）
+  const handleAddZeroPair = useCallback(() => {
+    const id1 = getNextId();
+    const id2 = getNextId();
+    const zero1: PoleZero = {
+      id: id1,
+      real: -0.7,
+      imag: 0.3,
+      isPole: false,
+      pairId: id2,
+    };
+    const zero2: PoleZero = {
+      id: id2,
+      real: -0.7,
+      imag: -0.3,
+      isPole: false,
+      pairId: id1,
+      isConjugate: true,
+    };
+    setZeros((prev) => [...prev, zero1, zero2]);
+  }, []);
+
   // 零点を追加（実軸上に配置）
-  const handleAddZero = useCallback(() => {
+  const handleAddZeroReal = useCallback(() => {
     const newId = getNextId();
     const newZero: PoleZero = {
       id: newId,
@@ -179,8 +223,10 @@ function App() {
             <Toolbar
               poles={poles}
               zeros={zeros}
-              onAddPole={handleAddPole}
-              onAddZero={handleAddZero}
+              onAddPolePair={handleAddPolePair}
+              onAddPoleReal={handleAddPoleReal}
+              onAddZeroPair={handleAddZeroPair}
+              onAddZeroReal={handleAddZeroReal}
               onDeletePole={handleDeletePole}
               onDeleteZero={handleDeleteZero}
               onClear={handleClear}

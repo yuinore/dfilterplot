@@ -52,14 +52,23 @@ export const ComplexPlane = ({ poles, zeros, onPoleMove, onZeroMove }: ComplexPl
 
     const { x: svgX, y: svgY } = getSvgCoordinates(e.clientX, e.clientY);
     const real = fromSvgX(svgX);
-    const imag = fromSvgY(svgY);
+    let imag = fromSvgY(svgY);
 
+    // 実軸上の点（ペアがない点）は虚部を0に固定
     if (draggingItem.isPole) {
+      const pole = poles.find(p => p.id === draggingItem.id);
+      if (pole && !pole.pairId) {
+        imag = 0;
+      }
       onPoleMove?.(draggingItem.id, real, imag);
     } else {
+      const zero = zeros.find(z => z.id === draggingItem.id);
+      if (zero && !zero.pairId) {
+        imag = 0;
+      }
       onZeroMove?.(draggingItem.id, real, imag);
     }
-  }, [draggingItem, onPoleMove, onZeroMove]);
+  }, [draggingItem, poles, zeros, onPoleMove, onZeroMove]);
 
   const handleMouseUp = useCallback(() => {
     setDraggingItem(null);

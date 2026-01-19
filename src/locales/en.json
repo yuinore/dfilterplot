@@ -12,8 +12,10 @@
     "unitCircle": "Unit Circle"
   },
   "toolbar": {
-    "addPole": "Add Pole",
-    "addZero": "Add Zero",
+    "addPolePair": "Add Pole Pair",
+    "addPoleReal": "Add Pole (Real Axis)",
+    "addZeroPair": "Add Zero Pair",
+    "addZeroReal": "Add Zero (Real Axis)",
     "clear": "Clear"
   },
   "polezero": {

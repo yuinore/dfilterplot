@@ -8,8 +8,10 @@ import type { PoleZero } from '../types';
 interface ToolbarProps {
   poles: PoleZero[];
   zeros: PoleZero[];
-  onAddPole: () => void;
-  onAddZero: () => void;
+  onAddPolePair: () => void;
+  onAddPoleReal: () => void;
+  onAddZeroPair: () => void;
+  onAddZeroReal: () => void;
   onDeletePole: (id: string) => void;
   onDeleteZero: (id: string) => void;
   onClear: () => void;
@@ -18,8 +20,10 @@ interface ToolbarProps {
 export const Toolbar = ({
   poles,
   zeros,
-  onAddPole,
-  onAddZero,
+  onAddPolePair,
+  onAddPoleReal,
+  onAddZeroPair,
+  onAddZeroReal,
   onDeletePole,
   onDeleteZero,
   onClear,
@@ -33,23 +37,44 @@ export const Toolbar = ({
           variant="contained"
           color="error"
           startIcon={<AddCircleOutlineIcon />}
-          onClick={onAddPole}
+          onClick={onAddPolePair}
+          size="small"
         >
-          {t('toolbar.addPole')}
+          {t('toolbar.addPolePair')}
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          startIcon={<AddCircleOutlineIcon />}
+          onClick={onAddPoleReal}
+          size="small"
+        >
+          {t('toolbar.addPoleReal')}
         </Button>
         <Button
           variant="contained"
           color="success"
           startIcon={<AddCircleOutlineIcon />}
-          onClick={onAddZero}
+          onClick={onAddZeroPair}
+          size="small"
         >
-          {t('toolbar.addZero')}
+          {t('toolbar.addZeroPair')}
+        </Button>
+        <Button
+          variant="outlined"
+          color="success"
+          startIcon={<AddCircleOutlineIcon />}
+          onClick={onAddZeroReal}
+          size="small"
+        >
+          {t('toolbar.addZeroReal')}
         </Button>
         <Button
           variant="outlined"
           color="secondary"
           startIcon={<ClearIcon />}
           onClick={onClear}
+          size="small"
         >
           {t('toolbar.clear')}
         </Button>

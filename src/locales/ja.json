@@ -12,8 +12,10 @@
     "unitCircle": "単位円"
   },
   "toolbar": {
-    "addPole": "極を追加",
-    "addZero": "零点を追加",
+    "addPolePair": "極ペアを追加",
+    "addPoleReal": "極（実軸上）を追加",
+    "addZeroPair": "零点ペアを追加",
+    "addZeroReal": "零点（実軸上）を追加",
     "clear": "クリア"
   },
   "polezero": {
