@@ -86,10 +86,10 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
   const commonOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
-    animation: false,
+    animation: false as const,
     scales: {
       x: {
-        type: (logarithmicFrequency ? 'logarithmic' : 'linear') as const,
+        type: logarithmicFrequency ? ('logarithmic' as const) : ('linear' as const),
         title: {
           display: true,
           text: t('bodePlot.frequency'),
@@ -148,7 +148,12 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency }: BodePlotProps) 
   }), [commonOptions, t]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, height: '100%' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: { xs: 'column', md: 'row' }, 
+      gap: 2, 
+      height: '100%' 
+    }}>
       <Paper elevation={3} sx={{ p: 2, flex: 1, minHeight: 0 }}>
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.magnitude')}

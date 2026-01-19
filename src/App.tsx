@@ -245,7 +245,7 @@ function App() {
             />
           </Box>
           <Box sx={{ 
-            flex: 1, 
+            flex: 2, 
             minHeight: { xs: '600px', lg: 0 },
             minWidth: { xs: '100%', lg: '400px' }
           }}>
