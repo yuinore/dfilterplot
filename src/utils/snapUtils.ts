@@ -18,6 +18,25 @@ function snapToZero(value: number, threshold: number): number {
 }
 
 /**
+ * 実軸上の特別な点（0, ±1）にスナップ
+ */
+function snapRealAxisPoint(real: number, threshold: number): number {
+  // 0にスナップ
+  if (Math.abs(real) <= threshold) {
+    return 0;
+  }
+  // 1にスナップ
+  if (Math.abs(real - 1) <= threshold) {
+    return 1;
+  }
+  // -1にスナップ
+  if (Math.abs(real + 1) <= threshold) {
+    return -1;
+  }
+  return real;
+}
+
+/**
  * 単位円上の点を計算
  */
 function projectToUnitCircle(real: number, imag: number): { real: number; imag: number } {
@@ -63,6 +82,11 @@ function snapToFourthRootsOfUnity(
  * スナップ機能を適用
  * 
  * アルゴリズム：
+ * 
+ * 【実軸上の点（isRealAxisOnly = true）の場合】
+ * - 原点 (0,0)、または単位円とx軸の交点 (±1,0) にスナップ
+ * 
+ * 【複素共役ペアの点（isRealAxisOnly = false）の場合】
  * 1. 単位円上にスナップ（単位円からの距離が閾値以内）
  *    1-A. さらに1の4乗根（±1, ±j）に近い場合はその点にスナップ
  * 2. 軸へのスナップ
@@ -86,10 +110,10 @@ export function applySnap(
     return { real, imag };
   }
 
-  // 実軸上の点の場合は虚部を0に固定し、実部のみ処理
+  // 実軸上の点の場合は虚部を0に固定し、実部は特別な点（0, ±1）にスナップ
   if (isRealAxisOnly) {
     return {
-      real: snapToZero(real, SNAP_THRESHOLD),
+      real: snapRealAxisPoint(real, SNAP_THRESHOLD),
       imag: 0,
     };
   }
