@@ -12,6 +12,9 @@
     "imagAxis": "Imaginary Axis",
     "unitCircle": "Unit Circle"
   },
+  "sPlane": {
+    "title": "s Plane (Polar Components)"
+  },
   "toolbar": {
     "addPolePair": "Add Pole Pair",
     "addPoleReal": "Add Pole (Real Axis)",

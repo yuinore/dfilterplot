@@ -2,6 +2,7 @@ import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
+import { SPlane } from './components/SPlane';
 import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
 import { Settings, type FrequencyUnit } from './components/Settings';
@@ -196,6 +197,10 @@ function App() {
               enableSnap={enableSnap}
               onPoleMove={handlePoleMove}
               onZeroMove={handleZeroMove}
+            />
+            <SPlane
+              poles={toPoleZeros(poles)}
+              zeros={toPoleZeros(zeros)}
             />
             <GainControl
               gain={gain}

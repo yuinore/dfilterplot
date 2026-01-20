@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { PoleZero } from '../types';
 import { applySnap } from '../utils/snapUtils';
+import { PoleZeroRenderer } from './PoleZeroRenderer';
 
 interface ComplexPlaneProps {
   poles: PoleZero[];
@@ -196,54 +197,16 @@ export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove 
           {t('complexPlane.unitCircle')}
         </text>
 
-        {/* 零点 (○) */}
-        {zeros.map((zero) => (
-          <g key={zero.id} onMouseDown={handleMouseDown(zero.id, false)}>
-            <circle
-              cx={toSvgX(zero.real)}
-              cy={toSvgY(zero.imag)}
-              r={8}
-              fill="white"
-              stroke="#2e7d32"
-              strokeWidth="3"
-              style={{ cursor: 'move' }}
-            />
-          </g>
-        ))}
-
-        {/* 極 (×) */}
-        {poles.map((pole) => (
-          <g key={pole.id} onMouseDown={handleMouseDown(pole.id, true)}>
-            <line
-              x1={toSvgX(pole.real) - 8}
-              y1={toSvgY(pole.imag) - 8}
-              x2={toSvgX(pole.real) + 8}
-              y2={toSvgY(pole.imag) + 8}
-              stroke="#c62828"
-              strokeWidth="3"
-              strokeLinecap="round"
-              style={{ cursor: 'move', pointerEvents: 'none' }}
-            />
-            <line
-              x1={toSvgX(pole.real) - 8}
-              y1={toSvgY(pole.imag) + 8}
-              x2={toSvgX(pole.real) + 8}
-              y2={toSvgY(pole.imag) - 8}
-              stroke="#c62828"
-              strokeWidth="3"
-              strokeLinecap="round"
-              style={{ cursor: 'move', pointerEvents: 'none' }}
-            />
-            {/* 透明な円でクリック領域を拡大 */}
-            <circle
-              cx={toSvgX(pole.real)}
-              cy={toSvgY(pole.imag)}
-              r={10}
-              fill="transparent"
-              style={{ cursor: 'move' }}
-            />
-          </g>
-        ))}
+        {/* 極と零点の描画 */}
+        <PoleZeroRenderer
+          poles={poles}
+          zeros={zeros}
+          toSvgX={toSvgX}
+          toSvgY={toSvgY}
+          interactive={true}
+          onPoleMouseDown={(id) => handleMouseDown(id, true)}
+          onZeroMouseDown={(id) => handleMouseDown(id, false)}
+        />
         </svg>
       </div>
     </Paper>
