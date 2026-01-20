@@ -138,6 +138,10 @@ export const SincFilterPanel = ({ onChange, logarithmicFrequency = false, freque
           {t('filters.sinc.windowHann')}
         </ToggleButton>
       </ToggleButtonGroup>
+
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+        {t('filters.sinc.description')}
+      </Typography>
     </Box>
   );
 };

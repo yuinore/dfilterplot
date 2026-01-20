@@ -140,6 +140,10 @@ export const BiquadFilterPanel = ({ onChange, logarithmicFrequency = false, freq
         valueLabelDisplay="auto"
         valueLabelFormat={(value) => value.toFixed(2)}
       />
+
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+        {t('filters.biquad.description')}
+      </Typography>
     </Box>
   );
 };

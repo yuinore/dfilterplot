@@ -77,7 +77,7 @@
   "filters": {
     "biquad": {
       "name": "Biquad Filter",
-      "description": "Biquad filter based on Audio EQ Cookbook",
+      "description": "Widely used IIR filter in audio signal processing. Realized by second-order transfer function, and can be cascaded to form higher-order filters with sharper characteristics. Implementation based on Audio EQ Cookbook by Robert Bristow-Johnson.",
       "type": "Filter Type",
       "lowPass": "Low Pass",
       "highPass": "High Pass",
@@ -111,7 +111,7 @@
     },
     "butterworth": {
       "name": "Butterworth Filter",
-      "description": "IIR filter with maximally flat magnitude response in the passband. Features monotonic attenuation and nearly linear phase response.",
+      "description": "IIR filter with maximally flat magnitude response in the passband. Features monotonic attenuation.",
       "type": "Filter Type",
       "lowPass": "Low Pass",
       "highPass": "High Pass",
@@ -120,7 +120,7 @@
     },
     "sinc": {
       "name": "Sinc Filter",
-      "description": "FIR filter based on ideal low-pass filter impulse response. Uses truncated sinc function.",
+      "description": "FIR filter based on the impulse response of an ideal low-pass filter (sinc function). Theoretically achieves ideal rectangular frequency response, but truncation error occurs due to finite length.",
       "cutoffFrequency": "Cutoff Frequency",
       "taps": "Number of Taps",
       "windowFunction": "Window Function",
@@ -129,7 +129,7 @@
     },
     "gaussian": {
       "name": "Gaussian Filter",
-      "description": "FIR filter based on Gaussian function. Features smooth frequency response.",
+      "description": "FIR filter with Gaussian function impulse response. Features smooth frequency response and rapid decay in the time domain.",
       "sigma": "Standard Deviation",
       "taps": "Number of Taps",
       "windowFunction": "Window Function",

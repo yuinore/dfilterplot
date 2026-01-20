@@ -74,6 +74,10 @@ export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
           {t('filters.gaussian.windowHann')}
         </ToggleButton>
       </ToggleButtonGroup>
+
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+        {t('filters.gaussian.description')}
+      </Typography>
     </Box>
   );
 };

@@ -77,7 +77,7 @@
   "filters": {
     "biquad": {
       "name": "双二次フィルタ",
-      "description": "Audio EQ Cookbookに基づく双二次フィルタ",
+      "description": "音響信号処理で広く用いられているIIRフィルタ。2次伝達関数により実現され、直列接続することでより鋭い特性を持つフィルタを構成できる。Robert Bristow-JohnsonによるAudio EQ Cookbookに基づく実装。",
       "type": "フィルタタイプ",
       "lowPass": "Low Pass",
       "highPass": "High Pass",
@@ -105,13 +105,13 @@
     },
     "movingAverage": {
       "name": "移動平均フィルタ",
-      "description": "過去N個のサンプルの平均を出力する最も単純なローパスFIRフィルタ。ノイズ除去や平滑化に使用されます。",
+      "description": "過去N個のサンプルの平均を出力する最も単純なローパスFIRフィルタ。ノイズ除去や平滑化に使用される。",
       "length": "窓長",
       "samples": "サンプル"
     },
     "butterworth": {
       "name": "バターワースフィルタ",
-      "description": "通過域において最大限フラットな振幅特性を持つIIRフィルタ。モノトニックな減衰特性と線形に近い位相特性を持ちます。",
+      "description": "通過域において最大限フラットな振幅特性を持つIIRフィルタ。単調性のある減衰特性を持つ。",
       "type": "フィルタタイプ",
       "lowPass": "ローパス",
       "highPass": "ハイパス",
@@ -120,7 +120,7 @@
     },
     "sinc": {
       "name": "Sincフィルタ",
-      "description": "理想的なローパスフィルタのインパルス応答に基づくFIRフィルタ。打ち切りsinc関数を使用。",
+      "description": "理想的なローパスフィルタのインパルス応答（sinc関数）に基づくFIRフィルタ。理論的には理想的な矩形特性を持つが、有限長のため打ち切り誤差が発生する。",
       "cutoffFrequency": "カットオフ周波数",
       "taps": "タップ数",
       "windowFunction": "窓関数",
@@ -129,7 +129,7 @@
     },
     "gaussian": {
       "name": "ガウシアンフィルタ",
-      "description": "ガウシアン関数に基づくFIRフィルタ。滑らかな周波数特性を持つ。",
+      "description": "ガウス関数をインパルス応答とするFIRフィルタ。滑らかな周波数特性を持ち、時間領域では急速に減少する。",
       "sigma": "標準偏差",
       "taps": "タップ数",
       "windowFunction": "窓関数",
