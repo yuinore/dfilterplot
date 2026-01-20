@@ -1,5 +1,6 @@
-import { Paper, Typography, Slider, Box, FormControlLabel, Checkbox } from '@mui/material';
+import { Typography, Slider, Box, FormControlLabel, Checkbox } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { CollapsiblePanel } from './CollapsiblePanel';
 
 interface GainControlProps {
   gain: number;
@@ -19,13 +20,7 @@ export const GainControl = ({ gain, onGainChange, autoGain, onAutoGainChange }: 
   const clampedGain = Math.max(minGain, Math.min(maxGain, gain));
 
   return (
-    <Paper elevation={3} sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        {t('gainControl.title')}
-      </Typography>
-      <Typography variant="body2" gutterBottom>
-        {t('gainControl.gain')}: {clampedGain.toFixed(6)}
-      </Typography>
+    <CollapsiblePanel title={`${t('gainControl.title')} (${clampedGain.toFixed(6)})`} defaultExpanded={false}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Slider
           value={clampedGain}
@@ -48,7 +43,7 @@ export const GainControl = ({ gain, onGainChange, autoGain, onAutoGainChange }: 
           label={t('gainControl.autoAdjust')}
         />
       </Box>
-    </Paper>
+    </CollapsiblePanel>
   );
 };
 

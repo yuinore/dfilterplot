@@ -178,28 +178,31 @@ function App() {
           component="main"
           sx={{
             flexGrow: 1,
-            p: { xs: 3, lg: 3 },
+            p: { xs: 3, xl: 3 },
             display: 'flex',
-            flexDirection: { xs: 'row', lg: 'row' },
-            gap: { xs: 3, lg: 3 },
+            flexDirection: { xs: 'column', sm: 'row', xl: 'row' },
+            gap: { xs: 3, xl: 3 },
             overflow: 'auto',
           }}
         >
           <Box id="controller-box" sx={{ 
-            flexGrow: 2, 
-            flexShrink: 2,
-            flexBasis: 320,
+            flexGrow: 4, 
+            flexShrink: 4,
+            flexBasis: 360,
             display: 'flex', 
             flexDirection: 'column', 
             gap: 2,
-            // minWidth: { sm: '100%', lg: '400px' },
-            maxWidth: { xs: '320px', lg: '640px' }
+            // minWidth: { sm: '100%', xl: '400px' },
+            maxWidth: { xs: '480px', xl: '720px' }
           }}>
             <Box id="complex-plane-combi" sx={{ 
               flexGrow: 0, 
               display: 'flex', 
-              flexDirection: { xs: 'column', lg: 'row' },
+              flexDirection: { xs: 'column', xl: 'row' },
+              alignItems: 'flex-start',
               gap: 2,
+              width: '100%',
+              maxWidth: { xs: '360px', xl: '720px' }
             }}>
               <ComplexPlane 
                 poles={toPoleZeros(poles)} 
@@ -249,10 +252,10 @@ function App() {
           <Box id="bode-plot-box" sx={{ 
             flexGrow: 2,
             flexShrink: 2,
-            flexBasis: 320,
+            flexBasis: 480,
             minWidth: 0, // Flexboxで縮小を許可
-            // minHeight: { xs: '600px', lg: 0 },
-            // minWidth: { xs: '400px', lg: '400px' }
+            // minHeight: { xs: '600px', xl: 0 },
+            // minWidth: { xs: '400px', xl: '400px' }
           }}>
             <BodePlot 
               poles={poles} 

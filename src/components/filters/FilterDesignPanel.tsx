@@ -1,9 +1,10 @@
-import { Paper, Typography, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
 import { FilterRegistry } from '../../filters';
 import type { FilterDesignBase } from '../../filters/base';
 import type { FrequencyUnit } from '../Settings';
+import { CollapsiblePanel } from '../CollapsiblePanel';
 
 interface FilterDesignPanelProps {
   onFilterChange: (filterId: string, params: Record<string, any>) => void;
@@ -43,11 +44,7 @@ export const FilterDesignPanel = ({
   const availableFilters = FilterRegistry.getAll();
 
   return (
-    <Paper elevation={3} sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        {t('filterDesign.title')}
-      </Typography>
-
+    <CollapsiblePanel title={t('filterDesign.title')}>
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>{t('filterDesign.filterType')}</InputLabel>
         <Select
@@ -73,7 +70,7 @@ export const FilterDesignPanel = ({
           />
         </Box>
       )}
-    </Paper>
+    </CollapsiblePanel>
   );
 };
 

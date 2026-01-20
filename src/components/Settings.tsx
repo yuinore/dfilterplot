@@ -1,6 +1,7 @@
-import { Paper, Typography, FormControlLabel, Switch, Box, Slider, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import { Typography, FormControlLabel, Switch, Box, Slider, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { BODE_PLOT } from '../constants';
+import { CollapsiblePanel } from './CollapsiblePanel';
 
 export type FrequencyUnit = 'radians' | '44100' | '48000';
 
@@ -28,10 +29,7 @@ export const Settings = ({
   const { t } = useTranslation();
 
   return (
-    <Paper elevation={3} sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        {t('settings.title')}
-      </Typography>
+    <CollapsiblePanel title={t('settings.title')} defaultExpanded={false}>
       <FormControlLabel
         control={
           <Switch
@@ -96,7 +94,7 @@ export const Settings = ({
           disabled={!logarithmicFrequency}
         />
       </Box>
-    </Paper>
+    </CollapsiblePanel>
   );
 };
 

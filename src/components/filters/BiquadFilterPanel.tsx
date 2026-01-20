@@ -45,7 +45,7 @@ export const BiquadFilterPanel = ({ onChange, logarithmicFrequency = false, freq
   const { t } = useTranslation();
   const [type, setType] = useState<string>('lowpass');
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
-  const [qFactor, setQFactor] = useState<number>(0.707);
+  const [qFactor, setQFactor] = useState<number>(3.000);
 
   // パラメータが変更されたら通知
   useEffect(() => {

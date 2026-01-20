@@ -16,10 +16,11 @@
     "title": "s 平面（極座標成分表示）"
   },
   "toolbar": {
-    "addPolePair": "極ペアを追加",
-    "addPoleReal": "極（実軸上）を追加",
-    "addZeroPair": "零点ペアを追加",
-    "addZeroReal": "零点（実軸上）を追加",
+    "title": "ツールバー",
+    "addPolePair": "極ペア",
+    "addPoleReal": "極（実数）",
+    "addZeroPair": "零点ペア",
+    "addZeroReal": "零点（実数）",
     "clear": "クリア"
   },
   "polezero": {

@@ -1,4 +1,5 @@
-import { Paper, Typography, Box } from '@mui/material';
+import { Box } from '@mui/material';
+import { CollapsiblePanel } from './CollapsiblePanel';
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import {
@@ -389,50 +390,35 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
       height: '100%',
       minWidth: 0, // Flexboxで縮小を許可
     }}>
-      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
-        <Typography variant="h6" gutterBottom>
-          {t('bodePlot.magnitude')}
-        </Typography>
-        <Box sx={{ height: 'max(200px, calc(100% - 40px))', minWidth: 0 }}>
+      <CollapsiblePanel title={t('bodePlot.magnitude')}>
+        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
           <Line data={magnitudeData} options={magnitudeOptions} />
         </Box>
-      </Paper>
+      </CollapsiblePanel>
 
-      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
-        <Typography variant="h6" gutterBottom>
-          {t('bodePlot.phase')}
-        </Typography>
-        <Box sx={{ height: 'max(200px, calc(100% - 40px))', minWidth: 0 }}>
+      <CollapsiblePanel title={t('bodePlot.phase')}>
+        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
           <Line data={phaseData} options={phaseOptions} />
         </Box>
-      </Paper>
+      </CollapsiblePanel>
 
-      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
-        <Typography variant="h6" gutterBottom>
-          {t('bodePlot.groupDelay')}
-        </Typography>
-        <Box sx={{ height: 'max(200px, calc(100% - 40px))', minWidth: 0 }}>
+      <CollapsiblePanel title={t('bodePlot.groupDelay')} defaultExpanded={false}>
+        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
           <Line data={groupDelayData} options={groupDelayOptions} />
         </Box>
-      </Paper>
+      </CollapsiblePanel>
 
-      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
-        <Typography variant="h6" gutterBottom>
-          {t('bodePlot.impulseResponse')}
-        </Typography>
-        <Box sx={{ height: 'max(200px, calc(100% - 40px))', minWidth: 0 }}>
+      <CollapsiblePanel title={t('bodePlot.impulseResponse')}>
+        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
           <Line data={impulseData} options={impulseOptions} />
         </Box>
-      </Paper>
+      </CollapsiblePanel>
 
-      <Paper elevation={3} sx={{ p: 2, height: '400px' }}>
-        <Typography variant="h6" gutterBottom>
-          {t('bodePlot.stepResponse')}
-        </Typography>
-        <Box sx={{ height: 'max(200px, calc(100% - 40px))', minWidth: 0 }}>
+      <CollapsiblePanel title={t('bodePlot.stepResponse')} defaultExpanded={false}>
+        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
           <Line data={stepData} options={stepOptions} />
         </Box>
-      </Paper>
+      </CollapsiblePanel>
     </Box>
   );
 };

@@ -1,9 +1,9 @@
-import { Box, Button, Paper, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ClearIcon from '@mui/icons-material/Clear';
 import type { PoleZero } from '../types';
+import { CollapsiblePanel } from './CollapsiblePanel';
 
 interface ToolbarProps {
   poles: PoleZero[];
@@ -18,20 +18,16 @@ interface ToolbarProps {
 }
 
 export const Toolbar = ({
-  poles,
-  zeros,
   onAddPolePair,
   onAddPoleReal,
   onAddZeroPair,
   onAddZeroReal,
-  onDeletePole,
-  onDeleteZero,
   onClear,
 }: ToolbarProps) => {
   const { t } = useTranslation();
 
   return (
-    <Paper elevation={3} sx={{ p: 2 }}>
+    <CollapsiblePanel title={t('toolbar.title')}>
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
         <Button
           variant="contained"
@@ -79,7 +75,7 @@ export const Toolbar = ({
           {t('toolbar.clear')}
         </Button>
       </Box>
-    </Paper>
+    </CollapsiblePanel>
   );
 };
 

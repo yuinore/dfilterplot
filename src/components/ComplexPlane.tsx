@@ -1,9 +1,9 @@
-import { Paper, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { PoleZero } from '../types';
 import { applySnap } from '../utils/snapUtils';
 import { PoleZeroRenderer } from './PoleZeroRenderer';
+import { CollapsiblePanel } from './CollapsiblePanel';
 
 interface ComplexPlaneProps {
   poles: PoleZero[];
@@ -27,8 +27,8 @@ export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove 
   } | null>(null);
 
   // 複素平面の座標を SVG 座標に変換
-  const toSvgX = (real: number): number => centerX + real * scale;
-  const toSvgY = (imag: number): number => centerY - imag * scale;
+  const toSvgX = (real: number): number => Math.max(0, Math.min(width, centerX + real * scale));
+  const toSvgY = (imag: number): number => Math.max(0, Math.min(height, centerY - imag * scale));
 
   // SVG 座標を複素平面の座標に変換
   const fromSvgX = (svgX: number): number => (svgX - centerX) / scale;
@@ -104,14 +104,11 @@ export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove 
   }, [draggingItem, handleMouseMove, handleMouseUp]);
 
   return (
-    <Paper elevation={3} sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        {t('complexPlane.title')}
-      </Typography>
+    <CollapsiblePanel title={t('complexPlane.title')}>
       <div
         style={{
           aspectRatio: '1 / 1',
-          maxWidth: '600px',
+          maxWidth: '720px',
           width: '100%',
           border: '1px solid #ccc',
           background: '#fafafa',
@@ -209,7 +206,7 @@ export const ComplexPlane = ({ poles, zeros, enableSnap, onPoleMove, onZeroMove 
         />
         </svg>
       </div>
-    </Paper>
+    </CollapsiblePanel>
   );
 };
 

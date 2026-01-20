@@ -16,10 +16,11 @@
     "title": "s Plane (Polar Components)"
   },
   "toolbar": {
-    "addPolePair": "Add Pole Pair",
-    "addPoleReal": "Add Pole (Real Axis)",
-    "addZeroPair": "Add Zero Pair",
-    "addZeroReal": "Add Zero (Real Axis)",
+    "title": "Toolbar",
+    "addPolePair": "Pole Pair",
+    "addPoleReal": "Pole (Real)",
+    "addZeroPair": "Zero Pair",
+    "addZeroReal": "Zero (Real)",
     "clear": "Clear"
   },
   "polezero": {

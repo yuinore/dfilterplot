@@ -1,8 +1,8 @@
-import { Paper, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import type { PoleZero } from '../types';
 import { PoleZeroRenderer } from './PoleZeroRenderer';
+import { CollapsiblePanel } from './CollapsiblePanel';
 
 interface SPlaneProps {
   poles: PoleZero[];
@@ -51,11 +51,11 @@ export const SPlane = ({ poles, zeros }: SPlaneProps) => {
   
   // s平面の座標をSVG座標に変換
   const toSvgX = (sigma: number): number => {
-    return centerX + sigma * scaleX;
+    return Math.max(0, Math.min(width, centerX + sigma * scaleX));
   };
   
   const toSvgY = (omega: number): number => {
-    return centerY - omega * scaleY;
+    return Math.max(0, Math.min(height, centerY - omega * scaleY));
   };
   
   // z平面の極・零点をs平面に変換
@@ -82,17 +82,15 @@ export const SPlane = ({ poles, zeros }: SPlaneProps) => {
   }, [zeros]);
 
   return (
-    <Paper elevation={3} sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        {t('sPlane.title')}
-      </Typography>
+    <CollapsiblePanel title={t('sPlane.title')} defaultExpanded={false}>
       <div
         style={{
           aspectRatio: '1 / 1',
-          maxWidth: '600px',
+          maxWidth: '720px',
           width: '100%',
           border: '1px solid #ccc',
           background: '#fafafa',
+          minHeight: 0,
         }}
       >
         <svg
@@ -202,7 +200,7 @@ export const SPlane = ({ poles, zeros }: SPlaneProps) => {
           />
         </svg>
       </div>
-    </Paper>
+    </CollapsiblePanel>
   );
 };
 
