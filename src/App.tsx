@@ -178,31 +178,41 @@ function App() {
           component="main"
           sx={{
             flexGrow: 1,
-            p: { xs: 1, sm: 2, md: 3 },
+            p: { xs: 3, lg: 3 },
             display: 'flex',
-            flexDirection: { xs: 'column', lg: 'row' },
-            gap: { xs: 2, md: 3 },
+            flexDirection: { xs: 'row', lg: 'row' },
+            gap: { xs: 3, lg: 3 },
             overflow: 'auto',
           }}
         >
-          <Box sx={{ 
-            flex: 1, 
+          <Box id="controller-box" sx={{ 
+            flexGrow: 2, 
+            flexShrink: 2,
+            flexBasis: 320,
             display: 'flex', 
             flexDirection: 'column', 
             gap: 2,
-            minWidth: { xs: '100%', lg: '400px' }
+            // minWidth: { sm: '100%', lg: '400px' },
+            maxWidth: { xs: '320px', lg: '640px' }
           }}>
-            <ComplexPlane 
-              poles={toPoleZeros(poles)} 
-              zeros={toPoleZeros(zeros)}
-              enableSnap={enableSnap}
-              onPoleMove={handlePoleMove}
-              onZeroMove={handleZeroMove}
-            />
-            <SPlane
-              poles={toPoleZeros(poles)}
-              zeros={toPoleZeros(zeros)}
-            />
+            <Box id="complex-plane-combi" sx={{ 
+              flexGrow: 0, 
+              display: 'flex', 
+              flexDirection: { xs: 'column', lg: 'row' },
+              gap: 2,
+            }}>
+              <ComplexPlane 
+                poles={toPoleZeros(poles)} 
+                zeros={toPoleZeros(zeros)}
+                enableSnap={enableSnap}
+                onPoleMove={handlePoleMove}
+                onZeroMove={handleZeroMove}
+              />
+              <SPlane
+                poles={toPoleZeros(poles)}
+                zeros={toPoleZeros(zeros)}
+              />
+            </Box>
             <GainControl
               gain={gain}
               onGainChange={setGain}
@@ -220,6 +230,11 @@ function App() {
               onDeleteZero={handleDeleteZero}
               onClear={handleClear}
             />
+            <FilterDesignPanel
+              onFilterChange={handleFilterChange}
+              logarithmicFrequency={logarithmicFrequency}
+              frequencyUnit={frequencyUnit}
+            />
             <Settings
               enableSnap={enableSnap}
               onEnableSnapChange={setEnableSnap}
@@ -230,16 +245,13 @@ function App() {
               frequencyUnit={frequencyUnit}
               onFrequencyUnitChange={setFrequencyUnit}
             />
-            <FilterDesignPanel
-              onFilterChange={handleFilterChange}
-              logarithmicFrequency={logarithmicFrequency}
-              frequencyUnit={frequencyUnit}
-            />
           </Box>
-          <Box sx={{ 
-            flex: 2, 
-            minHeight: { xs: '600px', lg: 0 },
-            minWidth: { xs: '100%', lg: '400px' }
+          <Box id="bode-plot-box" sx={{ 
+            flexGrow: 2,
+            flesShrink: 2,
+            flexBasis: 320,
+            // minHeight: { xs: '600px', lg: 0 },
+            // minWidth: { xs: '400px', lg: '400px' }
           }}>
             <BodePlot 
               poles={poles} 

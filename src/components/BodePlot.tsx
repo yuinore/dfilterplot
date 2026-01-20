@@ -392,7 +392,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.magnitude')}
         </Typography>
-        <Box sx={{ height: 'calc(100% - 40px)' }}>
+        <Box sx={{ height: 'max(200px, calc(100% - 40px))' }}>
           <Line data={magnitudeData} options={magnitudeOptions} />
         </Box>
       </Paper>
@@ -401,7 +401,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.phase')}
         </Typography>
-        <Box sx={{ height: 'calc(100% - 40px)' }}>
+        <Box sx={{ height: 'max(200px, calc(100% - 40px))' }}>
           <Line data={phaseData} options={phaseOptions} />
         </Box>
       </Paper>
@@ -410,7 +410,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.groupDelay')}
         </Typography>
-        <Box sx={{ height: 'calc(100% - 40px)' }}>
+        <Box sx={{ height: 'max(200px, calc(100% - 40px))' }}>
           <Line data={groupDelayData} options={groupDelayOptions} />
         </Box>
       </Paper>
@@ -419,7 +419,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.impulseResponse')}
         </Typography>
-        <Box sx={{ height: 'calc(100% - 40px)' }}>
+        <Box sx={{ height: 'max(200px, calc(100% - 40px))' }}>
           <Line data={impulseData} options={impulseOptions} />
         </Box>
       </Paper>
@@ -428,7 +428,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
         <Typography variant="h6" gutterBottom>
           {t('bodePlot.stepResponse')}
         </Typography>
-        <Box sx={{ height: 'calc(100% - 40px)' }}>
+        <Box sx={{ height: 'max(200px, calc(100% - 40px))' }}>
           <Line data={stepData} options={stepOptions} />
         </Box>
       </Paper>
