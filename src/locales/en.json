@@ -113,6 +113,12 @@
       "highPass": "High Pass",
       "order": "Order",
       "cutoffFrequency": "Cutoff Frequency"
+    },
+    "sinc": {
+      "name": "Sinc Filter",
+      "description": "FIR filter based on ideal low-pass filter impulse response. Uses truncated sinc function.",
+      "cutoffFrequency": "Cutoff Frequency",
+      "taps": "Number of Taps"
     }
   },
   "references": {

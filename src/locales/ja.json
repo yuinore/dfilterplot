@@ -113,6 +113,12 @@
       "highPass": "ハイパス",
       "order": "次数",
       "cutoffFrequency": "カットオフ周波数"
+    },
+    "sinc": {
+      "name": "Sincフィルタ",
+      "description": "理想的なローパスフィルタのインパルス応答に基づくFIRフィルタ。打ち切りsinc関数を使用。",
+      "cutoffFrequency": "カットオフ周波数",
+      "taps": "タップ数"
     }
   },
   "references": {
