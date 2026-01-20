@@ -1,5 +1,5 @@
 import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
-import { useMemo, useState, useRef, useCallback } from 'react';
+import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
@@ -11,6 +11,7 @@ import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from './types';
 import { toPoleZeros } from './types';
 import { FilterRegistry } from './filters';
 import { BODE_PLOT } from './constants';
+import { calculateAutoGain } from './utils/transferFunction';
 
 function App() {
   const theme = useMemo(
@@ -47,7 +48,16 @@ function App() {
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
   const [gain, setGain] = useState<number>(1.0);
+  const [autoGain, setAutoGain] = useState<boolean>(false);
   const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('radians');
+
+  // 自動調整が有効な場合、ゲインを自動計算
+  useEffect(() => {
+    if (autoGain) {
+      const calculatedGain = calculateAutoGain(poles, zeros, logarithmicFrequency, octaves);
+      setGain(calculatedGain);
+    }
+  }, [autoGain, poles, zeros, logarithmicFrequency, octaves]);
 
   // フィルタ設計の変更を処理
   const handleFilterChange = useCallback((filterId: string, params: Record<string, any>) => {
@@ -60,9 +70,12 @@ function App() {
       const result = filter.generate(params);
       setPoles(result.poles);
       setZeros(result.zeros);
-      setGain(result.gain);
+      // 自動調整が無効な場合のみ、フィルタ設計のゲインを使用
+      if (!autoGain) {
+        setGain(result.gain);
+      }
     }
-  }, []);
+  }, [autoGain]);
 
   // 極の移動処理
   const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
@@ -187,6 +200,8 @@ function App() {
             <GainControl
               gain={gain}
               onGainChange={setGain}
+              autoGain={autoGain}
+              onAutoGainChange={setAutoGain}
             />
             <Toolbar
               poles={toPoleZeros(poles)}

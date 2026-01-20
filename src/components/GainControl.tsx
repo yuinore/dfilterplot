@@ -1,12 +1,14 @@
-import { Paper, Typography, Slider, Box } from '@mui/material';
+import { Paper, Typography, Slider, Box, FormControlLabel, Checkbox } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 interface GainControlProps {
   gain: number;
   onGainChange: (gain: number) => void;
+  autoGain: boolean;
+  onAutoGainChange: (autoGain: boolean) => void;
 }
 
-export const GainControl = ({ gain, onGainChange }: GainControlProps) => {
+export const GainControl = ({ gain, onGainChange, autoGain, onAutoGainChange }: GainControlProps) => {
   const { t } = useTranslation();
 
   // dBスケールの範囲: -120dB ～ 0dB
@@ -35,15 +37,28 @@ export const GainControl = ({ gain, onGainChange }: GainControlProps) => {
       <Typography variant="body2" gutterBottom>
         {t('gainControl.gain')}: {gain.toFixed(6)} ({gainDB.toFixed(1)} dB)
       </Typography>
-      <Slider
-        value={gainDB}
-        onChange={(_, value) => onGainChange(dbToLinear(value as number))}
-        min={minDB}
-        max={maxDB}
-        step={0.1}
-        valueLabelDisplay="auto"
-        valueLabelFormat={(value) => `${value.toFixed(1)} dB`}
-      />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Slider
+          value={gainDB}
+          onChange={(_, value) => onGainChange(dbToLinear(value as number))}
+          min={minDB}
+          max={maxDB}
+          step={0.1}
+          valueLabelDisplay="auto"
+          valueLabelFormat={(value) => `${value.toFixed(1)} dB`}
+          disabled={autoGain}
+          sx={{ flex: 1 }}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={autoGain}
+              onChange={(e) => onAutoGainChange(e.target.checked)}
+            />
+          }
+          label={t('gainControl.autoAdjust')}
+        />
+      </Box>
     </Paper>
   );
 };
