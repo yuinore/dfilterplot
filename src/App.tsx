@@ -166,6 +166,7 @@ function App() {
   const handleClear = useCallback(() => {
     setPoles([]);
     setZeros([]);
+    setGain(1.0);
   }, []);
 
   return (
