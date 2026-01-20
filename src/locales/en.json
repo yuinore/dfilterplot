@@ -90,7 +90,7 @@
       "integrator": "Integrator"
     },
     "comb": {
-      "name": "Comb Filter",
+      "name": "Comb Filter / Delay / Chorus / Flanger",
       "description": "Filter with periodic frequency response",
       "type": "Filter Type",
       "feedforward": "Feedforward (FIR)",

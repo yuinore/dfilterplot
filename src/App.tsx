@@ -49,7 +49,7 @@ function App() {
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
   const [gain, setGain] = useState<number>(1.0);
   const [autoGain, setAutoGain] = useState<boolean>(false);
-  const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('radians');
+  const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('44100');
 
   // 自動調整が有効な場合、ゲインを自動計算
   useEffect(() => {

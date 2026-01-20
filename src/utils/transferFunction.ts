@@ -304,20 +304,23 @@ export function calculateGroupDelay(
     phases.push(h.phase());
   }
 
-  // 位相アンラッピング: -π から π の境界でのジャンプを補正
+  // 位相アンラッピング: -π から π の境界でのジャンプを補正、
+  //   および、振幅特性=0 または ∞ の点の前後での ±π のジャンプを補正
   const unwrappedPhases: number[] = [phases[0]];
   let cumulativeOffset = 0;
   
   for (let i = 1; i < numPoints; i++) {
-    const phaseDiff = phases[i] - phases[i - 1];
+    let phaseDiff = phases[i] - phases[i - 1];
     
-    // 位相差が π より大きい場合（-π から π へのジャンプ）
-    if (phaseDiff > Math.PI) {
-      cumulativeOffset -= 2 * Math.PI;
+    // 位相差が π/2 より大きい場合（±π または ±2π のジャンプ）
+    while (phaseDiff > Math.PI / 2) {
+      cumulativeOffset -= Math.PI;
+      phaseDiff -= Math.PI;
     }
-    // 位相差が -π より小さい場合（π から -π へのジャンプ）
-    else if (phaseDiff < -Math.PI) {
-      cumulativeOffset += 2 * Math.PI;
+    // 位相差が -π/2 より小さい場合（±π または ±2π のジャンプ）
+    while (phaseDiff < -Math.PI / 2) {
+      cumulativeOffset += Math.PI;
+      phaseDiff += Math.PI;
     }
     
     unwrappedPhases.push(phases[i] + cumulativeOffset);
@@ -341,9 +344,12 @@ export function calculateGroupDelay(
     groupDelays.push(groupDelay);
   }
 
+  // 群遅延を 1e-8 の倍数に揃える (微小誤差の解消のため)
+  const roundedGroupDelays = groupDelays.map(delay => Math.round(delay / 1e-8) * 1e-8);
+
   return {
     frequency: frequencies,
-    groupDelay: groupDelays,
+    groupDelay: roundedGroupDelays,
   };
 }
 
@@ -369,7 +375,7 @@ function createBiquadSectionsFromPoleOrZero(
   poles: PoleOrZero[]
 ): BiquadSection[] {
   const sections: BiquadSection[] = [];
-  
+
   // 零点と極を同時に処理してセクションを作成
   const maxLength = Math.max(zeros.length, poles.length);
   
