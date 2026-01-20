@@ -248,8 +248,9 @@ function App() {
           </Box>
           <Box id="bode-plot-box" sx={{ 
             flexGrow: 2,
-            flesShrink: 2,
+            flexShrink: 2,
             flexBasis: 320,
+            minWidth: 0, // Flexboxで縮小を許可
             // minHeight: { xs: '600px', lg: 0 },
             // minWidth: { xs: '400px', lg: '400px' }
           }}>
