@@ -1,4 +1,4 @@
-import { Box, Typography, Slider } from '@mui/material';
+import { Box, Typography, Slider, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import type { FilterPanelProps } from '../../filters/base';
@@ -43,14 +43,17 @@ export const SincFilterPanel = ({ onChange, logarithmicFrequency = false, freque
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
   // タップ数（奇数、3-10）
   const [taps, setTaps] = useState<number>(9);
+  // 窓関数
+  const [windowFunction, setWindowFunction] = useState<string>('hann');
 
   // パラメータ変更時に親に通知
   useEffect(() => {
     onChange({
       cutoffFrequency: cutoffFrequency,
       taps: taps,
+      windowFunction: windowFunction,
     });
-  }, [cutoffFrequency, taps, onChange]);
+  }, [cutoffFrequency, taps, windowFunction, onChange]);
 
   // スライダーの範囲（rad/s）
   const minFreqRad = 0.001 * Math.PI;
@@ -112,6 +115,29 @@ export const SincFilterPanel = ({ onChange, logarithmicFrequency = false, freque
         valueLabelDisplay="auto"
         sx={{ mb: 2 }}
       />
+      
+      <Typography variant="subtitle2" gutterBottom>
+        {t('filters.sinc.windowFunction')}
+      </Typography>
+      <ToggleButtonGroup
+        value={windowFunction}
+        exclusive
+        onChange={(_, value) => {
+          if (value !== null) {
+            setWindowFunction(value);
+          }
+        }}
+        fullWidth
+        size="small"
+        sx={{ mb: 2 }}
+      >
+        <ToggleButton value="none">
+          {t('filters.sinc.windowNone')}
+        </ToggleButton>
+        <ToggleButton value="hann">
+          {t('filters.sinc.windowHann')}
+        </ToggleButton>
+      </ToggleButtonGroup>
     </Box>
   );
 };

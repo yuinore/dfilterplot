@@ -19,8 +19,8 @@ export class SincFilterDesign implements FilterDesignBase {
   PanelComponent = SincFilterPanel;
 
   generate(params: Record<string, any>): FilterGenerationResult {
-    const { cutoffFrequency, taps } = params;
-    return this.generateSincFilter(cutoffFrequency, taps);
+    const { cutoffFrequency, taps, windowFunction = 'none' } = params;
+    return this.generateSincFilter(cutoffFrequency, taps, windowFunction);
   }
 
   /**
@@ -28,11 +28,13 @@ export class SincFilterDesign implements FilterDesignBase {
    * 
    * @param cutoffFrequency カットオフ周波数（rad/s）
    * @param taps タップ数（奇数、31以下）
+   * @param windowFunction 窓関数 ('none' | 'hann')
    * @returns 極・零点・ゲイン
    */
   private generateSincFilter(
     cutoffFrequency: number,
-    taps: number
+    taps: number,
+    windowFunction: string = 'none'
   ): FilterGenerationResult {
     // タップ数は奇数で31以下
     const N = Math.min(Math.max(3, taps), 31);
@@ -49,6 +51,23 @@ export class SincFilterDesign implements FilterDesignBase {
       }
     }
     
+    // 窓関数を適用
+    if (windowFunction === 'hann') {
+      for (let i = 0; i < impulseResponse.length; i++) {
+        // 最初のサンプルが 0 にならないように、窓関数の長さは N + 1 になるようにする
+        const n = i - halfN; // -halfN から halfN までのインデックス
+        const normalizedIndex = (n + halfN + 1) / (N + 1); // 0 から 1 に正規化
+        const windowValue = 0.5 * (1 - Math.cos(2 * Math.PI * normalizedIndex));
+        impulseResponse[i] *= windowValue;
+      }
+    }
+    
+    // ノーマライズ
+    const sum = impulseResponse.reduce((acc, curr) => acc + curr, 0);
+    for (let i = 0; i < impulseResponse.length; i++) {
+    impulseResponse[i] /= sum;
+    }
+
     // 伝達関数 H(z) = Σ h[n] * z^(-n) の係数を計算
     // z^(-n) の係数が h[n] なので、降べき順に並べると:
     // H(z) = h[-halfN] * z^(halfN) + ... + h[0] + ... + h[halfN] * z^(-halfN)

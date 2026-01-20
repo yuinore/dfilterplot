@@ -122,13 +122,19 @@
       "name": "Sinc Filter",
       "description": "FIR filter based on ideal low-pass filter impulse response. Uses truncated sinc function.",
       "cutoffFrequency": "Cutoff Frequency",
-      "taps": "Number of Taps"
+      "taps": "Number of Taps",
+      "windowFunction": "Window Function",
+      "windowNone": "None",
+      "windowHann": "Hann"
     },
     "gaussian": {
       "name": "Gaussian Filter",
       "description": "FIR filter based on Gaussian function. Features smooth frequency response.",
       "sigma": "Standard Deviation",
-      "taps": "Number of Taps"
+      "taps": "Number of Taps",
+      "windowFunction": "Window Function",
+      "windowNone": "None",
+      "windowHann": "Hann"
     }
   },
   "references": {

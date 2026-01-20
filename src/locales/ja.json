@@ -122,13 +122,19 @@
       "name": "Sincフィルタ",
       "description": "理想的なローパスフィルタのインパルス応答に基づくFIRフィルタ。打ち切りsinc関数を使用。",
       "cutoffFrequency": "カットオフ周波数",
-      "taps": "タップ数"
+      "taps": "タップ数",
+      "windowFunction": "窓関数",
+      "windowNone": "窓関数なし",
+      "windowHann": "ハン窓"
     },
     "gaussian": {
       "name": "ガウシアンフィルタ",
       "description": "ガウシアン関数に基づくFIRフィルタ。滑らかな周波数特性を持つ。",
       "sigma": "標準偏差",
-      "taps": "タップ数"
+      "taps": "タップ数",
+      "windowFunction": "窓関数",
+      "windowNone": "窓関数なし",
+      "windowHann": "ハン窓"
     }
   },
   "references": {

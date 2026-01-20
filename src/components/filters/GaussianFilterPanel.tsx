@@ -1,4 +1,4 @@
-import { Box, Typography, Slider } from '@mui/material';
+import { Box, Typography, Slider, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import type { FilterPanelProps } from '../../filters/base';
@@ -10,14 +10,17 @@ export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
   const [sigma, setSigma] = useState<number>(1.0);
   // タップ数（奇数、3-31）
   const [taps, setTaps] = useState<number>(9);
+  // 窓関数
+  const [windowFunction, setWindowFunction] = useState<string>('hann');
 
   // パラメータ変更時に親に通知
   useEffect(() => {
     onChange({
       sigma: sigma,
       taps: taps,
+      windowFunction: windowFunction,
     });
-  }, [sigma, taps, onChange]);
+  }, [sigma, taps, windowFunction, onChange]);
 
   return (
     <Box>
@@ -48,6 +51,29 @@ export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
         valueLabelDisplay="auto"
         sx={{ mb: 2 }}
       />
+      
+      <Typography variant="subtitle2" gutterBottom>
+        {t('filters.gaussian.windowFunction')}
+      </Typography>
+      <ToggleButtonGroup
+        value={windowFunction}
+        exclusive
+        onChange={(_, value) => {
+          if (value !== null) {
+            setWindowFunction(value);
+          }
+        }}
+        fullWidth
+        size="small"
+        sx={{ mb: 2 }}
+      >
+        <ToggleButton value="none">
+          {t('filters.gaussian.windowNone')}
+        </ToggleButton>
+        <ToggleButton value="hann">
+          {t('filters.gaussian.windowHann')}
+        </ToggleButton>
+      </ToggleButtonGroup>
     </Box>
   );
 };

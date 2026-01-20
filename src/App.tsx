@@ -36,7 +36,7 @@ function App() {
   // 初期の極と零点（デモ用）
   const [poles, setPoles] = useState<PoleOrZero[]>(() => {
     return [
-      { id: getNextId(), real: 0.5, imag: 0.5, isPole: true } as PoleZeroPair,
+      { id: getNextId(), real: 0.6, imag: 0.6, isPole: true } as PoleZeroPair,
     ];
   });
 
