@@ -5,7 +5,7 @@ import { generateFilterId } from '../utils/filterMath';
 
 /**
  * Biquadフィルタ設計
- * 
+ *
  * Reference: Audio EQ Cookbook by Robert Bristow-Johnson
  * https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt
  */
@@ -37,7 +37,11 @@ export class BiquadFilterDesign implements FilterDesignBase {
   /**
    * 2次方程式 a*z^2 + b*z + c = 0 の根を求める
    */
-  private solveQuadratic(a: number, b: number, c: number): { real: number; imag: number }[] {
+  private solveQuadratic(
+    a: number,
+    b: number,
+    c: number,
+  ): { real: number; imag: number }[] {
     const discriminant = b * b - 4 * a * c;
 
     if (Math.abs(discriminant) < 1e-10) {
@@ -75,7 +79,7 @@ export class BiquadFilterDesign implements FilterDesignBase {
     b2: number,
     a0: number,
     a1: number,
-    a2: number
+    a2: number,
   ): FilterGenerationResult {
     // 正規化
     const b0n = b0 / a0;
@@ -149,7 +153,10 @@ export class BiquadFilterDesign implements FilterDesignBase {
    * Low Pass フィルタの極・零点を生成
    * Audio EQ Cookbook: LPF
    */
-  private generateLowPassBiquad(cutoffFreq: number, Q: number): FilterGenerationResult {
+  private generateLowPassBiquad(
+    cutoffFreq: number,
+    Q: number,
+  ): FilterGenerationResult {
     const w0 = cutoffFreq;
     const cosW0 = Math.cos(w0);
     const sinW0 = Math.sin(w0);
@@ -170,7 +177,10 @@ export class BiquadFilterDesign implements FilterDesignBase {
    * High Pass フィルタの極・零点を生成
    * Audio EQ Cookbook: HPF
    */
-  private generateHighPassBiquad(cutoffFreq: number, Q: number): FilterGenerationResult {
+  private generateHighPassBiquad(
+    cutoffFreq: number,
+    Q: number,
+  ): FilterGenerationResult {
     const w0 = cutoffFreq;
     const cosW0 = Math.cos(w0);
     const sinW0 = Math.sin(w0);
@@ -191,7 +201,10 @@ export class BiquadFilterDesign implements FilterDesignBase {
    * Band Pass フィルタの極・零点を生成
    * Audio EQ Cookbook: BPF (constant 0 dB peak gain)
    */
-  private generateBandPassBiquad(centerFreq: number, Q: number): FilterGenerationResult {
+  private generateBandPassBiquad(
+    centerFreq: number,
+    Q: number,
+  ): FilterGenerationResult {
     const w0 = centerFreq;
     const cosW0 = Math.cos(w0);
     const sinW0 = Math.sin(w0);
@@ -212,7 +225,10 @@ export class BiquadFilterDesign implements FilterDesignBase {
    * Band Stop (Notch) フィルタの極・零点を生成
    * Audio EQ Cookbook: notch
    */
-  private generateBandStopBiquad(notchFreq: number, Q: number): FilterGenerationResult {
+  private generateBandStopBiquad(
+    notchFreq: number,
+    Q: number,
+  ): FilterGenerationResult {
     const w0 = notchFreq;
     const cosW0 = Math.cos(w0);
     const sinW0 = Math.sin(w0);

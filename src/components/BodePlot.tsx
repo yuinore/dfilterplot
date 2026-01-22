@@ -35,7 +35,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 interface BodePlotProps {
@@ -74,26 +74,56 @@ function getFrequencyLabel(unit: FrequencyUnit): string {
   return 'Hz';
 }
 
-export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, frequencyUnit }: BodePlotProps) => {
+export const BodePlot = ({
+  poles,
+  zeros,
+  logarithmicFrequency,
+  octaves,
+  gain,
+  frequencyUnit,
+}: BodePlotProps) => {
   const { t } = useTranslation();
 
   // 周波数応答を計算
   const frequencyResponse = useMemo(() => {
     if (logarithmicFrequency) {
-      return calculateFrequencyResponseLog(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, octaves, gain);
+      return calculateFrequencyResponseLog(
+        zeros,
+        poles,
+        FREQUENCY_RESPONSE.NUM_POINTS,
+        octaves,
+        gain,
+      );
     } else {
-      return calculateFrequencyResponse(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, gain);
+      return calculateFrequencyResponse(
+        zeros,
+        poles,
+        FREQUENCY_RESPONSE.NUM_POINTS,
+        gain,
+      );
     }
   }, [zeros, poles, logarithmicFrequency, octaves, gain]);
 
   // 群遅延を計算
   const groupDelayResponse = useMemo(() => {
-    return calculateGroupDelay(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, logarithmicFrequency, octaves, gain);
+    return calculateGroupDelay(
+      zeros,
+      poles,
+      FREQUENCY_RESPONSE.NUM_POINTS,
+      logarithmicFrequency,
+      octaves,
+      gain,
+    );
   }, [zeros, poles, logarithmicFrequency, octaves, gain]);
 
   // インパルス応答を計算
   const impulseResponse = useMemo(() => {
-    return calculateImpulseResponse(zeros, poles, TIME_RESPONSE.NUM_SAMPLES, gain);
+    return calculateImpulseResponse(
+      zeros,
+      poles,
+      TIME_RESPONSE.NUM_SAMPLES,
+      gain,
+    );
   }, [zeros, poles, gain]);
 
   // ステップ応答を計算
@@ -103,7 +133,9 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
 
   // 振幅特性のグラフデータ
   const magnitudeData = useMemo(() => {
-    const convertedFrequency = frequencyResponse.frequency.map(f => convertFrequency(f, frequencyUnit));
+    const convertedFrequency = frequencyResponse.frequency.map((f) =>
+      convertFrequency(f, frequencyUnit),
+    );
     return {
       labels: convertedFrequency,
       datasets: [
@@ -122,7 +154,9 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
 
   // 位相特性のグラフデータ
   const phaseData = useMemo(() => {
-    const convertedFrequency = frequencyResponse.frequency.map(f => convertFrequency(f, frequencyUnit));
+    const convertedFrequency = frequencyResponse.frequency.map((f) =>
+      convertFrequency(f, frequencyUnit),
+    );
     return {
       labels: convertedFrequency,
       datasets: [
@@ -144,21 +178,23 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
     // 角周波数の範囲を計算
     const omegaMin = logarithmicFrequency ? Math.PI / Math.pow(2, octaves) : 0;
     const omegaMax = Math.PI;
-    
+
     // 指定された単位に変換
     const xMin = convertFrequency(omegaMin, frequencyUnit);
     const xMax = convertFrequency(omegaMax, frequencyUnit);
-    
+
     // 軸ラベルを生成
     const frequencyLabel = `${t('bodePlot.frequency')} (${getFrequencyLabel(frequencyUnit)})`;
-    
+
     return {
       responsive: true,
       maintainAspectRatio: false,
       animation: false as const,
       scales: {
         x: {
-          type: logarithmicFrequency ? ('logarithmic' as const) : ('linear' as const),
+          type: logarithmicFrequency
+            ? ('logarithmic' as const)
+            : ('linear' as const),
           title: {
             display: true,
             text: frequencyLabel,
@@ -186,40 +222,48 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
   }, [logarithmicFrequency, octaves, t, frequencyUnit]);
 
   // 振幅特性のオプション
-  const magnitudeOptions = useMemo(() => ({
-    ...commonOptions,
-    scales: {
-      ...commonOptions.scales,
-      y: {
-        title: {
-          display: true,
-          text: t('bodePlot.magnitudeDB'),
+  const magnitudeOptions = useMemo(
+    () => ({
+      ...commonOptions,
+      scales: {
+        ...commonOptions.scales,
+        y: {
+          title: {
+            display: true,
+            text: t('bodePlot.magnitudeDB'),
+          },
+          min: BODE_PLOT.MAGNITUDE_MIN_DB,
+          max: BODE_PLOT.MAGNITUDE_MAX_DB,
         },
-        min: BODE_PLOT.MAGNITUDE_MIN_DB,
-        max: BODE_PLOT.MAGNITUDE_MAX_DB,
       },
-    },
-  }), [commonOptions, t]);
+    }),
+    [commonOptions, t],
+  );
 
   // 位相特性のオプション
-  const phaseOptions = useMemo(() => ({
-    ...commonOptions,
-    scales: {
-      ...commonOptions.scales,
-      y: {
-        title: {
-          display: true,
-          text: t('bodePlot.phaseDeg'),
+  const phaseOptions = useMemo(
+    () => ({
+      ...commonOptions,
+      scales: {
+        ...commonOptions.scales,
+        y: {
+          title: {
+            display: true,
+            text: t('bodePlot.phaseDeg'),
+          },
+          min: -180,
+          max: 180,
         },
-        min: -180,
-        max: 180,
       },
-    },
-  }), [commonOptions, t]);
+    }),
+    [commonOptions, t],
+  );
 
   // 群遅延のグラフデータ
   const groupDelayData = useMemo(() => {
-    const convertedFrequency = groupDelayResponse.frequency.map(f => convertFrequency(f, frequencyUnit));
+    const convertedFrequency = groupDelayResponse.frequency.map((f) =>
+      convertFrequency(f, frequencyUnit),
+    );
     return {
       labels: convertedFrequency,
       datasets: [
@@ -237,18 +281,21 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
   }, [groupDelayResponse, t, frequencyUnit]);
 
   // 群遅延のオプション
-  const groupDelayOptions = useMemo(() => ({
-    ...commonOptions,
-    scales: {
-      ...commonOptions.scales,
-      y: {
-        title: {
-          display: true,
-          text: t('bodePlot.delaySamples'),
+  const groupDelayOptions = useMemo(
+    () => ({
+      ...commonOptions,
+      scales: {
+        ...commonOptions.scales,
+        y: {
+          title: {
+            display: true,
+            text: t('bodePlot.delaySamples'),
+          },
         },
       },
-    },
-  }), [commonOptions, t]);
+    }),
+    [commonOptions, t],
+  );
 
   // インパルス応答のグラフデータ
   const impulseData = useMemo(() => {
@@ -274,7 +321,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
     const { min: yMin, max: yMax } = calculateTimeResponseAxisRange(
       impulseResponse.amplitude,
       -0.1,
-      0.1
+      0.1,
     );
 
     return {
@@ -340,7 +387,7 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
     const { min: yMin, max: yMax } = calculateTimeResponseAxisRange(
       stepResponse.amplitude,
       -0.1,
-      0.1
+      0.1,
     );
 
     return {
@@ -383,43 +430,80 @@ export const BodePlot = ({ poles, zeros, logarithmicFrequency, octaves, gain, fr
   }, [stepResponse, t]);
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      gap: 2, 
-      height: '100%',
-      minWidth: 0, // Flexboxで縮小を許可
-    }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        height: '100%',
+        minWidth: 0, // Flexboxで縮小を許可
+      }}
+    >
       <CollapsiblePanel title={t('bodePlot.magnitude')}>
-        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
+        <Box
+          sx={{
+            height: 'max(240px, calc((100% - 200px) / 5))',
+            minWidth: 0,
+            minHeight: 240,
+          }}
+        >
           <Line data={magnitudeData} options={magnitudeOptions} />
         </Box>
       </CollapsiblePanel>
 
       <CollapsiblePanel title={t('bodePlot.phase')}>
-        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
+        <Box
+          sx={{
+            height: 'max(240px, calc((100% - 200px) / 5))',
+            minWidth: 0,
+            minHeight: 240,
+          }}
+        >
           <Line data={phaseData} options={phaseOptions} />
         </Box>
       </CollapsiblePanel>
 
-      <CollapsiblePanel title={t('bodePlot.groupDelay')} defaultExpanded={false}>
-        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
+      <CollapsiblePanel
+        title={t('bodePlot.groupDelay')}
+        defaultExpanded={false}
+      >
+        <Box
+          sx={{
+            height: 'max(240px, calc((100% - 200px) / 5))',
+            minWidth: 0,
+            minHeight: 240,
+          }}
+        >
           <Line data={groupDelayData} options={groupDelayOptions} />
         </Box>
       </CollapsiblePanel>
 
       <CollapsiblePanel title={t('bodePlot.impulseResponse')}>
-        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
+        <Box
+          sx={{
+            height: 'max(240px, calc((100% - 200px) / 5))',
+            minWidth: 0,
+            minHeight: 240,
+          }}
+        >
           <Line data={impulseData} options={impulseOptions} />
         </Box>
       </CollapsiblePanel>
 
-      <CollapsiblePanel title={t('bodePlot.stepResponse')} defaultExpanded={false}>
-        <Box sx={{ height: 'max(240px, calc((100% - 200px) / 5))', minWidth: 0, minHeight: 240 }}>
+      <CollapsiblePanel
+        title={t('bodePlot.stepResponse')}
+        defaultExpanded={false}
+      >
+        <Box
+          sx={{
+            height: 'max(240px, calc((100% - 200px) / 5))',
+            minWidth: 0,
+            minHeight: 240,
+          }}
+        >
           <Line data={stepData} options={stepOptions} />
         </Box>
       </CollapsiblePanel>
     </Box>
   );
 };
-

@@ -33,7 +33,7 @@ export class CalculusFilterDesign implements FilterDesignBase {
   private generateDifferentiator(): FilterGenerationResult {
     const poles: PoleOrZero[] = [];
     const zeros: PoleOrZero[] = [];
-    
+
     // 零点: z = 1
     zeros.push({
       type: 'real',
@@ -41,10 +41,10 @@ export class CalculusFilterDesign implements FilterDesignBase {
       real: 1.0,
       isPole: false,
     } as PoleZeroReal);
-    
+
     // ゲイン = 1
     const gain = 1.0;
-    
+
     return { poles, zeros, gain };
   }
 
@@ -56,7 +56,7 @@ export class CalculusFilterDesign implements FilterDesignBase {
   private generateIntegrator(): FilterGenerationResult {
     const poles: PoleOrZero[] = [];
     const zeros: PoleOrZero[] = [];
-    
+
     // 極: z = 1（単位円上なので不安定）
     poles.push({
       type: 'real',
@@ -64,11 +64,10 @@ export class CalculusFilterDesign implements FilterDesignBase {
       real: 1.0,
       isPole: true,
     } as PoleZeroReal);
-    
+
     // ゲイン = 1
     const gain = 1.0;
-    
+
     return { poles, zeros, gain };
   }
 }
-

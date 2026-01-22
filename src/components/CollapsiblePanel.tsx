@@ -11,11 +11,11 @@ interface CollapsiblePanelProps {
   elevation?: number;
 }
 
-export const CollapsiblePanel = ({ 
-  title, 
-  children, 
+export const CollapsiblePanel = ({
+  title,
+  children,
   defaultExpanded = true,
-  elevation = 3 
+  elevation = 3,
 }: CollapsiblePanelProps) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
@@ -30,9 +30,7 @@ export const CollapsiblePanel = ({
         }}
         onClick={() => setExpanded(!expanded)}
       >
-        <Typography variant="h6">
-          {title}
-        </Typography>
+        <Typography variant="h6">{title}</Typography>
         <IconButton
           size="small"
           onClick={(e) => {
@@ -45,11 +43,8 @@ export const CollapsiblePanel = ({
         </IconButton>
       </Box>
       <Collapse in={expanded}>
-        <Box sx={{ mt: 2, overflow: 'visible', minHeight: 0 }}>
-          {children}
-        </Box>
+        <Box sx={{ mt: 2, overflow: 'visible', minHeight: 0 }}>{children}</Box>
       </Collapse>
     </Paper>
   );
 };
-

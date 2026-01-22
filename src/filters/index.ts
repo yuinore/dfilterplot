@@ -24,4 +24,3 @@ export { MovingAverageFilterDesign } from './movingaverage';
 export { ButterworthFilterDesign } from './butterworth';
 export { SincFilterDesign } from './sinc';
 export { GaussianFilterDesign } from './gaussian';
-

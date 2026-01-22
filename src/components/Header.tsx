@@ -1,9 +1,9 @@
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  IconButton, 
-  Menu, 
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
   MenuItem,
   Dialog,
   DialogTitle,
@@ -11,7 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Link
+  Link,
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import InfoIcon from '@mui/icons-material/Info';
@@ -49,20 +49,20 @@ export const Header = () => {
       title: 'Audio EQ Cookbook',
       author: 'Robert Bristow-Johnson',
       url: 'https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt',
-      descriptionKey: 'references.audioEqCookbook'
+      descriptionKey: 'references.audioEqCookbook',
     },
     {
       title: 'Bode Plot - Interactive Pole/Zero Placement',
       author: 'Control Systems Academy',
       url: 'https://controlsystemsacademy.com/0019/0019.html',
-      descriptionKey: 'references.controlSystemsAcademy'
+      descriptionKey: 'references.controlSystemsAcademy',
     },
     {
       title: 'Digital Filter',
       author: 'Paul Falstad',
       url: 'https://www.falstad.com/dfilter/',
-      descriptionKey: 'references.falstadFilter'
-    }
+      descriptionKey: 'references.falstadFilter',
+    },
   ];
 
   return (
@@ -106,13 +106,21 @@ export const Header = () => {
                 <ListItem key={index}>
                   <ListItemText
                     primary={
-                      <Link href={ref.url} target="_blank" rel="noopener noreferrer">
+                      <Link
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         {ref.title}
                       </Link>
                     }
                     secondary={
                       <>
-                        <Typography component="span" variant="body2" color="text.secondary">
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          color="text.secondary"
+                        >
                           {ref.author}
                         </Typography>
                         <br />
@@ -131,4 +139,3 @@ export const Header = () => {
     </AppBar>
   );
 };
-

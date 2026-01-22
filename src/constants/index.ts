@@ -31,4 +31,3 @@ export const TIME_RESPONSE = {
   /** インパルス応答とステップ応答の表示長（サンプル数） */
   NUM_SAMPLES: 64,
 } as const;
-

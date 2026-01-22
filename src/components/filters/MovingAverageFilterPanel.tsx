@@ -7,7 +7,9 @@ interface MovingAverageFilterPanelProps {
   logarithmicFrequency?: boolean;
 }
 
-export const MovingAverageFilterPanel = ({ onChange }: MovingAverageFilterPanelProps) => {
+export const MovingAverageFilterPanel = ({
+  onChange,
+}: MovingAverageFilterPanelProps) => {
   const { t } = useTranslation();
   const [length, setLength] = useState<number>(8);
 
@@ -19,7 +21,8 @@ export const MovingAverageFilterPanel = ({ onChange }: MovingAverageFilterPanelP
   return (
     <Box>
       <Typography variant="subtitle2" gutterBottom>
-        {t('filters.movingAverage.length')}: {length} {t('filters.movingAverage.samples')}
+        {t('filters.movingAverage.length')}: {length}{' '}
+        {t('filters.movingAverage.samples')}
       </Typography>
       <Slider
         value={length}
@@ -36,11 +39,10 @@ export const MovingAverageFilterPanel = ({ onChange }: MovingAverageFilterPanelP
         ]}
         valueLabelDisplay="auto"
       />
-      
+
       <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
         {t('filters.movingAverage.description')}
       </Typography>
     </Box>
   );
 };
-

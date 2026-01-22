@@ -1,4 +1,10 @@
-import { Typography, Slider, Box, FormControlLabel, Checkbox } from '@mui/material';
+import {
+  Typography,
+  Slider,
+  Box,
+  FormControlLabel,
+  Checkbox,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { CollapsiblePanel } from './CollapsiblePanel';
 
@@ -9,7 +15,12 @@ interface GainControlProps {
   onAutoGainChange: (autoGain: boolean) => void;
 }
 
-export const GainControl = ({ gain, onGainChange, autoGain, onAutoGainChange }: GainControlProps) => {
+export const GainControl = ({
+  gain,
+  onGainChange,
+  autoGain,
+  onAutoGainChange,
+}: GainControlProps) => {
   const { t } = useTranslation();
 
   // リニアスケールの範囲: -1 ～ 1
@@ -20,7 +31,10 @@ export const GainControl = ({ gain, onGainChange, autoGain, onAutoGainChange }: 
   const clampedGain = Math.max(minGain, Math.min(maxGain, gain));
 
   return (
-    <CollapsiblePanel title={`${t('gainControl.title')} (${clampedGain.toFixed(6)})`} defaultExpanded={false}>
+    <CollapsiblePanel
+      title={`${t('gainControl.title')} (${clampedGain.toFixed(6)})`}
+      defaultExpanded={false}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Slider
           value={clampedGain}
@@ -46,4 +60,3 @@ export const GainControl = ({ gain, onGainChange, autoGain, onAutoGainChange }: 
     </CollapsiblePanel>
   );
 };
-

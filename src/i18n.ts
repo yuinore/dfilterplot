@@ -10,19 +10,16 @@ const getBrowserLanguage = (): string => {
   return 'en';
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources: {
-      ja: { translation: ja },
-      en: { translation: en },
-    },
-    lng: getBrowserLanguage(),
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  resources: {
+    ja: { translation: ja },
+    en: { translation: en },
+  },
+  lng: getBrowserLanguage(),
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export default i18n;
-

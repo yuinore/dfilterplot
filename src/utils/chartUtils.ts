@@ -6,7 +6,7 @@
  * y軸の範囲を計算する
  * データの範囲とデフォルト範囲を比較し、両方を含む範囲を返す
  * 軸の範囲は10の累乗の倍数に丸められる
- * 
+ *
  * @param dataMin データの最小値
  * @param dataMax データの最大値
  * @param defaultMin デフォルトの最小値
@@ -17,7 +17,7 @@ export function calculateAxisRange(
   dataMin: number,
   dataMax: number,
   defaultMin: number,
-  defaultMax: number
+  defaultMax: number,
 ): { min: number; max: number } {
   // データの最大値より1桁小さい 10 の累乗数を計算（刻み幅）
   const dataMaxAbs = Math.max(0.001, Math.abs(dataMax));
@@ -34,13 +34,13 @@ export function calculateAxisRange(
   // min が dataMin より小さく、かつ minStep の倍数となるようにする
   // さらに defaultMin 以下であることを保証
   const min = Math.min(defaultMin, Math.floor(dataMin / minStep - 1) * minStep);
-  
+
   return { min, max };
 }
 
 /**
  * 配列の最小値を取得する
- * 
+ *
  * @param data 数値配列
  * @returns 最小値
  */
@@ -51,7 +51,7 @@ export function getArrayMin(data: number[]): number {
 
 /**
  * 配列の最大値を取得する
- * 
+ *
  * @param data 数値配列
  * @returns 最大値
  */
@@ -62,7 +62,7 @@ export function getArrayMax(data: number[]): number {
 
 /**
  * インパルス応答・ステップ応答のy軸範囲を計算する
- * 
+ *
  * @param amplitude 振幅データの配列
  * @param defaultMin デフォルトの最小値（デフォルト: -0.5）
  * @param defaultMax デフォルトの最大値（デフォルト: 1.5）
@@ -71,11 +71,10 @@ export function getArrayMax(data: number[]): number {
 export function calculateTimeResponseAxisRange(
   amplitude: number[],
   defaultMin: number = -0.5,
-  defaultMax: number = 1.5
+  defaultMax: number = 1.5,
 ): { min: number; max: number } {
   const dataMin = getArrayMin(amplitude);
   const dataMax = getArrayMax(amplitude);
-  
+
   return calculateAxisRange(dataMin, dataMax, defaultMin, defaultMax);
 }
-

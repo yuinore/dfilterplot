@@ -1,4 +1,12 @@
-import { Typography, FormControlLabel, Switch, Box, Slider, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import {
+  Typography,
+  FormControlLabel,
+  Switch,
+  Box,
+  Slider,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { BODE_PLOT } from '../constants';
 import { CollapsiblePanel } from './CollapsiblePanel';
@@ -16,15 +24,15 @@ interface SettingsProps {
   onFrequencyUnitChange: (unit: FrequencyUnit) => void;
 }
 
-export const Settings = ({ 
-  enableSnap, 
+export const Settings = ({
+  enableSnap,
   onEnableSnapChange,
   logarithmicFrequency,
   onLogarithmicFrequencyChange,
   octaves,
   onOctavesChange,
   frequencyUnit,
-  onFrequencyUnitChange
+  onFrequencyUnitChange,
 }: SettingsProps) => {
   const { t } = useTranslation();
 
@@ -68,15 +76,9 @@ export const Settings = ({
           size="small"
           sx={{ mb: 1 }}
         >
-          <ToggleButton value="radians">
-            {t('settings.radians')}
-          </ToggleButton>
-          <ToggleButton value="44100">
-            44.1kHz
-          </ToggleButton>
-          <ToggleButton value="48000">
-            48kHz
-          </ToggleButton>
+          <ToggleButton value="radians">{t('settings.radians')}</ToggleButton>
+          <ToggleButton value="44100">44.1kHz</ToggleButton>
+          <ToggleButton value="48000">48kHz</ToggleButton>
         </ToggleButtonGroup>
       </Box>
       <Box sx={{ mt: 2 }}>
@@ -89,7 +91,10 @@ export const Settings = ({
           min={Math.min(...BODE_PLOT.OCTAVE_OPTIONS)}
           max={Math.max(...BODE_PLOT.OCTAVE_OPTIONS)}
           step={null}
-          marks={BODE_PLOT.OCTAVE_OPTIONS.map(v => ({ value: v, label: v.toString() }))}
+          marks={BODE_PLOT.OCTAVE_OPTIONS.map((v) => ({
+            value: v,
+            label: v.toString(),
+          }))}
           valueLabelDisplay="auto"
           disabled={!logarithmicFrequency}
         />
@@ -97,4 +102,3 @@ export const Settings = ({
     </CollapsiblePanel>
   );
 };
-

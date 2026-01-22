@@ -32,7 +32,7 @@ export interface FilterDesignBase {
   descriptionKey?: string;
   /** フィルタのUIコンポーネント */
   PanelComponent: ComponentType<FilterPanelProps>;
-  
+
   /**
    * フィルタを生成
    * @param params パラメータの値
@@ -75,4 +75,3 @@ export class FilterRegistry {
     return Array.from(this.filters.keys());
   }
 }
-

@@ -26,7 +26,7 @@ export const useDraggable = ({ onDrag, onDragEnd }: UseDraggableOptions) => {
 
       onDrag(dx, dy);
     },
-    [onDrag]
+    [onDrag],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -42,4 +42,3 @@ export const useDraggable = ({ onDrag, onDragEnd }: UseDraggableOptions) => {
     handleMouseUp,
   };
 };
-

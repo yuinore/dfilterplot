@@ -1,11 +1,17 @@
-import { Box, Typography, Slider, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Slider,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import type { FilterPanelProps } from '../../filters/base';
 
 export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
   const { t } = useTranslation();
-  
+
   // 標準偏差（sigma）
   const [sigma, setSigma] = useState<number>(1.0);
   // タップ数（奇数、3-31）
@@ -37,7 +43,7 @@ export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
         valueLabelFormat={(value) => value.toFixed(2)}
         sx={{ mb: 2 }}
       />
-      
+
       <Typography variant="subtitle2" gutterBottom>
         {t('filters.gaussian.taps')}
       </Typography>
@@ -51,7 +57,7 @@ export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
         valueLabelDisplay="auto"
         sx={{ mb: 2 }}
       />
-      
+
       <Typography variant="subtitle2" gutterBottom>
         {t('filters.gaussian.windowFunction')}
       </Typography>
@@ -81,4 +87,3 @@ export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
     </Box>
   );
 };
-

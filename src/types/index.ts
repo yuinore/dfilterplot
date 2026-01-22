@@ -56,7 +56,7 @@ export function isPoleZeroPair(pz: PoleOrZero): pz is PoleZeroPair {
  */
 export function toPoleZeros(items: PoleOrZero[]): PoleZero[] {
   const result: PoleZero[] = [];
-  
+
   for (const item of items) {
     if (isPoleZeroReal(item)) {
       // 実数の場合
@@ -72,7 +72,7 @@ export function toPoleZeros(items: PoleOrZero[]): PoleZero[] {
       const pairItem = item as PoleZeroPair;
       const id1 = pairItem.id;
       const id2 = `${pairItem.id}_conj`;
-      
+
       result.push({
         id: id1,
         real: pairItem.real,
@@ -81,7 +81,7 @@ export function toPoleZeros(items: PoleOrZero[]): PoleZero[] {
         isConjugate: true,
         pairId: id2,
       });
-      
+
       result.push({
         id: id2,
         real: pairItem.real,
@@ -92,7 +92,7 @@ export function toPoleZeros(items: PoleOrZero[]): PoleZero[] {
       });
     }
   }
-  
+
   return result;
 }
 

@@ -40,7 +40,10 @@ export const PoleZeroRenderer = ({
         const svgX = toSvgX(zero.real);
         const svgY = toSvgY(zero.imag);
         return (
-          <g key={zero.id} onMouseDown={interactive ? onZeroMouseDown?.(zero.id) : undefined}>
+          <g
+            key={zero.id}
+            onMouseDown={interactive ? onZeroMouseDown?.(zero.id) : undefined}
+          >
             <circle
               cx={svgX}
               cy={svgY}
@@ -57,19 +60,21 @@ export const PoleZeroRenderer = ({
               height={20}
               style={{ overflow: 'visible', pointerEvents: 'none' }}
             >
-              <Tooltip 
-                title={formatTooltipText(zero, false)} 
-                arrow 
+              <Tooltip
+                title={formatTooltipText(zero, false)}
+                arrow
                 placement="top"
                 enterDelay={500}
                 leaveDelay={100}
               >
-                <div style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  pointerEvents: 'auto',
-                  cursor: interactive ? 'move' : 'default'
-                }} />
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'auto',
+                    cursor: interactive ? 'move' : 'default',
+                  }}
+                />
               </Tooltip>
             </foreignObject>
           </g>
@@ -81,7 +86,10 @@ export const PoleZeroRenderer = ({
         const svgX = toSvgX(pole.real);
         const svgY = toSvgY(pole.imag);
         return (
-          <g key={pole.id} onMouseDown={interactive ? onPoleMouseDown?.(pole.id) : undefined}>
+          <g
+            key={pole.id}
+            onMouseDown={interactive ? onPoleMouseDown?.(pole.id) : undefined}
+          >
             <line
               x1={svgX - 8}
               y1={svgY - 8}
@@ -119,19 +127,21 @@ export const PoleZeroRenderer = ({
               height={20}
               style={{ overflow: 'visible', pointerEvents: 'none' }}
             >
-              <Tooltip 
-                title={formatTooltipText(pole, true)} 
-                arrow 
+              <Tooltip
+                title={formatTooltipText(pole, true)}
+                arrow
                 placement="top"
                 enterDelay={200}
                 leaveDelay={200}
               >
-                <div style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  pointerEvents: 'auto',
-                  cursor: interactive ? 'move' : 'default'
-                }} />
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'auto',
+                    cursor: interactive ? 'move' : 'default',
+                  }}
+                />
               </Tooltip>
             </foreignObject>
           </g>
@@ -140,4 +150,3 @@ export const PoleZeroRenderer = ({
     </>
   );
 };
-

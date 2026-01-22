@@ -22,7 +22,7 @@ function App() {
           mode: 'light',
         },
       }),
-    []
+    [],
   );
 
   // ID カウンター
@@ -55,66 +55,80 @@ function App() {
   // 自動調整が有効な場合、ゲインを自動計算
   useEffect(() => {
     if (autoGain) {
-      const calculatedGain = calculateAutoGain(poles, zeros, logarithmicFrequency, octaves);
+      const calculatedGain = calculateAutoGain(
+        poles,
+        zeros,
+        logarithmicFrequency,
+        octaves,
+      );
       setGain(calculatedGain);
     }
   }, [autoGain, poles, zeros, logarithmicFrequency, octaves]);
 
   // フィルタ設計の変更を処理
-  const handleFilterChange = useCallback((filterId: string, params: Record<string, any>) => {
-    if (filterId === 'none') {
-      return;
-    }
-
-    const filter = FilterRegistry.get(filterId);
-    if (filter) {
-      const result = filter.generate(params);
-      setPoles(result.poles);
-      setZeros(result.zeros);
-      // 自動調整が無効な場合のみ、フィルタ設計のゲインを使用
-      if (!autoGain) {
-        setGain(result.gain);
+  const handleFilterChange = useCallback(
+    (filterId: string, params: Record<string, any>) => {
+      if (filterId === 'none') {
+        return;
       }
-    }
-  }, [autoGain]);
+
+      const filter = FilterRegistry.get(filterId);
+      if (filter) {
+        const result = filter.generate(params);
+        setPoles(result.poles);
+        setZeros(result.zeros);
+        // 自動調整が無効な場合のみ、フィルタ設計のゲインを使用
+        if (!autoGain) {
+          setGain(result.gain);
+        }
+      }
+    },
+    [autoGain],
+  );
 
   // 極の移動処理
-  const handlePoleMove = useCallback((id: string, real: number, imag: number) => {
-    // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
-    const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
-    
-    setPoles((prevPoles) =>
-      prevPoles.map((pole) => {
-        if (pole.id === actualId) {
-          if ('imag' in pole) {
-            return { ...pole, real, imag: Math.abs(imag) } as PoleZeroPair;
-          } else {
-            return { ...pole, real } as PoleZeroReal;
+  const handlePoleMove = useCallback(
+    (id: string, real: number, imag: number) => {
+      // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
+      const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
+
+      setPoles((prevPoles) =>
+        prevPoles.map((pole) => {
+          if (pole.id === actualId) {
+            if ('imag' in pole) {
+              return { ...pole, real, imag: Math.abs(imag) } as PoleZeroPair;
+            } else {
+              return { ...pole, real } as PoleZeroReal;
+            }
           }
-        }
-        return pole;
-      })
-    );
-  }, []);
+          return pole;
+        }),
+      );
+    },
+    [],
+  );
 
   // 零点の移動処理
-  const handleZeroMove = useCallback((id: string, real: number, imag: number) => {
-    // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
-    const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
-    
-    setZeros((prevZeros) =>
-      prevZeros.map((zero) => {
-        if (zero.id === actualId) {
-          if ('imag' in zero) {
-            return { ...zero, real, imag: Math.abs(imag) } as PoleZeroPair;
-          } else {
-            return { ...zero, real } as PoleZeroReal;
+  const handleZeroMove = useCallback(
+    (id: string, real: number, imag: number) => {
+      // 共役ペアの場合、IDに _conj サフィックスが付いているので削除
+      const actualId = id.endsWith('_conj') ? id.replace('_conj', '') : id;
+
+      setZeros((prevZeros) =>
+        prevZeros.map((zero) => {
+          if (zero.id === actualId) {
+            if ('imag' in zero) {
+              return { ...zero, real, imag: Math.abs(imag) } as PoleZeroPair;
+            } else {
+              return { ...zero, real } as PoleZeroReal;
+            }
           }
-        }
-        return zero;
-      })
-    );
-  }, []);
+          return zero;
+        }),
+      );
+    },
+    [],
+  );
 
   // 極ペアを追加
   const handleAddPolePair = useCallback(() => {
@@ -185,36 +199,39 @@ function App() {
             overflow: 'auto',
           }}
         >
-          <Box id="controller-box" sx={{ 
-            flexGrow: 4, 
-            flexShrink: 4,
-            flexBasis: 360,
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 2,
-            // minWidth: { sm: '100%', xl: '400px' },
-            maxWidth: { xs: '480px', xl: '720px' }
-          }}>
-            <Box id="complex-plane-combi" sx={{ 
-              flexGrow: 0, 
-              display: 'flex', 
-              flexDirection: { xs: 'column', xl: 'row' },
-              alignItems: 'flex-start',
+          <Box
+            id="controller-box"
+            sx={{
+              flexGrow: 4,
+              flexShrink: 4,
+              flexBasis: 360,
+              display: 'flex',
+              flexDirection: 'column',
               gap: 2,
-              width: '100%',
-              maxWidth: { xs: '360px', xl: '720px' }
-            }}>
-              <ComplexPlane 
-                poles={toPoleZeros(poles)} 
+              // minWidth: { sm: '100%', xl: '400px' },
+              maxWidth: { xs: '480px', xl: '720px' },
+            }}
+          >
+            <Box
+              id="complex-plane-combi"
+              sx={{
+                flexGrow: 0,
+                display: 'flex',
+                flexDirection: { xs: 'column', xl: 'row' },
+                alignItems: 'flex-start',
+                gap: 2,
+                width: '100%',
+                maxWidth: { xs: '360px', xl: '720px' },
+              }}
+            >
+              <ComplexPlane
+                poles={toPoleZeros(poles)}
                 zeros={toPoleZeros(zeros)}
                 enableSnap={enableSnap}
                 onPoleMove={handlePoleMove}
                 onZeroMove={handleZeroMove}
               />
-              <SPlane
-                poles={toPoleZeros(poles)}
-                zeros={toPoleZeros(zeros)}
-              />
+              <SPlane poles={toPoleZeros(poles)} zeros={toPoleZeros(zeros)} />
             </Box>
             <GainControl
               gain={gain}
@@ -249,16 +266,19 @@ function App() {
               onFrequencyUnitChange={setFrequencyUnit}
             />
           </Box>
-          <Box id="bode-plot-box" sx={{ 
-            flexGrow: 2,
-            flexShrink: 2,
-            flexBasis: 480,
-            minWidth: 0, // Flexboxで縮小を許可
-            // minHeight: { xs: '600px', xl: 0 },
-            // minWidth: { xs: '400px', xl: '400px' }
-          }}>
-            <BodePlot 
-              poles={poles} 
+          <Box
+            id="bode-plot-box"
+            sx={{
+              flexGrow: 2,
+              flexShrink: 2,
+              flexBasis: 480,
+              minWidth: 0, // Flexboxで縮小を許可
+              // minHeight: { xs: '600px', xl: 0 },
+              // minWidth: { xs: '400px', xl: '400px' }
+            }}
+          >
+            <BodePlot
+              poles={poles}
               zeros={zeros}
               logarithmicFrequency={logarithmicFrequency}
               octaves={octaves}

@@ -118,15 +118,18 @@ export const FilterDesign = ({
           </ToggleButtonGroup>
 
           <Typography variant="subtitle2" gutterBottom>
-            {t('filterDesign.cutoffFrequency')}: {cutoffFrequency.toFixed(3)} (rad/s)
+            {t('filterDesign.cutoffFrequency')}: {cutoffFrequency.toFixed(3)}{' '}
+            (rad/s)
           </Typography>
           <Slider
             value={getSliderValue(cutoffFrequency)}
-            onChange={(_, value) => onCutoffFrequencyChange(getFreqFromSlider(value as number))}
+            onChange={(_, value) =>
+              onCutoffFrequencyChange(getFreqFromSlider(value as number))
+            }
             min={logarithmicFrequency ? logMin : minFreq}
             max={logarithmicFrequency ? logMax : maxFreq}
             step={logarithmicFrequency ? 0.01 : 0.001}
-            scale={logarithmicFrequency ? ((x) => Math.pow(10, x)) : undefined}
+            scale={logarithmicFrequency ? (x) => Math.pow(10, x) : undefined}
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => value.toFixed(3)}
             sx={{ mb: 2 }}
@@ -176,4 +179,3 @@ export const FilterDesign = ({
     </Paper>
   );
 };
-

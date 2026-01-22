@@ -39,7 +39,10 @@ function snapRealAxisPoint(real: number, threshold: number): number {
 /**
  * 単位円上の点を計算
  */
-function projectToUnitCircle(real: number, imag: number): { real: number; imag: number } {
+function projectToUnitCircle(
+  real: number,
+  imag: number,
+): { real: number; imag: number } {
   const magnitude = Math.sqrt(real * real + imag * imag);
   if (magnitude === 0) {
     return { real: 1, imag: 0 };
@@ -57,18 +60,18 @@ function projectToUnitCircle(real: number, imag: number): { real: number; imag: 
 function snapToFourthRootsOfUnity(
   real: number,
   imag: number,
-  threshold: number
+  threshold: number,
 ): { real: number; imag: number } | null {
   const fourthRoots = [
-    { real: 1, imag: 0 },   // 1
-    { real: 0, imag: 1 },   // j
-    { real: -1, imag: 0 },  // -1
-    { real: 0, imag: -1 },  // -j
+    { real: 1, imag: 0 }, // 1
+    { real: 0, imag: 1 }, // j
+    { real: -1, imag: 0 }, // -1
+    { real: 0, imag: -1 }, // -j
   ];
 
   for (const root of fourthRoots) {
     const distance = Math.sqrt(
-      Math.pow(real - root.real, 2) + Math.pow(imag - root.imag, 2)
+      Math.pow(real - root.real, 2) + Math.pow(imag - root.imag, 2),
     );
     if (distance <= threshold) {
       return root;
@@ -80,19 +83,19 @@ function snapToFourthRootsOfUnity(
 
 /**
  * スナップ機能を適用
- * 
+ *
  * アルゴリズム：
- * 
+ *
  * 【実軸上の点（isRealAxisOnly = true）の場合】
  * - 原点 (0,0)、または単位円とx軸の交点 (±1,0) にスナップ
- * 
+ *
  * 【複素共役ペアの点（isRealAxisOnly = false）の場合】
  * 1. 単位円上にスナップ（単位円からの距離が閾値以内）
  *    1-A. さらに1の4乗根（±1, ±j）に近い場合はその点にスナップ
  * 2. 軸へのスナップ
  *    2-A. x軸にスナップ（y座標が0に近い場合）
  *    2-B. y軸にスナップ（x座標が0に近い場合）
- * 
+ *
  * これにより以下の点にスナップ可能：
  * - 単位円上の任意の点
  * - 1の4乗根：(1,0), (0,1), (-1,0), (0,-1)
@@ -104,7 +107,7 @@ export function applySnap(
   real: number,
   imag: number,
   enableSnap: boolean,
-  isRealAxisOnly: boolean = false
+  isRealAxisOnly: boolean = false,
 ): { real: number; imag: number } {
   if (!enableSnap) {
     return { real, imag };
@@ -125,20 +128,24 @@ export function applySnap(
   if (distanceFromUnitCircle <= SNAP_THRESHOLD) {
     // 単位円上にスナップ
     const projected = projectToUnitCircle(real, imag);
-    
+
     // 1-A. さらに1の4乗根のいずれかに近い場合は、その点にスナップ
-    const rootSnap = snapToFourthRootsOfUnity(projected.real, projected.imag, SNAP_THRESHOLD);
+    const rootSnap = snapToFourthRootsOfUnity(
+      projected.real,
+      projected.imag,
+      SNAP_THRESHOLD,
+    );
     if (rootSnap) {
       return rootSnap;
     }
-    
+
     return projected;
   }
 
   // 2. 軸へのスナップ
   // 2-A. x軸にスナップ（y座標が0に近い場合）
   const snappedImag = snapToZero(imag, SNAP_THRESHOLD);
-  
+
   // 2-B. y軸にスナップ（x座標が0に近い場合）
   const snappedReal = snapToZero(real, SNAP_THRESHOLD);
 

@@ -25,7 +25,7 @@ class Complex {
   multiply(other: Complex): Complex {
     return new Complex(
       this.real * other.real - this.imag * other.imag,
-      this.real * other.imag + this.imag * other.real
+      this.real * other.imag + this.imag * other.real,
     );
   }
 
@@ -33,7 +33,7 @@ class Complex {
     const denominator = other.real * other.real + other.imag * other.imag;
     return new Complex(
       (this.real * other.real + this.imag * other.imag) / denominator,
-      (this.imag * other.real - this.real * other.imag) / denominator
+      (this.imag * other.real - this.real * other.imag) / denominator,
     );
   }
 
@@ -46,7 +46,10 @@ class Complex {
   }
 
   static fromPolar(magnitude: number, phase: number): Complex {
-    return new Complex(magnitude * Math.cos(phase), magnitude * Math.sin(phase));
+    return new Complex(
+      magnitude * Math.cos(phase),
+      magnitude * Math.sin(phase),
+    );
   }
 }
 
@@ -58,7 +61,7 @@ function evaluateTransferFunction(
   z: Complex,
   zeros: PoleZero[],
   poles: PoleZero[],
-  gain: number = 1.0
+  gain: number = 1.0,
 ): Complex {
   let numerator = new Complex(gain, 0);
   let denominator = new Complex(1, 0);
@@ -80,7 +83,7 @@ function evaluateTransferFunction(
 
 /**
  * 特定の周波数での振幅（dB）を計算
- * 
+ *
  * @param zeros 零点
  * @param poles 極
  * @param frequency 周波数（rad/s）
@@ -91,17 +94,17 @@ export function calculateMagnitudeAtFrequency(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
   frequency: number,
-  userGain: number = 1.0
+  userGain: number = 1.0,
 ): number {
   const zerosExpanded = toPoleZeros(zeros);
   const polesExpanded = toPoleZeros(poles);
-  
+
   // z = e^(jω)
   const z = Complex.fromPolar(1, frequency);
-  
+
   // H(e^(jω)) を計算
   const h = evaluateTransferFunction(z, zerosExpanded, polesExpanded, userGain);
-  
+
   // 振幅 (dB)
   const magnitude = h.magnitude();
   return magnitude > 1e-10 ? 20 * Math.log10(magnitude) : -200;
@@ -109,7 +112,7 @@ export function calculateMagnitudeAtFrequency(
 
 /**
  * 全周波数の振幅特性の中央値が0dBになるようにゲインを計算
- * 
+ *
  * @param zeros 零点
  * @param poles 極
  * @param logarithmicFrequency 対数スケールかどうか
@@ -120,27 +123,39 @@ export function calculateAutoGain(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
   logarithmicFrequency: boolean = true,
-  octaves: number = BODE_PLOT.DEFAULT_OCTAVES
+  octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
 ): number {
   // 周波数応答を計算（ゲイン=1.0で）
   const frequencyResponse = logarithmicFrequency
-    ? calculateFrequencyResponseLog(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, octaves, 1.0)
-    : calculateFrequencyResponse(zeros, poles, FREQUENCY_RESPONSE.NUM_POINTS, 1.0);
-  
+    ? calculateFrequencyResponseLog(
+        zeros,
+        poles,
+        FREQUENCY_RESPONSE.NUM_POINTS,
+        octaves,
+        1.0,
+      )
+    : calculateFrequencyResponse(
+        zeros,
+        poles,
+        FREQUENCY_RESPONSE.NUM_POINTS,
+        1.0,
+      );
+
   // 振幅（dB）の配列から中央値を計算
-  const magnitudes = frequencyResponse.magnitude.filter(m => m > -200); // 無効値を除外
-  
+  const magnitudes = frequencyResponse.magnitude.filter((m) => m > -200); // 無効値を除外
+
   if (magnitudes.length === 0) {
     return 1.0;
   }
-  
+
   // 中央値を計算
   const sorted = [...magnitudes].sort((a, b) => a - b);
   const medianIndex = Math.floor(sorted.length / 2);
-  const medianDB = sorted.length % 2 === 0
-    ? (sorted[medianIndex - 1] + sorted[medianIndex]) / 2
-    : sorted[medianIndex];
-  
+  const medianDB =
+    sorted.length % 2 === 0
+      ? (sorted[medianIndex - 1] + sorted[medianIndex]) / 2
+      : sorted[medianIndex];
+
   // 中央値が0dBになるようにゲインを調整
   // medianDB = 20 * log10(magnitude * gain)
   // 0 = 20 * log10(magnitude * gain)
@@ -148,11 +163,11 @@ export function calculateAutoGain(
   // gain = 1 / magnitude
   // magnitude = 10^(medianDB / 20)
   const magnitude = Math.pow(10, medianDB / 20);
-  
+
   if (magnitude > 1e-10) {
     return 1.0 / magnitude;
   }
-  
+
   return 1.0;
 }
 
@@ -164,7 +179,7 @@ export function calculateFrequencyResponse(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
   numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
-  userGain: number = 1.0
+  userGain: number = 1.0,
 ): FrequencyResponse {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -212,7 +227,7 @@ export function calculateFrequencyResponseLog(
   poles: PoleOrZero[],
   numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
   octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
-  userGain: number = 1.0
+  userGain: number = 1.0,
 ): FrequencyResponse {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -231,7 +246,8 @@ export function calculateFrequencyResponseLog(
   const logOmegaMax = Math.log10(omegaMax);
 
   for (let i = 0; i < numPoints; i++) {
-    const logOmega = logOmegaMin + ((logOmegaMax - logOmegaMin) * i) / (numPoints - 1);
+    const logOmega =
+      logOmegaMin + ((logOmegaMax - logOmegaMin) * i) / (numPoints - 1);
     const omega = Math.pow(10, logOmega);
     frequencies.push(omega);
 
@@ -263,7 +279,7 @@ export function calculateGroupDelay(
   numPoints: number = FREQUENCY_RESPONSE.NUM_POINTS,
   logarithmic: boolean = true,
   octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
-  userGain: number = 1.0
+  userGain: number = 1.0,
 ): { frequency: number[]; groupDelay: number[] } {
   // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
@@ -308,10 +324,10 @@ export function calculateGroupDelay(
   //   および、振幅特性=0 または ∞ の点の前後での ±π のジャンプを補正
   const unwrappedPhases: number[] = [phases[0]];
   let cumulativeOffset = 0;
-  
+
   for (let i = 1; i < numPoints; i++) {
     let phaseDiff = phases[i] - phases[i - 1];
-    
+
     // 位相差が π/2 より大きい場合（±π または ±2π のジャンプ）
     while (phaseDiff > Math.PI / 2) {
       cumulativeOffset -= Math.PI;
@@ -322,30 +338,38 @@ export function calculateGroupDelay(
       cumulativeOffset += Math.PI;
       phaseDiff += Math.PI;
     }
-    
+
     unwrappedPhases.push(phases[i] + cumulativeOffset);
   }
 
   // 群遅延 = -d(phase)/dω を数値微分で計算（アンラップされた位相を使用）
   for (let i = 0; i < numPoints; i++) {
     let groupDelay: number;
-    
+
     if (i === 0) {
       // 前方差分
-      groupDelay = -(unwrappedPhases[i + 1] - unwrappedPhases[i]) / (frequencies[i + 1] - frequencies[i]);
+      groupDelay =
+        -(unwrappedPhases[i + 1] - unwrappedPhases[i]) /
+        (frequencies[i + 1] - frequencies[i]);
     } else if (i === numPoints - 1) {
       // 後方差分
-      groupDelay = -(unwrappedPhases[i] - unwrappedPhases[i - 1]) / (frequencies[i] - frequencies[i - 1]);
+      groupDelay =
+        -(unwrappedPhases[i] - unwrappedPhases[i - 1]) /
+        (frequencies[i] - frequencies[i - 1]);
     } else {
       // 中心差分
-      groupDelay = -(unwrappedPhases[i + 1] - unwrappedPhases[i - 1]) / (frequencies[i + 1] - frequencies[i - 1]);
+      groupDelay =
+        -(unwrappedPhases[i + 1] - unwrappedPhases[i - 1]) /
+        (frequencies[i + 1] - frequencies[i - 1]);
     }
-    
+
     groupDelays.push(groupDelay);
   }
 
   // 群遅延を 1e-8 の倍数に揃える (微小誤差の解消のため)
-  const roundedGroupDelays = groupDelays.map(delay => Math.round(delay / 1e-8) * 1e-8);
+  const roundedGroupDelays = groupDelays.map(
+    (delay) => Math.round(delay / 1e-8) * 1e-8,
+  );
 
   return {
     frequency: frequencies,
@@ -372,21 +396,24 @@ interface BiquadSection {
  */
 function createBiquadSectionsFromPoleOrZero(
   zeros: PoleOrZero[],
-  poles: PoleOrZero[]
+  poles: PoleOrZero[],
 ): BiquadSection[] {
   const sections: BiquadSection[] = [];
 
   // 零点と極を同時に処理してセクションを作成
   const maxLength = Math.max(zeros.length, poles.length);
-  
+
   for (let i = 0; i < maxLength; i++) {
-    let b0 = 1, b1 = 0, b2 = 0;
-    let a1 = 0, a2 = 0;
-    
+    let b0 = 1,
+      b1 = 0,
+      b2 = 0;
+    let a1 = 0,
+      a2 = 0;
+
     // 零点の処理
     if (i < zeros.length) {
       const zero = zeros[i];
-      
+
       if (isPoleZeroPair(zero)) {
         // 複素共役ペア: (z - (r+ji))(z - (r-ji)) = z^2 - 2r*z + (r^2+i^2)
         b0 = 1.0;
@@ -399,11 +426,11 @@ function createBiquadSectionsFromPoleOrZero(
         b2 = 0.0;
       }
     }
-    
+
     // 極の処理
     if (i < poles.length) {
       const pole = poles[i];
-      
+
       if (isPoleZeroPair(pole)) {
         // 複素共役ペア: 分母 = z^2 - 2r*z + (r^2+i^2)
         a1 = -2 * pole.real;
@@ -414,40 +441,36 @@ function createBiquadSectionsFromPoleOrZero(
         a2 = 0.0;
       }
     }
-    
+
     sections.push({ b0, b1, b2, a1, a2 });
   }
-  
+
   return sections;
 }
-
 
 /**
  * 双二次セクションを実行
  * y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] - a1*y[n-1] - a2*y[n-2]
  */
-function applyBiquadSection(
-  input: number[],
-  section: BiquadSection
-): number[] {
+function applyBiquadSection(input: number[], section: BiquadSection): number[] {
   const output = new Array(input.length).fill(0);
-  
+
   for (let n = 0; n < input.length; n++) {
     let sum = section.b0 * input[n];
-    
+
     if (n >= 1) {
       sum += section.b1 * input[n - 1];
       sum -= section.a1 * output[n - 1];
     }
-    
+
     if (n >= 2) {
       sum += section.b2 * input[n - 2];
       sum -= section.a2 * output[n - 2];
     }
-    
+
     output[n] = sum;
   }
-  
+
   return output;
 }
 
@@ -459,10 +482,10 @@ export function calculateImpulseResponse(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
   numPoints: number = 128,
-  userGain: number = 1.0
+  userGain: number = 1.0,
 ): { time: number[]; amplitude: number[] } {
   const time: number[] = [];
-  
+
   // インパルス信号を生成
   let signal = new Array(numPoints).fill(0);
   signal[0] = 1.0; // δ[n]
@@ -496,7 +519,7 @@ export function calculateStepResponse(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
   numPoints: number = 128,
-  userGain: number = 1.0
+  userGain: number = 1.0,
 ): { time: number[]; amplitude: number[] } {
   // ユーザー指定のゲインでインパルス応答を計算
   const impulse = calculateImpulseResponse(zeros, poles, numPoints, userGain);
@@ -512,4 +535,3 @@ export function calculateStepResponse(
 
   return { time, amplitude };
 }
-

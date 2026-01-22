@@ -12,18 +12,20 @@ interface FilterDesignPanelProps {
   frequencyUnit: FrequencyUnit;
 }
 
-export const FilterDesignPanel = ({ 
-  onFilterChange, 
+export const FilterDesignPanel = ({
+  onFilterChange,
   logarithmicFrequency,
-  frequencyUnit
+  frequencyUnit,
 }: FilterDesignPanelProps) => {
   const { t } = useTranslation();
   const [selectedFilterId, setSelectedFilterId] = useState<string>('none');
-  const [selectedFilter, setSelectedFilter] = useState<FilterDesignBase | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<FilterDesignBase | null>(
+    null,
+  );
 
   const handleFilterSelect = (filterId: string) => {
     setSelectedFilterId(filterId);
-    
+
     if (filterId === 'none') {
       setSelectedFilter(null);
       return;
@@ -35,11 +37,14 @@ export const FilterDesignPanel = ({
     }
   };
 
-  const handleParamsChange = useCallback((params: Record<string, any>) => {
-    if (selectedFilterId !== 'none' && selectedFilter) {
-      onFilterChange(selectedFilterId, params);
-    }
-  }, [selectedFilterId, selectedFilter, onFilterChange]);
+  const handleParamsChange = useCallback(
+    (params: Record<string, any>) => {
+      if (selectedFilterId !== 'none' && selectedFilter) {
+        onFilterChange(selectedFilterId, params);
+      }
+    },
+    [selectedFilterId, selectedFilter, onFilterChange],
+  );
 
   const availableFilters = FilterRegistry.getAll();
 
@@ -73,4 +78,3 @@ export const FilterDesignPanel = ({
     </CollapsiblePanel>
   );
 };
-

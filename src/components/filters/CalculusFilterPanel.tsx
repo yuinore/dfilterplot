@@ -1,4 +1,9 @@
-import { Box, Typography, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 
@@ -42,4 +47,3 @@ export const CalculusFilterPanel = ({ onChange }: CalculusFilterPanelProps) => {
     </Box>
   );
 };
-
