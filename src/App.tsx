@@ -1,4 +1,10 @@
-import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Box,
+  Grid,
+} from '@mui/material';
 import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
@@ -20,6 +26,15 @@ function App() {
       createTheme({
         palette: {
           mode: 'light',
+        },
+        breakpoints: {
+          values: {
+            xs: 0,
+            sm: 600,
+            md: 900,
+            lg: 1200,
+            xl: 1880,
+          },
         },
       }),
     [],
@@ -192,10 +207,10 @@ function App() {
           component="main"
           sx={{
             flexGrow: 1,
-            p: { xs: 3, xl: 3 },
+            p: { xs: 3, lg: 3 },
             display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row', xl: 'row' },
-            gap: { xs: 3, xl: 3 },
+            flexDirection: { xs: 'column', sm: 'row', lg: 'row' },
+            gap: { xs: 3, lg: 3 },
             overflow: 'auto',
           }}
         >
@@ -208,8 +223,8 @@ function App() {
               display: 'flex',
               flexDirection: 'column',
               gap: 2,
-              // minWidth: { sm: '100%', xl: '400px' },
-              maxWidth: { xs: '480px', xl: '720px' },
+              // minWidth: { sm: '100%', lg: '400px' },
+              maxWidth: { xs: '480px', lg: '720px' },
             }}
           >
             <Box
@@ -217,11 +232,11 @@ function App() {
               sx={{
                 flexGrow: 0,
                 display: 'flex',
-                flexDirection: { xs: 'column', xl: 'row' },
+                flexDirection: { xs: 'column', lg: 'row' },
                 alignItems: 'flex-start',
                 gap: 2,
                 width: '100%',
-                maxWidth: { xs: '360px', xl: '720px' },
+                maxWidth: { xs: '360px', lg: '720px' },
               }}
             >
               <ComplexPlane
@@ -231,25 +246,36 @@ function App() {
                 onPoleMove={handlePoleMove}
                 onZeroMove={handleZeroMove}
               />
-              <SPlane poles={toPoleZeros(poles)} zeros={toPoleZeros(zeros)} />
+              <Grid container spacing={2} width="100%">
+                <Grid size={12}>
+                  <SPlane
+                    poles={toPoleZeros(poles)}
+                    zeros={toPoleZeros(zeros)}
+                  />
+                </Grid>
+                <Grid size={12}>
+                  <GainControl
+                    gain={gain}
+                    onGainChange={setGain}
+                    autoGain={autoGain}
+                    onAutoGainChange={setAutoGain}
+                  />
+                </Grid>
+                <Grid size={12}>
+                  <Toolbar
+                    poles={toPoleZeros(poles)}
+                    zeros={toPoleZeros(zeros)}
+                    onAddPolePair={handleAddPolePair}
+                    onAddPoleReal={handleAddPoleReal}
+                    onAddZeroPair={handleAddZeroPair}
+                    onAddZeroReal={handleAddZeroReal}
+                    onDeletePole={handleDeletePole}
+                    onDeleteZero={handleDeleteZero}
+                    onClear={handleClear}
+                  />
+                </Grid>
+              </Grid>
             </Box>
-            <GainControl
-              gain={gain}
-              onGainChange={setGain}
-              autoGain={autoGain}
-              onAutoGainChange={setAutoGain}
-            />
-            <Toolbar
-              poles={toPoleZeros(poles)}
-              zeros={toPoleZeros(zeros)}
-              onAddPolePair={handleAddPolePair}
-              onAddPoleReal={handleAddPoleReal}
-              onAddZeroPair={handleAddZeroPair}
-              onAddZeroReal={handleAddZeroReal}
-              onDeletePole={handleDeletePole}
-              onDeleteZero={handleDeleteZero}
-              onClear={handleClear}
-            />
             <FilterDesignPanel
               onFilterChange={handleFilterChange}
               logarithmicFrequency={logarithmicFrequency}
@@ -273,8 +299,8 @@ function App() {
               flexShrink: 2,
               flexBasis: 480,
               minWidth: 0, // Flexboxで縮小を許可
-              // minHeight: { xs: '600px', xl: 0 },
-              // minWidth: { xs: '400px', xl: '400px' }
+              // minHeight: { xs: '600px', lg: 0 },
+              // minWidth: { xs: '400px', lg: '400px' }
             }}
           >
             <BodePlot

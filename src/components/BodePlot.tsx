@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Grid, Stack } from '@mui/material';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
@@ -430,80 +430,93 @@ export const BodePlot = ({
   }, [stepResponse, t]);
 
   return (
-    <Box
+    <Grid
+      container
+      direction="row"
+      spacing={2}
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        height: '100%',
+        // display: 'flex',
+        // flexDirection: 'column',
+        // gap: 2,
+        // height: '100%',
         minWidth: 0, // Flexboxで縮小を許可
       }}
     >
-      <CollapsiblePanel title={t('bodePlot.magnitude')}>
-        <Box
-          sx={{
-            height: 'max(240px, calc((100% - 200px) / 5))',
-            minWidth: 0,
-            minHeight: 240,
-          }}
-        >
-          <Line data={magnitudeData} options={magnitudeOptions} />
-        </Box>
-      </CollapsiblePanel>
+      <Grid size={{ xs: 12, xl: 6 }}>
+        <CollapsiblePanel title={t('bodePlot.magnitude')}>
+          <Box
+            sx={{
+              height: 'max(240px, calc((100% - 200px) / 5))',
+              minWidth: 0,
+              minHeight: 240,
+            }}
+          >
+            <Line data={magnitudeData} options={magnitudeOptions} />
+          </Box>
+        </CollapsiblePanel>
+      </Grid>
 
-      <CollapsiblePanel title={t('bodePlot.phase')}>
-        <Box
-          sx={{
-            height: 'max(240px, calc((100% - 200px) / 5))',
-            minWidth: 0,
-            minHeight: 240,
-          }}
-        >
-          <Line data={phaseData} options={phaseOptions} />
-        </Box>
-      </CollapsiblePanel>
+      <Grid size={{ xs: 12, xl: 6 }}>
+        <CollapsiblePanel title={t('bodePlot.phase')}>
+          <Box
+            sx={{
+              height: 'max(240px, calc((100% - 200px) / 5))',
+              minWidth: 0,
+              minHeight: 240,
+            }}
+          >
+            <Line data={phaseData} options={phaseOptions} />
+          </Box>
+        </CollapsiblePanel>
+      </Grid>
 
-      <CollapsiblePanel
-        title={t('bodePlot.groupDelay')}
-        defaultExpanded={false}
-      >
-        <Box
-          sx={{
-            height: 'max(240px, calc((100% - 200px) / 5))',
-            minWidth: 0,
-            minHeight: 240,
-          }}
+      <Grid size={{ xs: 12, xl: 6 }}>
+        <CollapsiblePanel
+          title={t('bodePlot.groupDelay')}
+          // defaultExpanded={false}
         >
-          <Line data={groupDelayData} options={groupDelayOptions} />
-        </Box>
-      </CollapsiblePanel>
+          <Box
+            sx={{
+              height: 'max(240px, calc((100% - 200px) / 5))',
+              minWidth: 0,
+              minHeight: 240,
+            }}
+          >
+            <Line data={groupDelayData} options={groupDelayOptions} />
+          </Box>
+        </CollapsiblePanel>
+      </Grid>
 
-      <CollapsiblePanel title={t('bodePlot.impulseResponse')}>
-        <Box
-          sx={{
-            height: 'max(240px, calc((100% - 200px) / 5))',
-            minWidth: 0,
-            minHeight: 240,
-          }}
-        >
-          <Line data={impulseData} options={impulseOptions} />
-        </Box>
-      </CollapsiblePanel>
+      <Grid size={{ xs: 12, xl: 6 }}>
+        <CollapsiblePanel title={t('bodePlot.impulseResponse')}>
+          <Box
+            sx={{
+              height: 'max(240px, calc((100% - 200px) / 5))',
+              minWidth: 0,
+              minHeight: 240,
+            }}
+          >
+            <Line data={impulseData} options={impulseOptions} />
+          </Box>
+        </CollapsiblePanel>
+      </Grid>
 
-      <CollapsiblePanel
-        title={t('bodePlot.stepResponse')}
-        defaultExpanded={false}
-      >
-        <Box
-          sx={{
-            height: 'max(240px, calc((100% - 200px) / 5))',
-            minWidth: 0,
-            minHeight: 240,
-          }}
+      <Grid size={{ xs: 12, xl: 6 }}>
+        <CollapsiblePanel
+          title={t('bodePlot.stepResponse')}
+          // defaultExpanded={false}
         >
-          <Line data={stepData} options={stepOptions} />
-        </Box>
-      </CollapsiblePanel>
-    </Box>
+          <Box
+            sx={{
+              height: 'max(240px, calc((100% - 200px) / 5))',
+              minWidth: 0,
+              minHeight: 240,
+            }}
+          >
+            <Line data={stepData} options={stepOptions} />
+          </Box>
+        </CollapsiblePanel>
+      </Grid>
+    </Grid>
   );
 };

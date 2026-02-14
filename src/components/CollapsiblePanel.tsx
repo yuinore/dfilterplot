@@ -30,7 +30,7 @@ export const CollapsiblePanel = ({
         }}
         onClick={() => setExpanded(!expanded)}
       >
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="body1">{title}</Typography>
         <IconButton
           size="small"
           onClick={(e) => {
@@ -43,7 +43,7 @@ export const CollapsiblePanel = ({
         </IconButton>
       </Box>
       <Collapse in={expanded}>
-        <Box sx={{ mt: 2, overflow: 'visible', minHeight: 0 }}>{children}</Box>
+        <Box sx={{ mt: 1, overflow: 'visible', minHeight: 0 }}>{children}</Box>
       </Collapse>
     </Paper>
   );
