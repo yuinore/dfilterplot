@@ -72,6 +72,16 @@
     "apply": "適用"
   },
   "filters": {
+    "firstorderiir": {
+      "name": "一次 IIR フィルタ",
+      "description": "1次伝達関数で実現するIIRフィルタ。極・零点が各1個の実数で構成される。",
+      "type": "フィルタタイプ",
+      "lowPass": "LPF",
+      "highPass": "HPF",
+      "tooltipLowPass": "ローパスフィルタ",
+      "tooltipHighPass": "ハイパスフィルタ",
+      "cutoffFrequency": "カットオフ周波数"
+    },
     "biquad": {
       "name": "双二次フィルタ",
       "description": "音響信号処理で広く用いられているIIRフィルタ。2次伝達関数により実現され、直列接続することでより鋭い特性を持つフィルタを構成できる。Robert Bristow-JohnsonによるAudio EQ Cookbookに基づく実装。",

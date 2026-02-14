@@ -10,13 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import type { FrequencyUnit } from '../Settings';
 
-interface BiquadFilterPanelProps {
-  onChange: (params: {
-    type: string;
-    cutoffFrequency: number;
-    qFactor: number;
-    gainDB?: number;
-  }) => void;
+interface FirstOrderIIRFilterPanelProps {
+  onChange: (params: { type: string; cutoffFrequency: number }) => void;
   logarithmicFrequency?: boolean;
   frequencyUnit?: FrequencyUnit;
 }
@@ -59,31 +54,25 @@ function getFrequencyLabel(unit: FrequencyUnit = 'radians'): string {
   return 'Hz';
 }
 
-export const BiquadFilterPanel = ({
+export const FirstOrderIIRFilterPanel = ({
   onChange,
   logarithmicFrequency = false,
   frequencyUnit = 'radians',
-}: BiquadFilterPanelProps) => {
+}: FirstOrderIIRFilterPanelProps) => {
   const { t } = useTranslation();
   const [type, setType] = useState<string>('lowpass');
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 10);
-  const [qFactor, setQFactor] = useState<number>(3.0);
-  const [gainDB, setGainDB] = useState<number>(6.0);
 
-  // パラメータが変更されたら通知
   useEffect(() => {
-    onChange({ type, cutoffFrequency, qFactor, gainDB });
-  }, [type, cutoffFrequency, qFactor, gainDB, onChange]);
+    onChange({ type, cutoffFrequency });
+  }, [type, cutoffFrequency, onChange]);
 
-  // スライダーの範囲（rad/s）
   const minFreqRad = 0.001 * Math.PI;
   const maxFreqRad = Math.PI;
 
-  // 表示単位に変換
   const minFreqDisplay = convertFrequencyToDisplay(minFreqRad, frequencyUnit);
   const maxFreqDisplay = convertFrequencyToDisplay(maxFreqRad, frequencyUnit);
 
-  // 対数スケール用
   const logMin = Math.log10(minFreqDisplay);
   const logMax = Math.log10(maxFreqDisplay);
 
@@ -108,7 +97,7 @@ export const BiquadFilterPanel = ({
   return (
     <Box>
       <Typography variant="subtitle2" gutterBottom>
-        {t('filters.biquad.type')}
+        {t('filters.firstorderiir.type')}
       </Typography>
       <ToggleButtonGroup
         value={type}
@@ -125,79 +114,25 @@ export const BiquadFilterPanel = ({
         <Tooltip
           placement="top"
           arrow
-          title={t('filters.biquad.tooltipLowPass')}
+          title={t('filters.firstorderiir.tooltipLowPass')}
         >
           <ToggleButton value="lowpass">
-            {t('filters.biquad.lowPass')}
+            {t('filters.firstorderiir.lowPass')}
           </ToggleButton>
         </Tooltip>
         <Tooltip
           placement="top"
           arrow
-          title={t('filters.biquad.tooltipHighPass')}
+          title={t('filters.firstorderiir.tooltipHighPass')}
         >
           <ToggleButton value="highpass">
-            {t('filters.biquad.highPass')}
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip
-          placement="top"
-          arrow
-          title={t('filters.biquad.tooltipBandPass')}
-        >
-          <ToggleButton value="bandpass">
-            {t('filters.biquad.bandPass')}
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip
-          placement="top"
-          arrow
-          title={t('filters.biquad.tooltipBandStop')}
-        >
-          <ToggleButton value="bandstop">
-            {t('filters.biquad.bandStop')}
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip
-          placement="top"
-          arrow
-          title={t('filters.biquad.tooltipPeaking')}
-        >
-          <ToggleButton value="peaking">
-            {t('filters.biquad.peaking')}
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip
-          placement="top"
-          arrow
-          title={t('filters.biquad.tooltipLowShelf')}
-        >
-          <ToggleButton value="lowshelf">
-            {t('filters.biquad.lowShelf')}
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip
-          placement="top"
-          arrow
-          title={t('filters.biquad.tooltipHighShelf')}
-        >
-          <ToggleButton value="highshelf">
-            {t('filters.biquad.highShelf')}
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip
-          placement="top"
-          arrow
-          title={t('filters.biquad.tooltipAllPass')}
-        >
-          <ToggleButton value="allpass">
-            {t('filters.biquad.allPass')}
+            {t('filters.firstorderiir.highPass')}
           </ToggleButton>
         </Tooltip>
       </ToggleButtonGroup>
 
       <Typography variant="subtitle2" gutterBottom>
-        {t('filters.biquad.cutoffFrequency')}:{' '}
+        {t('filters.firstorderiir.cutoffFrequency')}:{' '}
         {convertFrequencyToDisplay(cutoffFrequency, frequencyUnit).toFixed(
           frequencyUnit === 'radians' ? 3 : 1,
         )}{' '}
@@ -221,39 +156,8 @@ export const BiquadFilterPanel = ({
         sx={{ mb: 2 }}
       />
 
-      <Typography variant="subtitle2" gutterBottom>
-        {t('filters.biquad.qFactor')}: {qFactor.toFixed(2)}
-      </Typography>
-      <Slider
-        value={qFactor}
-        onChange={(_, value) => setQFactor(value as number)}
-        min={0.05}
-        max={5}
-        step={0.05}
-        valueLabelDisplay="auto"
-        valueLabelFormat={(value) => value.toFixed(2)}
-      />
-
-      {(type === 'peaking' || type === 'lowshelf' || type === 'highshelf') && (
-        <>
-          <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-            {t('filters.biquad.gainDB')}: {gainDB.toFixed(1)} dB
-          </Typography>
-          <Slider
-            value={gainDB}
-            onChange={(_, value) => setGainDB(value as number)}
-            min={-20}
-            max={20}
-            step={0.5}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(value) => `${value} dB`}
-            sx={{ mb: 2 }}
-          />
-        </>
-      )}
-
       <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-        {t('filters.biquad.description')}
+        {t('filters.firstorderiir.description')}
       </Typography>
     </Box>
   );
