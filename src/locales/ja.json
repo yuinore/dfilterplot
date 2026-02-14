@@ -57,6 +57,7 @@
     "title": "設定",
     "enableSnap": "スナップを有効にする",
     "logarithmicFrequency": "対数スケール（周波数軸）",
+    "showZeroPoleTooltip": "零点・極の情報をツールチップに表示",
     "octaves": "オクターブ数",
     "frequencyUnit": "周波数軸の単位とサンプリング周波数",
     "radians": "角周波数 (rad/s)"

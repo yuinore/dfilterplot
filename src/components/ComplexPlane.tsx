@@ -9,6 +9,7 @@ interface ComplexPlaneProps {
   poles: PoleZero[];
   zeros: PoleZero[];
   enableSnap: boolean;
+  showZeroPoleTooltip: boolean;
   onPoleMove?: (id: string, real: number, imag: number) => void;
   onZeroMove?: (id: string, real: number, imag: number) => void;
   onDeletePole?: (id: string) => void;
@@ -19,6 +20,7 @@ export const ComplexPlane = ({
   poles,
   zeros,
   enableSnap,
+  showZeroPoleTooltip,
   onPoleMove,
   onZeroMove,
   onDeletePole,
@@ -235,6 +237,7 @@ export const ComplexPlane = ({
             toSvgX={toSvgX}
             toSvgY={toSvgY}
             interactive={true}
+            showZeroPoleTooltip={showZeroPoleTooltip}
             onPoleMouseDown={(id) => handleMouseDown(id, true)}
             onZeroMouseDown={(id) => handleMouseDown(id, false)}
             onPoleDoubleClick={handlePoleDoubleClick}

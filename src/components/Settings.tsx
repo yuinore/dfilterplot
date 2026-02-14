@@ -18,6 +18,8 @@ interface SettingsProps {
   onEnableSnapChange: (enabled: boolean) => void;
   logarithmicFrequency: boolean;
   onLogarithmicFrequencyChange: (enabled: boolean) => void;
+  showZeroPoleTooltip: boolean;
+  onShowZeroPoleTooltipChange: (enabled: boolean) => void;
   octaves: number;
   onOctavesChange: (octaves: number) => void;
   frequencyUnit: FrequencyUnit;
@@ -29,6 +31,8 @@ export const Settings = ({
   onEnableSnapChange,
   logarithmicFrequency,
   onLogarithmicFrequencyChange,
+  showZeroPoleTooltip,
+  onShowZeroPoleTooltipChange,
   octaves,
   onOctavesChange,
   frequencyUnit,
@@ -58,6 +62,17 @@ export const Settings = ({
           />
         }
         label={t('settings.logarithmicFrequency')}
+        sx={{ display: 'block', mb: 2 }}
+      />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={showZeroPoleTooltip}
+            onChange={(e) => onShowZeroPoleTooltipChange(e.target.checked)}
+            color="primary"
+          />
+        }
+        label={t('settings.showZeroPoleTooltip')}
         sx={{ display: 'block', mb: 2 }}
       />
       <Box sx={{ mt: 2, mb: 2 }}>

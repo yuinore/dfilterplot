@@ -57,6 +57,7 @@
     "title": "Settings",
     "enableSnap": "Enable Snap to Grid",
     "logarithmicFrequency": "Logarithmic Scale (Frequency Axis)",
+    "showZeroPoleTooltip": "Show zero/pole information in tooltip",
     "octaves": "Octaves",
     "frequencyUnit": "Frequency Unit & Sample Rate",
     "radians": "Angular Frequency (rad/s)"

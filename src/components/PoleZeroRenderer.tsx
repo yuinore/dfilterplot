@@ -8,6 +8,7 @@ interface PoleZeroRendererProps {
   toSvgX: (real: number) => number;
   toSvgY: (imag: number) => number;
   interactive?: boolean;
+  showZeroPoleTooltip?: boolean;
   onPoleMouseDown?: (id: string) => (e: React.MouseEvent<SVGGElement>) => void;
   onZeroMouseDown?: (id: string) => (e: React.MouseEvent<SVGGElement>) => void;
   onPoleDoubleClick?: (
@@ -27,6 +28,7 @@ export const PoleZeroRenderer = ({
   toSvgX,
   toSvgY,
   interactive = true,
+  showZeroPoleTooltip = true,
   onPoleMouseDown,
   onZeroMouseDown,
   onPoleDoubleClick,
@@ -134,30 +136,35 @@ export const PoleZeroRenderer = ({
                 style={{ cursor: 'move' }}
               />
             )}
-            <foreignObject
-              x={svgX - 10}
-              y={svgY - 10}
-              width={20}
-              height={20}
-              style={{ overflow: 'visible', pointerEvents: 'none' }}
-            >
-              <Tooltip
-                title={formatTooltipText(pole, true)}
-                arrow
-                placement="top"
-                enterDelay={200}
-                leaveDelay={200}
+            {showZeroPoleTooltip && (
+              <foreignObject
+                x={svgX - 10}
+                y={svgY - 10}
+                width={20}
+                height={20}
+                style={{ overflow: 'visible', pointerEvents: 'none' }}
               >
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    pointerEvents: 'auto',
-                    cursor: interactive ? 'move' : 'default',
-                  }}
-                />
-              </Tooltip>
-            </foreignObject>
+                <Tooltip
+                  title={formatTooltipText(pole, true)}
+                  arrow
+                  placement="top"
+                  enterDelay={200}
+                  enterNextDelay={200}
+                  enterTouchDelay={200}
+                  leaveDelay={200}
+                  leaveTouchDelay={200}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      pointerEvents: 'auto',
+                      cursor: interactive ? 'move' : 'default',
+                    }}
+                  />
+                </Tooltip>
+              </foreignObject>
+            )}
           </g>
         );
       })}
