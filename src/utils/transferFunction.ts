@@ -389,6 +389,11 @@ interface BiquadSection {
   a2: number;
 }
 
+interface BiquadDecompositionResult {
+  sections: BiquadSection[];
+  delaySamples: number;
+}
+
 /**
  * 極・零点を双二次セクションに分割（新しいAPI）
  * 複素共役ペア → 2次セクション
@@ -397,7 +402,7 @@ interface BiquadSection {
 function createBiquadSectionsFromPoleOrZero(
   zeros: PoleOrZero[],
   poles: PoleOrZero[],
-): BiquadSection[] {
+): BiquadDecompositionResult {
   const sections: BiquadSection[] = [];
 
   // 零点と極を同時に処理してセクションを作成
@@ -445,7 +450,13 @@ function createBiquadSectionsFromPoleOrZero(
     sections.push({ b0, b1, b2, a1, a2 });
   }
 
-  return sections;
+  // 極と零点の有効個数（複素共役ペアは2個分）の差 = グローバルな遅延サンプル数（正: 遅延、負: 非因果）
+  const countPoleOrZeros = (items: PoleOrZero[]) =>
+    items.reduce((sum, pz) => sum + (isPoleZeroPair(pz) ? 2 : 1), 0);
+  const totalPoles = countPoleOrZeros(poles);
+  const totalZeros = countPoleOrZeros(zeros);
+  const delaySamples = totalPoles - totalZeros;
+  return { sections, delaySamples };
 }
 
 /**
@@ -491,7 +502,10 @@ export function calculateImpulseResponse(
   signal[0] = 1.0; // δ[n]
 
   // 双二次セクションを作成し、カスケード接続で実行
-  const sections = createBiquadSectionsFromPoleOrZero(zeros, poles);
+  const { sections, delaySamples } = createBiquadSectionsFromPoleOrZero(
+    zeros,
+    poles,
+  );
   for (const section of sections) {
     signal = applyBiquadSection(signal, section);
   }
@@ -501,10 +515,10 @@ export function calculateImpulseResponse(
     signal[i] *= userGain;
   }
 
-  // 時間軸と振幅を返す
+  // 時間軸と振幅を返す（負のインデックスは time で表現、amplitude/signal はそのまま）
   const amplitude: number[] = [];
   for (let n = 0; n < numPoints; n++) {
-    time.push(n);
+    time.push(delaySamples + n);
     amplitude.push(signal[n]);
   }
 
