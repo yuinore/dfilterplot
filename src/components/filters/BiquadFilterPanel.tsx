@@ -4,6 +4,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Slider,
+  Tooltip,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
@@ -121,30 +122,78 @@ export const BiquadFilterPanel = ({
         size="small"
         sx={{ mb: 2 }}
       >
-        <ToggleButton value="lowpass">
-          {t('filters.biquad.lowPass')}
-        </ToggleButton>
-        <ToggleButton value="highpass">
-          {t('filters.biquad.highPass')}
-        </ToggleButton>
-        <ToggleButton value="bandpass">
-          {t('filters.biquad.bandPass')}
-        </ToggleButton>
-        <ToggleButton value="bandstop">
-          {t('filters.biquad.bandStop')}
-        </ToggleButton>
-        <ToggleButton value="peaking">
-          {t('filters.biquad.peaking')}
-        </ToggleButton>
-        <ToggleButton value="lowshelf">
-          {t('filters.biquad.lowShelf')}
-        </ToggleButton>
-        <ToggleButton value="highshelf">
-          {t('filters.biquad.highShelf')}
-        </ToggleButton>
-        <ToggleButton value="allpass">
-          {t('filters.biquad.allPass')}
-        </ToggleButton>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipLowPass')}
+        >
+          <ToggleButton value="lowpass">
+            {t('filters.biquad.lowPass')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipHighPass')}
+        >
+          <ToggleButton value="highpass">
+            {t('filters.biquad.highPass')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipBandPass')}
+        >
+          <ToggleButton value="bandpass">
+            {t('filters.biquad.bandPass')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipBandStop')}
+        >
+          <ToggleButton value="bandstop">
+            {t('filters.biquad.bandStop')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipPeaking')}
+        >
+          <ToggleButton value="peaking">
+            {t('filters.biquad.peaking')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipLowShelf')}
+        >
+          <ToggleButton value="lowshelf">
+            {t('filters.biquad.lowShelf')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipHighShelf')}
+        >
+          <ToggleButton value="highshelf">
+            {t('filters.biquad.highShelf')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.biquad.tooltipAllPass')}
+        >
+          <ToggleButton value="allpass">
+            {t('filters.biquad.allPass')}
+          </ToggleButton>
+        </Tooltip>
       </ToggleButtonGroup>
 
       <Typography variant="subtitle2" gutterBottom>
