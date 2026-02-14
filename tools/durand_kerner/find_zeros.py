@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-フィルタの零点を計算するメインスクリプト
+フィルタの零点を計算するメインスクリプト（mpmath使用）
 
 コマンドライン引数:
-    python find_zeros.py <filter_type> [filter_type_specific_args...]
-    
+    python find_zeros.py <filter_type> [filter_type_specific_args...] [--dps DPS]
+
     現在対応しているフィルタタイプ:
     - gauss <taps> <sigma>: ガウシアンフィルタ
         - taps: タップ数（奇数）
         - sigma: 標準偏差（シグマ）
+
+    オプション:
+    - --dps DPS: 計算精度（10進数の桁数、デフォルト: 50）
 """
 
 import argparse
@@ -21,7 +24,7 @@ from gaussian_filter import calculate_gaussian_zeros
 
 def main():
     parser = argparse.ArgumentParser(
-        description='フィルタの零点を計算する'
+        description='フィルタの零点を計算する（高精度版）'
     )
     parser.add_argument(
         'filter_type',
@@ -47,6 +50,12 @@ def main():
         default='zeros.json',
         help='出力JSONファイル名（デフォルト: zeros.json）',
     )
+    parser.add_argument(
+        '--dps',
+        type=int,
+        default=50,
+        help='計算精度（10進数の桁数、デフォルト: 50）',
+    )
 
     args = parser.parse_args()
 
@@ -60,22 +69,26 @@ def main():
             print('Error: タップ数は奇数である必要があります', file=sys.stderr)
             sys.exit(1)
 
-        # 零点を計算
-        zeros = calculate_gaussian_zeros(args.taps, args.sigma)
+        # 零点を計算（高精度版）
+        zeros = calculate_gaussian_zeros(args.taps, args.sigma, dps=args.dps)
 
         # 結果をコンソールに表示
-        print(f'ガウシアンフィルタの零点（タップ数: {args.taps}, シグマ: {args.sigma}）')
+        print(f'ガウシアンフィルタの零点（タップ数: {args.taps}, シグマ: {args.sigma}, 精度: {args.dps}桁）')
         print(f'零点の数: {len(zeros)}')
         print()
         print('零点（実部, 虚部）:')
         for i, zero in enumerate(zeros):
-            print(f'  {i+1}: {zero.real:.10e}, {zero.imag:.10e}')
+            # mpmath.mpcをfloatに変換して表示
+            real_val = float(zero.real)
+            imag_val = float(zero.imag)
+            print(f'  {i+1}: {real_val:.15e}, {imag_val:.15e}')
 
         # JSONファイルに出力
         output_data = {
             'filter_type': 'gauss',
             'taps': args.taps,
             'sigma': args.sigma,
+            'dps': args.dps,
             'zeros': [
                 {'real': float(zero.real), 'imag': float(zero.imag)}
                 for zero in zeros

@@ -48,14 +48,14 @@ yarn preview
 1. **UIコンポーネントの作成** (`src/components/filters/MyFilterPanel.tsx`)
    ```typescript
    import type { FilterPanelProps } from '../../filters/base';
-   
+
    export const MyFilterPanel = ({ onChange, logarithmicFrequency }: FilterPanelProps) => {
      const [myParam, setMyParam] = useState(defaultValue);
-     
+
      useEffect(() => {
        onChange({ myParam });
      }, [myParam, onChange]);
-     
+
      return <Box>{/* UI要素 */}</Box>;
    };
    ```
@@ -64,12 +64,12 @@ yarn preview
    ```typescript
    import type { FilterDesignBase } from './base';
    import { MyFilterPanel } from '../components/filters/MyFilterPanel';
-   
+
    export class MyFilterDesign implements FilterDesignBase {
      id = 'myfilter';
      nameKey = 'filters.myfilter.name';
      PanelComponent = MyFilterPanel;
-     
+
      generate(params) {
        // フィルタ生成ロジック
        return { poles, zeros, gain };
