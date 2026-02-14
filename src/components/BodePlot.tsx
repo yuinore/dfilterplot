@@ -1,4 +1,4 @@
-import { Box, Grid, Stack } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';

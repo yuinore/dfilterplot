@@ -7,7 +7,7 @@ import {
   Alert,
   Snackbar,
 } from '@mui/material';
-import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
@@ -20,7 +20,6 @@ import type { PoleOrZero, PoleZeroReal, PoleZeroPair } from './types';
 import { toPoleZeros } from './types';
 import { FilterRegistry } from './filters';
 import { BODE_PLOT } from './constants';
-import { calculateAutoGain } from './utils/transferFunction';
 
 const MAX_POLE_ZERO_COUNT = 256;
 
@@ -49,23 +48,22 @@ function App() {
     [],
   );
 
-  // ID カウンター
-  const nextIdRef = useRef(1);
-  const getNextId = () => {
+  // ID カウンター（初期状態では ref を読まないため、初期 ID は固定値）
+  const nextIdRef = useRef(3);
+
+  const getNextId = useCallback(() => {
     const id = nextIdRef.current.toString();
     nextIdRef.current += 1;
     return id;
-  };
+  }, []);
 
-  // 初期の極と零点（デモ用）
-  const [poles, setPoles] = useState<PoleOrZero[]>(() => {
-    return [
-      { id: getNextId(), real: 0.6, imag: 0.6, isPole: true } as PoleZeroPair,
-    ];
-  });
+  // 初期の極と零点（デモ用）。レンダー中に ref を読まないよう ID は固定
+  const [poles, setPoles] = useState<PoleOrZero[]>([
+    { id: '1', real: 0.6, imag: 0.6, isPole: true } as PoleZeroPair,
+  ]);
 
-  const [zeros, setZeros] = useState<PoleOrZero[]>(() => [
-    { id: getNextId(), real: -0.3, isPole: false } as PoleZeroReal,
+  const [zeros, setZeros] = useState<PoleOrZero[]>([
+    { id: '2', real: -0.3, isPole: false } as PoleZeroReal,
   ]);
 
   // 設定状態
@@ -73,27 +71,13 @@ function App() {
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
   const [gain, setGain] = useState<number>(1.0);
-  const [autoGain, setAutoGain] = useState<boolean>(false);
   const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('44100');
   const [limitErrorOpen, setLimitErrorOpen] = useState(false);
   const { t } = useTranslation();
 
-  // 自動調整が有効な場合、ゲインを自動計算
-  useEffect(() => {
-    if (autoGain) {
-      const calculatedGain = calculateAutoGain(
-        poles,
-        zeros,
-        logarithmicFrequency,
-        octaves,
-      );
-      setGain(calculatedGain);
-    }
-  }, [autoGain, poles, zeros, logarithmicFrequency, octaves]);
-
   // フィルタ設計の変更を処理
   const handleFilterChange = useCallback(
-    (filterId: string, params: Record<string, any>) => {
+    (filterId: string, params: Record<string, unknown>) => {
       if (filterId === 'none') {
         return;
       }
@@ -108,13 +92,10 @@ function App() {
         }
         setPoles(result.poles);
         setZeros(result.zeros);
-        // 自動調整が無効な場合のみ、フィルタ設計のゲインを使用
-        if (!autoGain) {
-          setGain(result.gain);
-        }
+        setGain(result.gain);
       }
     },
-    [autoGain],
+    [],
   );
 
   // 極の移動処理
@@ -172,7 +153,7 @@ function App() {
       ...prev,
       { id: getNextId(), real: 0.7, imag: 0.3, isPole: true } as PoleZeroPair,
     ]);
-  }, [poles, zeros]);
+  }, [poles, zeros, getNextId]);
 
   // 実軸上の極を追加
   const handleAddPoleReal = useCallback(() => {
@@ -185,7 +166,7 @@ function App() {
       ...prev,
       { id: getNextId(), real: 0.7, isPole: true } as PoleZeroReal,
     ]);
-  }, [poles, zeros]);
+  }, [poles, zeros, getNextId]);
 
   // 零点ペアを追加
   const handleAddZeroPair = useCallback(() => {
@@ -198,7 +179,7 @@ function App() {
       ...prev,
       { id: getNextId(), real: -0.7, imag: 0.3, isPole: false } as PoleZeroPair,
     ]);
-  }, [poles, zeros]);
+  }, [poles, zeros, getNextId]);
 
   // 実軸上の零点を追加
   const handleAddZeroReal = useCallback(() => {
@@ -211,7 +192,7 @@ function App() {
       ...prev,
       { id: getNextId(), real: -0.7, isPole: false } as PoleZeroReal,
     ]);
-  }, [poles, zeros]);
+  }, [poles, zeros, getNextId]);
 
   // 極を削除
   const handleDeletePole = useCallback((id: string) => {
@@ -250,7 +231,7 @@ function App() {
       ...prev.map((z) => ({ ...z, id: getNextId() }) as PoleOrZero),
     ]);
     setGain((g) => g * g);
-  }, [poles, zeros]);
+  }, [poles, zeros, getNextId]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -304,12 +285,7 @@ function App() {
               />
               <Grid container spacing={2} width="100%">
                 <Grid id="gain-control-panel" size={12}>
-                  <GainControl
-                    gain={gain}
-                    onGainChange={setGain}
-                    autoGain={autoGain}
-                    onAutoGainChange={setAutoGain}
-                  />
+                  <GainControl gain={gain} onGainChange={setGain} />
                 </Grid>
                 <Grid id="toolbar-panel" size={12}>
                   <Toolbar

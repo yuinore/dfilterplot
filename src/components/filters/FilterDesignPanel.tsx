@@ -7,7 +7,7 @@ import type { FrequencyUnit } from '../Settings';
 import { CollapsiblePanel } from '../CollapsiblePanel';
 
 interface FilterDesignPanelProps {
-  onFilterChange: (filterId: string, params: Record<string, any>) => void;
+  onFilterChange: (filterId: string, params: Record<string, unknown>) => void;
   logarithmicFrequency: boolean;
   frequencyUnit: FrequencyUnit;
 }
@@ -38,7 +38,7 @@ export const FilterDesignPanel = ({
   };
 
   const handleParamsChange = useCallback(
-    (params: Record<string, any>) => {
+    (params: Record<string, unknown>) => {
       if (selectedFilterId !== 'none' && selectedFilter) {
         onFilterChange(selectedFilterId, params);
       }

@@ -1,26 +1,13 @@
-import {
-  Typography,
-  Slider,
-  Box,
-  FormControlLabel,
-  Checkbox,
-} from '@mui/material';
+import { Slider, Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { CollapsiblePanel } from './CollapsiblePanel';
 
 interface GainControlProps {
   gain: number;
   onGainChange: (gain: number) => void;
-  autoGain: boolean;
-  onAutoGainChange: (autoGain: boolean) => void;
 }
 
-export const GainControl = ({
-  gain,
-  onGainChange,
-  autoGain,
-  onAutoGainChange,
-}: GainControlProps) => {
+export const GainControl = ({ gain, onGainChange }: GainControlProps) => {
   const { t } = useTranslation();
 
   // リニアスケールの範囲: -1 ～ 1
@@ -44,7 +31,6 @@ export const GainControl = ({
           step={0.001}
           valueLabelDisplay="auto"
           valueLabelFormat={(value) => value.toFixed(3)}
-          disabled={autoGain}
           sx={{ flex: 1 }}
         />
       </Box>

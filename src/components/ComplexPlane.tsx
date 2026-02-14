@@ -106,6 +106,7 @@ export const ComplexPlane = ({
         onZeroMove?.(draggingItem.id, real, imag);
       }
     },
+    // TODO: fromSvgX, fromSvgY を useCallback でラップした上で、この依存配列に追加する
     [draggingItem, poles, zeros, enableSnap, onPoleMove, onZeroMove],
   );
 
