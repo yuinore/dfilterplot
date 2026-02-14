@@ -20,7 +20,14 @@ export class FirstOrderIIRFilterDesign implements FilterDesignBase {
     const type = params.type as string;
     const cutoffFrequency = params.cutoffFrequency as number;
 
-    const alpha = Math.exp(-cutoffFrequency);
+    // const alpha = Math.exp(-cutoffFrequency);
+
+    // pre warping
+    const preWarpedCutoffFrequency = 2 * Math.tan(cutoffFrequency / 2);
+    let alpha = Math.exp(-preWarpedCutoffFrequency);
+    if (cutoffFrequency > Math.PI - 1e-9) {
+      alpha = 0;
+    }
 
     switch (type) {
       case 'lowpass':
