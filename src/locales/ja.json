@@ -21,7 +21,12 @@
     "addPoleReal": "極（実数）",
     "addZeroPair": "零点ペア",
     "addZeroReal": "零点（実数）",
-    "clear": "クリア"
+    "clear": "クリア",
+    "duplicateAll": "全ての極と零点を複製",
+    "doubleClickPoleOrZeroToRemove": "極または零点をダブルクリックすると削除できます。",
+    "poleZeroLimitExceeded": "極・零点の数の合計が上限（256個）を超えるため処理を中止しました。",
+    "poleCount": "極 : {{count}}個",
+    "zeroCount": "零点 : {{count}}個"
   },
   "polezero": {
     "pole": "極",
@@ -139,8 +144,8 @@
       "name": "バターワースフィルタ",
       "description": "通過域において最大平坦な振幅特性を持つIIRフィルタ。単調性のある減衰特性を持つ。",
       "type": "フィルタタイプ",
-      "lowPass": "ローパス",
-      "highPass": "ハイパス",
+      "lowPass": "LPF",
+      "highPass": "HPF",
       "order": "次数",
       "cutoffFrequency": "カットオフ周波数"
     },

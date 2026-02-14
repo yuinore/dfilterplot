@@ -10,6 +10,12 @@ interface PoleZeroRendererProps {
   interactive?: boolean;
   onPoleMouseDown?: (id: string) => (e: React.MouseEvent<SVGGElement>) => void;
   onZeroMouseDown?: (id: string) => (e: React.MouseEvent<SVGGElement>) => void;
+  onPoleDoubleClick?: (
+    id: string,
+  ) => (e: React.MouseEvent<SVGGElement>) => void;
+  onZeroDoubleClick?: (
+    id: string,
+  ) => (e: React.MouseEvent<SVGGElement>) => void;
 }
 
 /**
@@ -23,6 +29,8 @@ export const PoleZeroRenderer = ({
   interactive = true,
   onPoleMouseDown,
   onZeroMouseDown,
+  onPoleDoubleClick,
+  onZeroDoubleClick,
 }: PoleZeroRendererProps) => {
   const { t } = useTranslation();
 
@@ -43,6 +51,9 @@ export const PoleZeroRenderer = ({
           <g
             key={zero.id}
             onMouseDown={interactive ? onZeroMouseDown?.(zero.id) : undefined}
+            onDoubleClick={
+              interactive ? onZeroDoubleClick?.(zero.id) : undefined
+            }
           >
             <circle
               cx={svgX}
@@ -89,6 +100,9 @@ export const PoleZeroRenderer = ({
           <g
             key={pole.id}
             onMouseDown={interactive ? onPoleMouseDown?.(pole.id) : undefined}
+            onDoubleClick={
+              interactive ? onPoleDoubleClick?.(pole.id) : undefined
+            }
           >
             <line
               x1={svgX - 8}

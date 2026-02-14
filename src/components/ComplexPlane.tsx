@@ -11,6 +11,8 @@ interface ComplexPlaneProps {
   enableSnap: boolean;
   onPoleMove?: (id: string, real: number, imag: number) => void;
   onZeroMove?: (id: string, real: number, imag: number) => void;
+  onDeletePole?: (id: string) => void;
+  onDeleteZero?: (id: string) => void;
 }
 
 export const ComplexPlane = ({
@@ -19,6 +21,8 @@ export const ComplexPlane = ({
   enableSnap,
   onPoleMove,
   onZeroMove,
+  onDeletePole,
+  onDeleteZero,
 }: ComplexPlaneProps) => {
   const { t } = useTranslation();
   const width = 500;
@@ -108,6 +112,28 @@ export const ComplexPlane = ({
   const handleMouseUp = useCallback(() => {
     setDraggingItem(null);
   }, []);
+
+  // 表示用 id（id または id_conj）を state の id に変換（ペアは1つの PoleOrZero で保持）
+  const toActualId = (displayId: string) =>
+    displayId.endsWith('_conj') ? displayId.replace('_conj', '') : displayId;
+
+  const handlePoleDoubleClick = useCallback(
+    (displayId: string) => (e: React.MouseEvent<SVGGElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onDeletePole?.(toActualId(displayId));
+    },
+    [onDeletePole],
+  );
+
+  const handleZeroDoubleClick = useCallback(
+    (displayId: string) => (e: React.MouseEvent<SVGGElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onDeleteZero?.(toActualId(displayId));
+    },
+    [onDeleteZero],
+  );
 
   useEffect(() => {
     if (draggingItem) {
@@ -210,6 +236,8 @@ export const ComplexPlane = ({
             interactive={true}
             onPoleMouseDown={(id) => handleMouseDown(id, true)}
             onZeroMouseDown={(id) => handleMouseDown(id, false)}
+            onPoleDoubleClick={handlePoleDoubleClick}
+            onZeroDoubleClick={handleZeroDoubleClick}
           />
         </svg>
       </div>

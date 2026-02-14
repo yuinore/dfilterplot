@@ -21,7 +21,12 @@
     "addPoleReal": "Pole (Real)",
     "addZeroPair": "Zero Pair",
     "addZeroReal": "Zero (Real)",
-    "clear": "Clear"
+    "clear": "Clear",
+    "duplicateAll": "Duplicate all poles and zeros",
+    "doubleClickPoleOrZeroToRemove": "Double-click a pole or zero to remove it.",
+    "poleZeroLimitExceeded": "Operation cancelled: the total pole/zero count would exceed the limit (256).",
+    "poleCount": "Poles: {{count}}",
+    "zeroCount": "Zeros: {{count}}"
   },
   "polezero": {
     "pole": "Pole",
@@ -139,8 +144,8 @@
       "name": "Butterworth Filter",
       "description": "IIR filter with maximally flat magnitude response in the passband. Features monotonic attenuation.",
       "type": "Filter Type",
-      "lowPass": "Low Pass",
-      "highPass": "High Pass",
+      "lowPass": "LPF",
+      "highPass": "HPF",
       "order": "Order",
       "cutoffFrequency": "Cutoff Frequency"
     },

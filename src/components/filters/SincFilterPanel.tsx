@@ -56,11 +56,13 @@ export const SincFilterPanel = ({
   const { t } = useTranslation();
 
   // カットオフ周波数（rad/s）
-  const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
+  const [cutoffFrequency, setCutoffFrequency] = useState<number>(
+    (Math.PI * 4) / 10,
+  );
   // タップ数（奇数、3-10）
-  const [taps, setTaps] = useState<number>(9);
+  const [taps, setTaps] = useState<number>(15);
   // 窓関数
-  const [windowFunction, setWindowFunction] = useState<string>('hann');
+  const [windowFunction, setWindowFunction] = useState<string>('none');
 
   // パラメータ変更時に親に通知
   useEffect(() => {

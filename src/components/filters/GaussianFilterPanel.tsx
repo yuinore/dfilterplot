@@ -13,11 +13,11 @@ export const GaussianFilterPanel = ({ onChange }: FilterPanelProps) => {
   const { t } = useTranslation();
 
   // 標準偏差（sigma）
-  const [sigma, setSigma] = useState<number>(1.0);
+  const [sigma, setSigma] = useState<number>(2.0);
   // タップ数（奇数、3-31）
-  const [taps, setTaps] = useState<number>(9);
+  const [taps, setTaps] = useState<number>(15);
   // 窓関数
-  const [windowFunction, setWindowFunction] = useState<string>('hann');
+  const [windowFunction, setWindowFunction] = useState<string>('none');
 
   // パラメータ変更時に親に通知
   useEffect(() => {

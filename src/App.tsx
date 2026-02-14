@@ -4,8 +4,11 @@ import {
   CssBaseline,
   Box,
   Grid,
+  Alert,
+  Snackbar,
 } from '@mui/material';
 import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
 import { Toolbar } from './components/Toolbar';
@@ -18,6 +21,13 @@ import { toPoleZeros } from './types';
 import { FilterRegistry } from './filters';
 import { BODE_PLOT } from './constants';
 import { calculateAutoGain } from './utils/transferFunction';
+
+const MAX_POLE_ZERO_COUNT = 256;
+
+/** 展開後の極・零点の総数（共役ペアは 2 とカウント） */
+function getExpandedCount(poles: PoleOrZero[], zeros: PoleOrZero[]): number {
+  return toPoleZeros(poles).length + toPoleZeros(zeros).length;
+}
 
 function App() {
   const theme = useMemo(
@@ -65,6 +75,8 @@ function App() {
   const [gain, setGain] = useState<number>(1.0);
   const [autoGain, setAutoGain] = useState<boolean>(false);
   const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('44100');
+  const [limitErrorOpen, setLimitErrorOpen] = useState(false);
+  const { t } = useTranslation();
 
   // 自動調整が有効な場合、ゲインを自動計算
   useEffect(() => {
@@ -89,6 +101,11 @@ function App() {
       const filter = FilterRegistry.get(filterId);
       if (filter) {
         const result = filter.generate(params);
+        const count = getExpandedCount(result.poles, result.zeros);
+        if (count > MAX_POLE_ZERO_COUNT) {
+          setLimitErrorOpen(true);
+          return;
+        }
         setPoles(result.poles);
         setZeros(result.zeros);
         // 自動調整が無効な場合のみ、フィルタ設計のゲインを使用
@@ -146,35 +163,55 @@ function App() {
 
   // 極ペアを追加
   const handleAddPolePair = useCallback(() => {
+    const count = getExpandedCount(poles, zeros);
+    if (count + 2 > MAX_POLE_ZERO_COUNT) {
+      setLimitErrorOpen(true);
+      return;
+    }
     setPoles((prev) => [
       ...prev,
       { id: getNextId(), real: 0.7, imag: 0.3, isPole: true } as PoleZeroPair,
     ]);
-  }, []);
+  }, [poles, zeros]);
 
   // 実軸上の極を追加
   const handleAddPoleReal = useCallback(() => {
+    const count = getExpandedCount(poles, zeros);
+    if (count + 1 > MAX_POLE_ZERO_COUNT) {
+      setLimitErrorOpen(true);
+      return;
+    }
     setPoles((prev) => [
       ...prev,
       { id: getNextId(), real: 0.7, isPole: true } as PoleZeroReal,
     ]);
-  }, []);
+  }, [poles, zeros]);
 
   // 零点ペアを追加
   const handleAddZeroPair = useCallback(() => {
+    const count = getExpandedCount(poles, zeros);
+    if (count + 2 > MAX_POLE_ZERO_COUNT) {
+      setLimitErrorOpen(true);
+      return;
+    }
     setZeros((prev) => [
       ...prev,
       { id: getNextId(), real: -0.7, imag: 0.3, isPole: false } as PoleZeroPair,
     ]);
-  }, []);
+  }, [poles, zeros]);
 
   // 実軸上の零点を追加
   const handleAddZeroReal = useCallback(() => {
+    const count = getExpandedCount(poles, zeros);
+    if (count + 1 > MAX_POLE_ZERO_COUNT) {
+      setLimitErrorOpen(true);
+      return;
+    }
     setZeros((prev) => [
       ...prev,
       { id: getNextId(), real: -0.7, isPole: false } as PoleZeroReal,
     ]);
-  }, []);
+  }, [poles, zeros]);
 
   // 極を削除
   const handleDeletePole = useCallback((id: string) => {
@@ -196,6 +233,24 @@ function App() {
     setZeros([]);
     setGain(1.0);
   }, []);
+
+  // 全ての極と零点を複製（既存に追加し、ゲインは 2 乗）
+  const handleDuplicateAll = useCallback(() => {
+    const count = getExpandedCount(poles, zeros);
+    if (count * 2 > MAX_POLE_ZERO_COUNT) {
+      setLimitErrorOpen(true);
+      return;
+    }
+    setPoles((prev) => [
+      ...prev,
+      ...prev.map((p) => ({ ...p, id: getNextId() }) as PoleOrZero),
+    ]);
+    setZeros((prev) => [
+      ...prev,
+      ...prev.map((z) => ({ ...z, id: getNextId() }) as PoleOrZero),
+    ]);
+    setGain((g) => g * g);
+  }, [poles, zeros]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -244,9 +299,11 @@ function App() {
                 enableSnap={enableSnap}
                 onPoleMove={handlePoleMove}
                 onZeroMove={handleZeroMove}
+                onDeletePole={handleDeletePole}
+                onDeleteZero={handleDeleteZero}
               />
               <Grid container spacing={2} width="100%">
-                <Grid size={12}>
+                <Grid id="gain-control-panel" size={12}>
                   <GainControl
                     gain={gain}
                     onGainChange={setGain}
@@ -254,7 +311,7 @@ function App() {
                     onAutoGainChange={setAutoGain}
                   />
                 </Grid>
-                <Grid size={12}>
+                <Grid id="toolbar-panel" size={12}>
                   <Toolbar
                     poles={toPoleZeros(poles)}
                     zeros={toPoleZeros(zeros)}
@@ -265,6 +322,7 @@ function App() {
                     onDeletePole={handleDeletePole}
                     onDeleteZero={handleDeleteZero}
                     onClear={handleClear}
+                    onDuplicateAll={handleDuplicateAll}
                   />
                 </Grid>
               </Grid>
@@ -307,6 +365,21 @@ function App() {
           </Box>
         </Box>
       </Box>
+      <Snackbar
+        open={limitErrorOpen}
+        autoHideDuration={6000}
+        onClose={() => setLimitErrorOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setLimitErrorOpen(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {t('toolbar.poleZeroLimitExceeded')}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }

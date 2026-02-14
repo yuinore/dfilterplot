@@ -63,7 +63,9 @@ function cutoffFrequencyToFeedbackCoefficient(cutoffFrequency: number): number {
   return alpha;
 }
 
-function feedbackCoefficientToCutoffFrequency(feedbackCoefficient: number): number {
+function feedbackCoefficientToCutoffFrequency(
+  feedbackCoefficient: number,
+): number {
   if (feedbackCoefficient >= 1 - 1e-9) {
     return 0;
   }
@@ -83,7 +85,8 @@ export const FirstOrderIIRFilterPanel = ({
   const [type, setType] = useState<string>('lowpass');
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 10);
 
-  const feedbackCoefficient = cutoffFrequencyToFeedbackCoefficient(cutoffFrequency);
+  const feedbackCoefficient =
+    cutoffFrequencyToFeedbackCoefficient(cutoffFrequency);
 
   useEffect(() => {
     onChange({ type, cutoffFrequency });
