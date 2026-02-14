@@ -99,7 +99,8 @@ export class GaussianFilterDesign implements FilterDesignBase {
       // 削除後も再度0チェックを行い、0以外になるまで繰り返す
       while (
         trimmedCoefficients.length > 1 &&
-        Math.abs(trimmedCoefficients[trimmedCoefficients.length - 1]) <= gaussianFilterZeroTolerance
+        Math.abs(trimmedCoefficients[trimmedCoefficients.length - 1]) <=
+          gaussianFilterZeroTolerance
       ) {
         trimmedCoefficients = trimmedCoefficients.slice(0, -1);
         removedConstantTermsCount++;
@@ -149,7 +150,10 @@ export class GaussianFilterDesign implements FilterDesignBase {
     // ただし、多項式の次数を削減した場合は、その数に応じて FIR フィルタのタップ数が減ることに注意する
     // 代わりに、0次の係数（定数項）を削除した分だけ原点に極を追加し、遅延を追加する（zで割った分）
     const poles: PoleOrZero[] = [];
-    const poleCount = Math.max(0, trimmedCoefficients.length - 1 + removedConstantTermsCount);
+    const poleCount = Math.max(
+      0,
+      trimmedCoefficients.length - 1 + removedConstantTermsCount,
+    );
     for (let i = 0; i < poleCount; i++) {
       poles.push({
         type: 'real',
