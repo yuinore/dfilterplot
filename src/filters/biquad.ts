@@ -20,6 +20,8 @@ export class BiquadFilterDesign implements FilterDesignBase {
     const cutoffFrequency = params.cutoffFrequency as number;
     const qFactor = params.qFactor as number;
 
+    const gainDB = (params.gainDB as number) ?? 0;
+
     switch (type) {
       case 'lowpass':
         return this.generateLowPassBiquad(cutoffFrequency, qFactor);
@@ -29,6 +31,14 @@ export class BiquadFilterDesign implements FilterDesignBase {
         return this.generateBandPassBiquad(cutoffFrequency, qFactor);
       case 'bandstop':
         return this.generateBandStopBiquad(cutoffFrequency, qFactor);
+      case 'peaking':
+        return this.generatePeakingBiquad(cutoffFrequency, qFactor, gainDB);
+      case 'lowshelf':
+        return this.generateLowShelfBiquad(cutoffFrequency, qFactor, gainDB);
+      case 'highshelf':
+        return this.generateHighShelfBiquad(cutoffFrequency, qFactor, gainDB);
+      case 'allpass':
+        return this.generateAllPassBiquad(cutoffFrequency, qFactor);
       default:
         return this.generateLowPassBiquad(cutoffFrequency, qFactor);
     }
@@ -238,6 +248,106 @@ export class BiquadFilterDesign implements FilterDesignBase {
     const b0 = 1;
     const b1 = -2 * cosW0;
     const b2 = 1;
+    const a0 = 1 + alpha;
+    const a1 = -2 * cosW0;
+    const a2 = 1 - alpha;
+
+    return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+  }
+
+  /**
+   * Peaking EQ フィルタの極・零点を生成
+   * Audio EQ Cookbook: peakingEQ
+   */
+  private generatePeakingBiquad(
+    centerFreq: number,
+    Q: number,
+    dBgain: number,
+  ): FilterGenerationResult {
+    const w0 = centerFreq;
+    const cosW0 = Math.cos(w0);
+    const sinW0 = Math.sin(w0);
+    const A = Math.pow(10, dBgain / 40);
+    const alpha = sinW0 / (2 * Q);
+
+    const b0 = 1 + alpha * A;
+    const b1 = -2 * cosW0;
+    const b2 = 1 - alpha * A;
+    const a0 = 1 + alpha / A;
+    const a1 = -2 * cosW0;
+    const a2 = 1 - alpha / A;
+
+    return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+  }
+
+  /**
+   * Low Shelf フィルタの極・零点を生成
+   * Audio EQ Cookbook: lowShelf
+   */
+  private generateLowShelfBiquad(
+    shelfFreq: number,
+    Q: number,
+    dBgain: number,
+  ): FilterGenerationResult {
+    const w0 = shelfFreq;
+    const cosW0 = Math.cos(w0);
+    const sinW0 = Math.sin(w0);
+    const A = Math.pow(10, dBgain / 40);
+    const alpha = sinW0 / (2 * Q);
+    const sqrtA = Math.sqrt(A);
+
+    const b0 = A * (A + 1 - (A - 1) * cosW0 + 2 * sqrtA * alpha);
+    const b1 = 2 * A * (A - 1 - (A + 1) * cosW0);
+    const b2 = A * (A + 1 - (A - 1) * cosW0 - 2 * sqrtA * alpha);
+    const a0 = A + 1 + (A - 1) * cosW0 + 2 * sqrtA * alpha;
+    const a1 = -2 * (A - 1 + (A + 1) * cosW0);
+    const a2 = A + 1 + (A - 1) * cosW0 - 2 * sqrtA * alpha;
+
+    return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+  }
+
+  /**
+   * High Shelf フィルタの極・零点を生成
+   * Audio EQ Cookbook: highShelf
+   */
+  private generateHighShelfBiquad(
+    shelfFreq: number,
+    Q: number,
+    dBgain: number,
+  ): FilterGenerationResult {
+    const w0 = shelfFreq;
+    const cosW0 = Math.cos(w0);
+    const sinW0 = Math.sin(w0);
+    const A = Math.pow(10, dBgain / 40);
+    const alpha = sinW0 / (2 * Q);
+    const sqrtA = Math.sqrt(A);
+
+    const b0 = A * (A + 1 + (A - 1) * cosW0 + 2 * sqrtA * alpha);
+    const b1 = -2 * A * (A - 1 + (A + 1) * cosW0);
+    const b2 = A * (A + 1 + (A - 1) * cosW0 - 2 * sqrtA * alpha);
+    const a0 = A + 1 - (A - 1) * cosW0 + 2 * sqrtA * alpha;
+    const a1 = 2 * (A - 1 - (A + 1) * cosW0);
+    const a2 = A + 1 - (A - 1) * cosW0 - 2 * sqrtA * alpha;
+
+    return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+  }
+
+  /**
+   * All-Pass フィルタの極・零点を生成
+   * Audio EQ Cookbook: APF
+   */
+  private generateAllPassBiquad(
+    centerFreq: number,
+    Q: number,
+  ): FilterGenerationResult {
+    const w0 = centerFreq;
+    const cosW0 = Math.cos(w0);
+    const sinW0 = Math.sin(w0);
+    const alpha = sinW0 / (2 * Q);
+
+    const b0 = 1 - alpha;
+    const b1 = -2 * cosW0;
+    const b2 = 1 + alpha;
     const a0 = 1 + alpha;
     const a1 = -2 * cosW0;
     const a2 = 1 - alpha;

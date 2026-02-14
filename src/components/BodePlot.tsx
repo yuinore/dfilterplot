@@ -136,19 +136,30 @@ export const BodePlot = ({
     const convertedFrequency = frequencyResponse.frequency.map((f) =>
       convertFrequency(f, frequencyUnit),
     );
+    const magnitudeDataset = {
+      label: t('bodePlot.magnitude'),
+      data: frequencyResponse.magnitude,
+      borderColor: 'rgb(25, 118, 210)',
+      backgroundColor: 'rgba(25, 118, 210, 0.1)',
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.1,
+    };
+    // 0dB を灰色の点線で追加
+    const zeroDbDataset = {
+      label: t('bodePlot.zeroDb'),
+      data: convertedFrequency.map(() => 0),
+      borderColor: 'gray',
+      backgroundColor: 'transparent',
+      borderDash: [5, 5],
+      borderWidth: 1,
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+    };
     return {
       labels: convertedFrequency,
-      datasets: [
-        {
-          label: t('bodePlot.magnitude'),
-          data: frequencyResponse.magnitude,
-          borderColor: 'rgb(25, 118, 210)',
-          backgroundColor: 'rgba(25, 118, 210, 0.1)',
-          borderWidth: 2,
-          pointRadius: 0,
-          tension: 0.1,
-        },
-      ],
+      datasets: [magnitudeDataset, zeroDbDataset],
     };
   }, [frequencyResponse, t, frequencyUnit]);
 
@@ -264,19 +275,30 @@ export const BodePlot = ({
     const convertedFrequency = groupDelayResponse.frequency.map((f) =>
       convertFrequency(f, frequencyUnit),
     );
+    const groupDelayDataset = {
+      label: t('bodePlot.groupDelay'),
+      data: groupDelayResponse.groupDelay,
+      borderColor: 'rgb(211, 47, 47)',
+      backgroundColor: 'rgba(211, 47, 47, 0.1)',
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.1,
+    };
+    // 0 を灰色の点線で追加
+    const zeroLineDataset = {
+      label: t('bodePlot.zeroDelay'),
+      data: convertedFrequency.map(() => 0),
+      borderColor: 'gray',
+      backgroundColor: 'transparent',
+      borderDash: [5, 5],
+      borderWidth: 1,
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+    };
     return {
       labels: convertedFrequency,
-      datasets: [
-        {
-          label: t('bodePlot.groupDelay'),
-          data: groupDelayResponse.groupDelay,
-          borderColor: 'rgb(211, 47, 47)',
-          backgroundColor: 'rgba(211, 47, 47, 0.1)',
-          borderWidth: 2,
-          pointRadius: 0,
-          tension: 0.1,
-        },
-      ],
+      datasets: [groupDelayDataset, zeroLineDataset],
     };
   }, [groupDelayResponse, t, frequencyUnit]);
 

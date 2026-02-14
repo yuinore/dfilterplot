@@ -14,6 +14,7 @@ interface BiquadFilterPanelProps {
     type: string;
     cutoffFrequency: number;
     qFactor: number;
+    gainDB?: number;
   }) => void;
   logarithmicFrequency?: boolean;
   frequencyUnit?: FrequencyUnit;
@@ -66,11 +67,12 @@ export const BiquadFilterPanel = ({
   const [type, setType] = useState<string>('lowpass');
   const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 4);
   const [qFactor, setQFactor] = useState<number>(3.0);
+  const [gainDB, setGainDB] = useState<number>(6.0);
 
   // パラメータが変更されたら通知
   useEffect(() => {
-    onChange({ type, cutoffFrequency, qFactor });
-  }, [type, cutoffFrequency, qFactor, onChange]);
+    onChange({ type, cutoffFrequency, qFactor, gainDB });
+  }, [type, cutoffFrequency, qFactor, gainDB, onChange]);
 
   // スライダーの範囲（rad/s）
   const minFreqRad = 0.001 * Math.PI;
@@ -131,6 +133,18 @@ export const BiquadFilterPanel = ({
         <ToggleButton value="bandstop">
           {t('filters.biquad.bandStop')}
         </ToggleButton>
+        <ToggleButton value="peaking">
+          {t('filters.biquad.peaking')}
+        </ToggleButton>
+        <ToggleButton value="lowshelf">
+          {t('filters.biquad.lowShelf')}
+        </ToggleButton>
+        <ToggleButton value="highshelf">
+          {t('filters.biquad.highShelf')}
+        </ToggleButton>
+        <ToggleButton value="allpass">
+          {t('filters.biquad.allPass')}
+        </ToggleButton>
       </ToggleButtonGroup>
 
       <Typography variant="subtitle2" gutterBottom>
@@ -164,12 +178,30 @@ export const BiquadFilterPanel = ({
       <Slider
         value={qFactor}
         onChange={(_, value) => setQFactor(value as number)}
-        min={0.1}
-        max={10}
-        step={0.1}
+        min={0.05}
+        max={5}
+        step={0.05}
         valueLabelDisplay="auto"
         valueLabelFormat={(value) => value.toFixed(2)}
       />
+
+      {(type === 'peaking' || type === 'lowshelf' || type === 'highshelf') && (
+        <>
+          <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+            {t('filters.biquad.gainDB')}: {gainDB.toFixed(1)} dB
+          </Typography>
+          <Slider
+            value={gainDB}
+            onChange={(_, value) => setGainDB(value as number)}
+            min={-20}
+            max={20}
+            step={0.5}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(value) => `${value} dB`}
+            sx={{ mb: 2 }}
+          />
+        </>
+      )}
 
       <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
         {t('filters.biquad.description')}
