@@ -80,12 +80,44 @@ export class SincFilterDesign implements FilterDesignBase {
     // H(z) * z^(halfN) = 0 の根を求める
     const zeros: PoleOrZero[] = [];
 
+    // 0次の係数（定数項）を削除した回数をカウント（原点の極の数）
+    let removedConstantTermsCount = 0;
+
+    // 最高次の係数が0に近い場合は削除（x=∞の根は省略可能）
+    // 削除後も再度0チェックを行い、0以外になるまで繰り返す
+    let trimmedCoefficients = [...coefficients];
+
+    // Sincフィルタの零点の許容誤差
+    // 1e-10 は durandKerner で解くには小さすぎるので、1e-5 ～ 1e-6 に設定
+    const sincFilterZeroTolerance = 1e-5;
+
     if (coefficients.length > 1) {
+      while (
+        trimmedCoefficients.length > 1 &&
+        Math.abs(trimmedCoefficients[0]) <= sincFilterZeroTolerance
+      ) {
+        trimmedCoefficients = trimmedCoefficients.slice(1);
+      }
+
+      // 0次の係数（定数項）が0に近い場合は削除（z=0の根を削除し、原点に極を追加）
+      // 削除後も再度0チェックを行い、0以外になるまで繰り返す
+      while (
+        trimmedCoefficients.length > 1 &&
+        Math.abs(trimmedCoefficients[trimmedCoefficients.length - 1]) <=
+          sincFilterZeroTolerance
+      ) {
+        trimmedCoefficients = trimmedCoefficients.slice(0, -1);
+        removedConstantTermsCount++;
+      }
+
       // 最高次の係数が0でないことを確認
-      if (Math.abs(coefficients[0]) > 1e-10) {
+      if (
+        trimmedCoefficients.length > 1 &&
+        Math.abs(trimmedCoefficients[0]) > sincFilterZeroTolerance
+      ) {
         try {
           // 多項式の根を求める
-          const roots = durandKerner(coefficients);
+          const roots = durandKerner(trimmedCoefficients);
 
           // 根をPoleOrZero形式に変換
           for (let i = 0; i < roots.length; i++) {
@@ -119,8 +151,14 @@ export class SincFilterDesign implements FilterDesignBase {
     }
 
     // 極: FIRフィルタなので原点に N-1 個の極
+    // ただし、多項式の次数を削減した場合は、その数に応じて FIR フィルタのタップ数が減ることに注意する
+    // 代わりに、0次の係数（定数項）を削除した分だけ原点に極を追加し、遅延を追加する（zで割った分）
     const poles: PoleOrZero[] = [];
-    for (let i = 0; i < N - 1; i++) {
+    const poleCount = Math.max(
+      0,
+      trimmedCoefficients.length - 1 + removedConstantTermsCount,
+    );
+    for (let i = 0; i < poleCount; i++) {
       poles.push({
         type: 'real',
         id: `sinc_pole_origin_${i}`,
@@ -133,7 +171,11 @@ export class SincFilterDesign implements FilterDesignBase {
     // H(z) = K * z^(-halfN) * ∏(z - z_i)
     // ここで、K は z^(-halfN) の係数、つまり h[halfN] (インパルス応答の最後のサンプル)
     // impulseResponse配列は [h[-halfN], ..., h[0], ..., h[halfN]] の順序
-    const gain = impulseResponse[impulseResponse.length - 1];
+    // トリミング後の係数を使用する（定数項が削除された場合は、削除後の最後の係数）
+    const gain =
+      trimmedCoefficients.length > 0
+        ? trimmedCoefficients[trimmedCoefficients.length - 1]
+        : impulseResponse[impulseResponse.length - 1];
 
     return { poles, zeros, gain };
   }

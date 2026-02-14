@@ -150,7 +150,7 @@
       "cutoffFrequency": "Cutoff Frequency"
     },
     "sinc": {
-      "name": "Sinc Filter",
+      "name": "Sinc Filter (approximation)",
       "description": "FIR filter based on the impulse response of an ideal low-pass filter (sinc function). Theoretically achieves ideal rectangular frequency response, but truncation error occurs due to finite length.",
       "cutoffFrequency": "Cutoff Frequency",
       "taps": "Number of Taps",
@@ -159,7 +159,7 @@
       "windowHann": "Hann"
     },
     "gaussian": {
-      "name": "Gaussian Filter",
+      "name": "Gaussian Filter (approximation)",
       "description": "FIR filter with Gaussian function impulse response. Features smooth frequency response and rapid decay in the time domain.",
       "sigma": "Standard Deviation",
       "taps": "Number of Taps",
