@@ -80,7 +80,8 @@
       "highPass": "HPF",
       "tooltipLowPass": "ローパスフィルタ",
       "tooltipHighPass": "ハイパスフィルタ",
-      "cutoffFrequency": "カットオフ周波数"
+      "cutoffFrequency": "カットオフ周波数",
+      "feedbackCoefficient": "フィードバック係数 α"
     },
     "biquad": {
       "name": "双二次フィルタ",

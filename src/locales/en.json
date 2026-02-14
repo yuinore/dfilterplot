@@ -80,7 +80,8 @@
       "highPass": "HPF",
       "tooltipLowPass": "Low-pass filter",
       "tooltipHighPass": "High-pass filter",
-      "cutoffFrequency": "Cutoff Frequency"
+      "cutoffFrequency": "Cutoff Frequency",
+      "feedbackCoefficient": "Feedback coefficient α"
     },
     "biquad": {
       "name": "Biquad Filter",
