@@ -8,7 +8,6 @@ import {
 import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ComplexPlane } from './components/ComplexPlane';
-import { SPlane } from './components/SPlane';
 import { Toolbar } from './components/Toolbar';
 import { BodePlot } from './components/BodePlot';
 import { Settings, type FrequencyUnit } from './components/Settings';
@@ -247,12 +246,6 @@ function App() {
                 onZeroMove={handleZeroMove}
               />
               <Grid container spacing={2} width="100%">
-                <Grid size={12}>
-                  <SPlane
-                    poles={toPoleZeros(poles)}
-                    zeros={toPoleZeros(zeros)}
-                  />
-                </Grid>
                 <Grid size={12}>
                   <GainControl
                     gain={gain}

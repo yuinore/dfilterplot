@@ -56,8 +56,7 @@
   },
   "gainControl": {
     "title": "Gain Control",
-    "gain": "Gain Factor",
-    "autoAdjust": "Auto Adjust"
+    "gain": "Gain Factor"
   },
   "filterDesign": {
     "title": "Filter Design",

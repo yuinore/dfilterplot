@@ -56,8 +56,7 @@
   },
   "gainControl": {
     "title": "ゲイン調整",
-    "gain": "比例係数",
-    "autoAdjust": "自動調整"
+    "gain": "比例係数"
   },
   "filterDesign": {
     "title": "フィルタ設計",

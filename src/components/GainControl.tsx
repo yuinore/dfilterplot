@@ -47,15 +47,6 @@ export const GainControl = ({
           disabled={autoGain}
           sx={{ flex: 1 }}
         />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={autoGain}
-              onChange={(e) => onAutoGainChange(e.target.checked)}
-            />
-          }
-          label={t('gainControl.autoAdjust')}
-        />
       </Box>
     </CollapsiblePanel>
   );
