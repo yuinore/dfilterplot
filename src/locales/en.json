@@ -95,9 +95,14 @@
       "differentiator": "Differentiator",
       "integrator": "Integrator"
     },
+    "delay": {
+      "name": "Delay Filter",
+      "description": "Pure delay filter with the specified number of poles at the origin. H(z)=z^(-n).",
+      "order": "Order"
+    },
     "comb": {
-      "name": "Comb Filter / Delay / Chorus / Flanger",
-      "description": "Filter with periodic frequency response",
+      "name": "Comb Filter / Delay",
+      "description": "Filter with periodic frequency response. Widely used in software synthesizers and the like due to its ease of implementation.",
       "type": "Filter Type",
       "feedforward": "Feedforward (FIR)",
       "feedback": "Feedback (IIR)",

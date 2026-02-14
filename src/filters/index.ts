@@ -1,6 +1,7 @@
 import { FilterRegistry } from './base';
 import { BiquadFilterDesign } from './biquad';
 import { CalculusFilterDesign } from './calculus';
+import { DelayFilterDesign } from './delay';
 import { CombFilterDesign } from './comb';
 import { MovingAverageFilterDesign } from './movingaverage';
 import { ButterworthFilterDesign } from './butterworth';
@@ -10,6 +11,7 @@ import { GaussianFilterDesign } from './gaussian';
 // フィルタを登録
 FilterRegistry.register(new BiquadFilterDesign());
 FilterRegistry.register(new CalculusFilterDesign());
+FilterRegistry.register(new DelayFilterDesign());
 FilterRegistry.register(new CombFilterDesign());
 FilterRegistry.register(new MovingAverageFilterDesign());
 FilterRegistry.register(new ButterworthFilterDesign());
@@ -19,6 +21,7 @@ FilterRegistry.register(new GaussianFilterDesign());
 export * from './base';
 export { BiquadFilterDesign } from './biquad';
 export { CalculusFilterDesign } from './calculus';
+export { DelayFilterDesign } from './delay';
 export { CombFilterDesign } from './comb';
 export { MovingAverageFilterDesign } from './movingaverage';
 export { ButterworthFilterDesign } from './butterworth';
