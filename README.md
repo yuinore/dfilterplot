@@ -4,7 +4,7 @@
 
 ## 概要
 
-複素平面上に極と零点を配置し、リアルタイムに伝達関数のボード線図（振幅特性・位相特性）を表示します。
+複素平面上に極と零点を配置し、伝達関数の周波数応答や時間応答をリアルタイムに表示します。極・零点をドラッグするか、フィルタ設計からプリセットを選択して利用できます。
 
 ## 技術スタック
 
@@ -14,14 +14,11 @@
 - **国際化**: react-i18next (日本語・英語対応)
 - **複素平面描画**: SVG
 
-## 機能
+## 主な機能
 
-- 複素平面上での極・零点の配置と移動（ドラッグ操作）
-- 実数係数フィルタの制約（複素共役ペア）
-- 極・零点の追加・削除
-- ボード線図のリアルタイム表示
-  - 振幅特性（dB）
-  - 位相特性（度）
+- 複素平面での極・零点のドラッグ操作（ダブルクリックで削除）
+- フィルタ設計プリセット（双二次、移動平均、バターワースなど）
+- ボード線図（振幅・位相・群遅延）、インパルス応答、ステップ応答のリアルタイム表示
 
 ## 開発
 
@@ -39,64 +36,6 @@ yarn build
 yarn preview
 ```
 
-## アーキテクチャ / Architecture
-
-### フィルタ設計の拡張性
-
-新しいフィルタを追加する場合：
-
-1. **UIコンポーネントの作成** (`src/components/filters/MyFilterPanel.tsx`)
-   ```typescript
-   import type { FilterPanelProps } from '../../filters/base';
-
-   export const MyFilterPanel = ({ onChange, logarithmicFrequency }: FilterPanelProps) => {
-     const [myParam, setMyParam] = useState(defaultValue);
-
-     useEffect(() => {
-       onChange({ myParam });
-     }, [myParam, onChange]);
-
-     return <Box>{/* UI要素 */}</Box>;
-   };
-   ```
-
-2. **フィルタクラスの作成** (`src/filters/myfilter.ts`)
-   ```typescript
-   import type { FilterDesignBase } from './base';
-   import { MyFilterPanel } from '../components/filters/MyFilterPanel';
-
-   export class MyFilterDesign implements FilterDesignBase {
-     id = 'myfilter';
-     nameKey = 'filters.myfilter.name';
-     PanelComponent = MyFilterPanel;
-
-     generate(params) {
-       // フィルタ生成ロジック
-       return { poles, zeros, gain };
-     }
-   }
-   ```
-
-3. **フィルタの登録** (`src/filters/index.ts`)
-   ```typescript
-   import { MyFilterDesign } from './myfilter';
-   FilterRegistry.register(new MyFilterDesign());
-   ```
-
-4. **翻訳の追加** (`src/locales/ja.json`, `src/locales/en.json`)
-   ```json
-   "filters": {
-     "myfilter": {
-       "name": "My Filter"
-     }
-   }
-   ```
-
-**設計思想:**
-- **1フィルタ = 1UIコンポーネント = 1ファイル** でスケーラビリティを確保
-- 各フィルタは専用のUIコンポーネントを持ち、完全に独立
-- FilterRegistryによる自動検出でアプリケーションコードの変更不要
-
 ## 参考文献 / References
 
 - [Audio EQ Cookbook by Robert Bristow-Johnson](https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt) - Biquad filter design equations
@@ -109,6 +48,10 @@ This is an educational learning application and a disposable repository. The cod
 
 このプロジェクトは教育用の学習アプリケーションであり、使い捨てのリポジトリです。コードベースは DRY 原則に従っておらず、コードの可読性も優先されていません。ただし、コントリビューションは歓迎します。
 
-## ライセンス
+## License
 
-MIT
+MIT License. See [LICENSE](LICENSE) file for details.
+
+## Author
+
+Directed & Built by [yuinore](https://github.com/yuinore)

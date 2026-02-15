@@ -6,6 +6,8 @@ import {
   Grid,
   Alert,
   Snackbar,
+  Typography,
+  Link,
 } from '@mui/material';
 import { useMemo, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -243,13 +245,22 @@ function App() {
           component="main"
           sx={{
             flexGrow: 1,
+            minHeight: 0,
             p: { xs: 3, lg: 3 },
             display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row', lg: 'row' },
+            flexDirection: 'column',
             gap: { xs: 3, lg: 3 },
             overflow: 'auto',
           }}
         >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row', lg: 'row' },
+              gap: { xs: 3, lg: 3 },
+              flexShrink: 0,
+            }}
+          >
           <Box
             id="controller-box"
             sx={{
@@ -342,6 +353,30 @@ function App() {
               gain={gain}
               frequencyUnit={frequencyUnit}
             />
+          </Box>
+          </Box>
+          <Box
+            component="footer"
+            sx={{
+              flexShrink: 0,
+              pt: 2,
+              px: 2,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              Directed & Built by yuinore / See GitHub →{' '}
+              <Link
+                href="https://github.com/yuinore"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ textDecoration: 'none' }}
+              >
+                https://github.com/yuinore
+              </Link>
+            </Typography>
           </Box>
         </Box>
       </Box>
