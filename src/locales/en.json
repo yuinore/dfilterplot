@@ -4,7 +4,8 @@
   },
   "header": {
     "language": "Language",
-    "references": "References"
+    "references": "References",
+    "aboutThisTool": "About this tool"
   },
   "complexPlane": {
     "title": "Complex Plane",
@@ -168,6 +169,10 @@
       "windowNone": "None",
       "windowHann": "Hann"
     }
+  },
+  "aboutThisTool": {
+    "title": "About this tool",
+    "description": "This tool visualizes the transfer function and response when you change the poles and zeros of a digital filter. Drag poles and zeros on the complex plane, or select a preset from the \"Filter Design\" section."
   },
   "references": {
     "title": "References",

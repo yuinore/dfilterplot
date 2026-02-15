@@ -15,12 +15,14 @@ import {
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import InfoIcon from '@mui/icons-material/Info';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const Header = () => {
   const { t, i18n } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [howToUseDialogOpen, setHowToUseDialogOpen] = useState(false);
   const [referencesDialogOpen, setReferencesDialogOpen] = useState(false);
 
   const handleLanguageMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -34,6 +36,14 @@ export const Header = () => {
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
     handleLanguageMenuClose();
+  };
+
+  const handleHowToUseOpen = () => {
+    setHowToUseDialogOpen(true);
+  };
+
+  const handleHowToUseClose = () => {
+    setHowToUseDialogOpen(false);
   };
 
   const handleReferencesOpen = () => {
@@ -73,6 +83,13 @@ export const Header = () => {
         </Typography>
         <IconButton
           color="inherit"
+          onClick={handleHowToUseOpen}
+          aria-label={t('header.aboutThisTool')}
+        >
+          <HelpOutlineIcon />
+        </IconButton>
+        <IconButton
+          color="inherit"
           onClick={handleReferencesOpen}
           aria-label={t('header.references')}
         >
@@ -93,6 +110,19 @@ export const Header = () => {
           <MenuItem onClick={() => changeLanguage('ja')}>日本語</MenuItem>
           <MenuItem onClick={() => changeLanguage('en')}>English</MenuItem>
         </Menu>
+        <Dialog
+          open={howToUseDialogOpen}
+          onClose={handleHowToUseClose}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>{t('aboutThisTool.title')}</DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+              {t('aboutThisTool.description')}
+            </Typography>
+          </DialogContent>
+        </Dialog>
         <Dialog
           open={referencesDialogOpen}
           onClose={handleReferencesClose}

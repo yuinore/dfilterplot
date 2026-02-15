@@ -4,7 +4,8 @@
   },
   "header": {
     "language": "言語",
-    "references": "参考文献"
+    "references": "参考文献",
+    "aboutThisTool": "このツールについて"
   },
   "complexPlane": {
     "title": "複素平面",
@@ -168,6 +169,10 @@
       "windowNone": "窓関数なし",
       "windowHann": "ハン窓"
     }
+  },
+  "aboutThisTool": {
+    "title": "このツールについて",
+    "description": "デジタルフィルタの極と零点を変化させた際の伝達関数や応答を可視化するツールです。複素平面内の極・零点をドラッグするか、「フィルタ設計」の項目からプリセットを選択してください。"
   },
   "references": {
     "title": "参考文献",
