@@ -261,99 +261,99 @@ function App() {
               flexShrink: 0,
             }}
           >
-          <Box
-            id="controller-box"
-            sx={{
-              flexGrow: 4,
-              flexShrink: 4,
-              flexBasis: 360,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              // minWidth: { sm: '100%', lg: '400px' },
-              maxWidth: { xs: '480px', lg: '720px' },
-            }}
-          >
             <Box
-              id="complex-plane-combi"
+              id="controller-box"
               sx={{
-                flexGrow: 0,
+                flexGrow: 4,
+                flexShrink: 4,
+                flexBasis: 360,
                 display: 'flex',
-                flexDirection: { xs: 'column', lg: 'row' },
-                alignItems: 'flex-start',
+                flexDirection: 'column',
                 gap: 2,
-                width: '100%',
-                maxWidth: { xs: '360px', lg: '720px' },
+                // minWidth: { sm: '100%', lg: '400px' },
+                maxWidth: { xs: '480px', lg: '720px' },
               }}
             >
-              <ComplexPlane
-                poles={toPoleZeros(poles)}
-                zeros={toPoleZeros(zeros)}
-                enableSnap={enableSnap}
-                showZeroPoleTooltip={showZeroPoleTooltip}
-                onPoleMove={handlePoleMove}
-                onZeroMove={handleZeroMove}
-                onDeletePole={handleDeletePole}
-                onDeleteZero={handleDeleteZero}
+              <Box
+                id="complex-plane-combi"
+                sx={{
+                  flexGrow: 0,
+                  display: 'flex',
+                  flexDirection: { xs: 'column', lg: 'row' },
+                  alignItems: 'flex-start',
+                  gap: 2,
+                  width: '100%',
+                  maxWidth: { xs: '360px', lg: '720px' },
+                }}
+              >
+                <ComplexPlane
+                  poles={toPoleZeros(poles)}
+                  zeros={toPoleZeros(zeros)}
+                  enableSnap={enableSnap}
+                  showZeroPoleTooltip={showZeroPoleTooltip}
+                  onPoleMove={handlePoleMove}
+                  onZeroMove={handleZeroMove}
+                  onDeletePole={handleDeletePole}
+                  onDeleteZero={handleDeleteZero}
+                />
+                <Grid container spacing={2} width="100%">
+                  <Grid id="gain-control-panel" size={12}>
+                    <GainControl gain={gain} onGainChange={setGain} />
+                  </Grid>
+                  <Grid id="toolbar-panel" size={12}>
+                    <Toolbar
+                      poles={toPoleZeros(poles)}
+                      zeros={toPoleZeros(zeros)}
+                      onAddPolePair={handleAddPolePair}
+                      onAddPoleReal={handleAddPoleReal}
+                      onAddZeroPair={handleAddZeroPair}
+                      onAddZeroReal={handleAddZeroReal}
+                      onDeletePole={handleDeletePole}
+                      onDeleteZero={handleDeleteZero}
+                      onClear={handleClear}
+                      onDuplicateAll={handleDuplicateAll}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+              <FilterDesignPanel
+                onFilterChange={handleFilterChange}
+                logarithmicFrequency={logarithmicFrequency}
+                frequencyUnit={frequencyUnit}
               />
-              <Grid container spacing={2} width="100%">
-                <Grid id="gain-control-panel" size={12}>
-                  <GainControl gain={gain} onGainChange={setGain} />
-                </Grid>
-                <Grid id="toolbar-panel" size={12}>
-                  <Toolbar
-                    poles={toPoleZeros(poles)}
-                    zeros={toPoleZeros(zeros)}
-                    onAddPolePair={handleAddPolePair}
-                    onAddPoleReal={handleAddPoleReal}
-                    onAddZeroPair={handleAddZeroPair}
-                    onAddZeroReal={handleAddZeroReal}
-                    onDeletePole={handleDeletePole}
-                    onDeleteZero={handleDeleteZero}
-                    onClear={handleClear}
-                    onDuplicateAll={handleDuplicateAll}
-                  />
-                </Grid>
-              </Grid>
+              <Settings
+                enableSnap={enableSnap}
+                onEnableSnapChange={setEnableSnap}
+                logarithmicFrequency={logarithmicFrequency}
+                onLogarithmicFrequencyChange={setLogarithmicFrequency}
+                showZeroPoleTooltip={showZeroPoleTooltip}
+                onShowZeroPoleTooltipChange={setShowZeroPoleTooltip}
+                octaves={octaves}
+                onOctavesChange={setOctaves}
+                frequencyUnit={frequencyUnit}
+                onFrequencyUnitChange={setFrequencyUnit}
+              />
             </Box>
-            <FilterDesignPanel
-              onFilterChange={handleFilterChange}
-              logarithmicFrequency={logarithmicFrequency}
-              frequencyUnit={frequencyUnit}
-            />
-            <Settings
-              enableSnap={enableSnap}
-              onEnableSnapChange={setEnableSnap}
-              logarithmicFrequency={logarithmicFrequency}
-              onLogarithmicFrequencyChange={setLogarithmicFrequency}
-              showZeroPoleTooltip={showZeroPoleTooltip}
-              onShowZeroPoleTooltipChange={setShowZeroPoleTooltip}
-              octaves={octaves}
-              onOctavesChange={setOctaves}
-              frequencyUnit={frequencyUnit}
-              onFrequencyUnitChange={setFrequencyUnit}
-            />
-          </Box>
-          <Box
-            id="bode-plot-box"
-            sx={{
-              flexGrow: 2,
-              flexShrink: 2,
-              flexBasis: 480,
-              minWidth: 0, // Flexboxで縮小を許可
-              // minHeight: { xs: '600px', lg: 0 },
-              // minWidth: { xs: '400px', lg: '400px' }
-            }}
-          >
-            <BodePlot
-              poles={poles}
-              zeros={zeros}
-              logarithmicFrequency={logarithmicFrequency}
-              octaves={octaves}
-              gain={gain}
-              frequencyUnit={frequencyUnit}
-            />
-          </Box>
+            <Box
+              id="bode-plot-box"
+              sx={{
+                flexGrow: 2,
+                flexShrink: 2,
+                flexBasis: 480,
+                minWidth: 0, // Flexboxで縮小を許可
+                // minHeight: { xs: '600px', lg: 0 },
+                // minWidth: { xs: '400px', lg: '400px' }
+              }}
+            >
+              <BodePlot
+                poles={poles}
+                zeros={zeros}
+                logarithmicFrequency={logarithmicFrequency}
+                octaves={octaves}
+                gain={gain}
+                frequencyUnit={frequencyUnit}
+              />
+            </Box>
           </Box>
           <Box
             component="footer"
