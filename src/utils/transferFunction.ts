@@ -197,7 +197,12 @@ export function calculateFrequencyResponseLog(
     const magnitudeDB = magnitude > 1e-10 ? 20 * Math.log10(magnitude) : -200;
     magnitudes.push(magnitudeDB);
 
-    const phaseDeg = (h.phase() * 180) / Math.PI;
+    let phase = h.phase();
+    if (magnitude < 1e-50) {
+      // 振幅が小さすぎる場合は位相が正確に判定できないため、 0 にフォールバックする
+      phase = 0.0;
+    }
+    const phaseDeg = (phase * 180) / Math.PI;
     phases.push(phaseDeg);
   }
 

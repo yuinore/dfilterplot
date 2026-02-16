@@ -49,7 +49,7 @@ export function durandKerner(
 
   let roots: Complex[] = [];
   for (let k = 0; k < n; k++) {
-    const angle = (2 * Math.PI * k) / n;
+    const angle = (2 * Math.PI * (k + 1)) / (n + 1);
     const real = initialRadius * Math.cos(angle);
     const imag = initialRadius * Math.sin(angle);
     roots.push(new Complex(real, imag));

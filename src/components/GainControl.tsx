@@ -17,9 +17,16 @@ export const GainControl = ({ gain, onGainChange }: GainControlProps) => {
   // ゲインを-1～1の範囲にクランプ
   const clampedGain = Math.max(minGain, Math.min(maxGain, gain));
 
+  let gainLabel = clampedGain.toFixed(6);
+
+  if (Math.abs(clampedGain) < 1e-4 && clampedGain !== 0.0) {
+    // 小さすぎる場合は科学的表記にする
+    gainLabel = clampedGain.toExponential(2);
+  }
+
   return (
     <CollapsiblePanel
-      title={`${t('gainControl.title')} (${clampedGain.toFixed(6)})`}
+      title={`${t('gainControl.title')} (${gainLabel})`}
       defaultExpanded={false}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

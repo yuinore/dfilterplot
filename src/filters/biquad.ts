@@ -204,7 +204,14 @@ export class BiquadFilterDesign implements FilterDesignBase {
     const a1 = -2 * cosW0;
     const a2 = 1 - alpha;
 
-    return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+    if (cutoffFreq < Math.PI - 1e-9) {
+      return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+    } else {
+      return {
+        ...this.calculatePolesZeros(1, -2, 1, 1, 2, 1),
+        gain: 0.0,
+      };
+    }
   }
 
   /**
@@ -228,7 +235,14 @@ export class BiquadFilterDesign implements FilterDesignBase {
     const a1 = -2 * cosW0;
     const a2 = 1 - alpha;
 
-    return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+    if (centerFreq < Math.PI - 1e-9) {
+      return this.calculatePolesZeros(b0, b1, b2, a0, a1, a2);
+    } else {
+      return {
+        ...this.calculatePolesZeros(1, 0, -1, 1, 2, 1),
+        gain: 0.0,
+      };
+    }
   }
 
   /**

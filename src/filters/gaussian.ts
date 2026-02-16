@@ -129,7 +129,7 @@ export class GaussianFilterDesign implements FilterDesignBase {
               } as PoleZeroReal);
             }
             // 上半平面の零点のみ処理（共役ペアとして登録）
-            else if (root.imag > 1e-10) {
+            else if (root.imag >= 1e-10) {
               zeros.push({
                 type: 'pair',
                 id: `gaussian_zero_${i}`,
