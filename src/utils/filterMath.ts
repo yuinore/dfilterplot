@@ -64,7 +64,7 @@ export class Complex {
  * @param T サンプリング周期（正規化：T=2）
  * @returns デジタル極（z平面）
  */
-export function bilinearTransform(analogPole: Complex, T: number = 2): Complex {
+export function bilinearTransform(analogPole: Complex, T: number = 1): Complex {
   // z = (1 + s*T/2) / (1 - s*T/2)
   const halfT = T / 2;
   const numerator = new Complex(1, 0).add(

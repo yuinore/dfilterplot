@@ -40,9 +40,10 @@ export class ButterworthFilterDesign implements FilterDesignBase {
     const poles: PoleOrZero[] = [];
 
     // 周波数ワーピング
-    const warpedCutoff = Math.tan(cutoffFrequency / 2);
-    const T = 2; // サンプリング周期（正規化）
+    const T = 1; // サンプリング周期（正規化）
+    const warpedCutoff = 2 / T * Math.tan(cutoffFrequency * T / 2);
 
+    // LPF と HPF では極配置が同じ（極が単位円上に対称に配置されているため）
     for (let k = 0; k < order; k++) {
       // s_k = exp(j * (π/2 + (2k+1)π/(2n)))
       const angle = Math.PI / 2 + ((2 * k + 1) * Math.PI) / (2 * order);

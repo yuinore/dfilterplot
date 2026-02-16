@@ -111,67 +111,6 @@ export function calculateMagnitudeAtFrequency(
 }
 
 /**
- * 全周波数の振幅特性の中央値が0dBになるようにゲインを計算
- *
- * @param zeros 零点
- * @param poles 極
- * @param logarithmicFrequency 対数スケールかどうか
- * @param octaves オクターブ数（対数スケールの場合）
- * @returns 調整されたゲイン
- */
-export function calculateAutoGain(
-  zeros: PoleOrZero[],
-  poles: PoleOrZero[],
-  logarithmicFrequency: boolean = true,
-  octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
-): number {
-  // 周波数応答を計算（ゲイン=1.0で）
-  const frequencyResponse = logarithmicFrequency
-    ? calculateFrequencyResponseLog(
-        zeros,
-        poles,
-        FREQUENCY_RESPONSE.NUM_POINTS,
-        octaves,
-        1.0,
-      )
-    : calculateFrequencyResponse(
-        zeros,
-        poles,
-        FREQUENCY_RESPONSE.NUM_POINTS,
-        1.0,
-      );
-
-  // 振幅（dB）の配列から中央値を計算
-  const magnitudes = frequencyResponse.magnitude.filter((m) => m > -200); // 無効値を除外
-
-  if (magnitudes.length === 0) {
-    return 1.0;
-  }
-
-  // 中央値を計算
-  const sorted = [...magnitudes].sort((a, b) => a - b);
-  const medianIndex = Math.floor(sorted.length / 2);
-  const medianDB =
-    sorted.length % 2 === 0
-      ? (sorted[medianIndex - 1] + sorted[medianIndex]) / 2
-      : sorted[medianIndex];
-
-  // 中央値が0dBになるようにゲインを調整
-  // medianDB = 20 * log10(magnitude * gain)
-  // 0 = 20 * log10(magnitude * gain)
-  // 1 = magnitude * gain
-  // gain = 1 / magnitude
-  // magnitude = 10^(medianDB / 20)
-  const magnitude = Math.pow(10, medianDB / 20);
-
-  if (magnitude > 1e-10) {
-    return 1.0 / magnitude;
-  }
-
-  return 1.0;
-}
-
-/**
  * 周波数応答を計算
  * z = e^(jω) として H(e^(jω)) を評価
  */
