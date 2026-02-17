@@ -1,7 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { PoleZero } from '../types';
+
+/** タッチなど coarse ポインタ時の当たり判定半径（px） */
+const HIT_RADIUS_COARSE = 32;
+/** マウス時の当たり判定半径（零点は見た目 r=8 のまま、極は透明円でこの値） */
+const HIT_RADIUS_FINE = 10;
 
 /** 重複判定で (real, imag) を整数化するときのグリッド幅。この値倍して round した座標で同一とみなす */
 const DUPLICATE_DETERMINATION_GRID_WIDTH = 1000;
@@ -135,6 +140,21 @@ export const PoleZeroRenderer = ({
 }: PoleZeroRendererProps) => {
   const { t } = useTranslation();
 
+  const [coarsePointer, setCoarsePointer] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(pointer: coarse)').matches
+      : false,
+  );
+  useEffect(() => {
+    const m = window.matchMedia('(pointer: coarse)');
+    setCoarsePointer(m.matches);
+    const handler = () => setCoarsePointer(m.matches);
+    m.addEventListener('change', handler);
+    return () => m.removeEventListener('change', handler);
+  }, []);
+
+  const hitRadius = coarsePointer ? HIT_RADIUS_COARSE : HIT_RADIUS_FINE;
+
   const poleDuplicateCounts = useMemo(
     () => computeDuplicateCounts(poles),
     [poles],
@@ -187,6 +207,16 @@ export const PoleZeroRenderer = ({
             }
             style={{ opacity }}
           >
+            {/* タッチ時のみ当たり判定を広げる（背面の透明円） */}
+            {interactive && coarsePointer && (
+              <circle
+                cx={svgX}
+                cy={svgY}
+                r={hitRadius}
+                fill="transparent"
+                style={{ cursor: 'move' }}
+              />
+            )}
             <circle
               cx={svgX}
               cy={svgY}
@@ -272,12 +302,12 @@ export const PoleZeroRenderer = ({
               strokeLinecap="round"
               style={{ pointerEvents: 'none' }}
             />
-            {/* 透明な円でクリック領域を拡大 */}
+            {/* 透明な円でクリック領域（タッチ時はより広く） */}
             {interactive && (
               <circle
                 cx={svgX}
                 cy={svgY}
-                r={10}
+                r={hitRadius}
                 fill="transparent"
                 style={{ cursor: 'move' }}
               />
