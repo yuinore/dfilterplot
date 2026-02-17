@@ -130,6 +130,7 @@ export const ComplexPlane = ({
         : zeros.find((z) => z.id === draggingItem.id);
       const isRealAxisOnly = !!(item && !item.pairId);
 
+      // スナップを適用
       const snapped = applySnap(real, imag, enableSnap, isRealAxisOnly);
 
       if (draggingItem.isPole) {
@@ -151,6 +152,8 @@ export const ComplexPlane = ({
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
       if (e.touches.length === 0) return;
+      // 1本指のときだけ極・零点ドラッグとして扱い preventDefault。2本指以上はピンチ等を許可する。
+      if (e.touches.length !== 1) return;
       e.preventDefault();
       applyDragPosition(e.touches[0].clientX, e.touches[0].clientY);
     },
@@ -227,7 +230,6 @@ export const ComplexPlane = ({
           height="100%"
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           preserveAspectRatio="xMidYMid meet"
-          style={{ touchAction: 'none' }}
         >
           {/* グリッド線 */}
           <defs>
