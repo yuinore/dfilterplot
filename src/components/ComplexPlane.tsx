@@ -163,6 +163,7 @@ export const ComplexPlane = ({
           aspectRatio: '1 / 1',
           maxWidth: '720px',
           width: '100%',
+          minHeight: 0,
           border: '1px solid #ccc',
           background: '#fafafa',
         }}
@@ -185,7 +186,7 @@ export const ComplexPlane = ({
               <path
                 d={`M ${scale / 5} 0 L 0 0 0 ${scale / 5}`}
                 fill="none"
-                stroke="#e0e0e0"
+                stroke="#d0d0d0"
                 strokeWidth="0.5"
               />
             </pattern>
