@@ -4,6 +4,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Slider,
+  Tooltip,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
@@ -186,18 +187,42 @@ export const LinkwitzRileyFilterPanel = ({
         size="small"
         sx={{ mb: 2 }}
       >
-        <ToggleButton value="lowpass">
-          {t('filters.linkwitzRiley.lowPass')}
-        </ToggleButton>
-        <ToggleButton value="highpass">
-          {t('filters.linkwitzRiley.highPass')}
-        </ToggleButton>
-        <ToggleButton value="mixed">
-          {t('filters.linkwitzRiley.mixed')}
-        </ToggleButton>
-        <ToggleButton value="custom">
-          {t('filters.linkwitzRiley.custom')}
-        </ToggleButton>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.linkwitzRiley.tooltipLowPass')}
+        >
+          <ToggleButton value="lowpass">
+            {t('filters.linkwitzRiley.lowPass')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.linkwitzRiley.tooltipHighPass')}
+        >
+          <ToggleButton value="highpass">
+            {t('filters.linkwitzRiley.highPass')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.linkwitzRiley.tooltipMixed')}
+        >
+          <ToggleButton value="mixed">
+            {t('filters.linkwitzRiley.mixed')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={t('filters.linkwitzRiley.tooltipCustom')}
+        >
+          <ToggleButton value="custom">
+            {t('filters.linkwitzRiley.custom')}
+          </ToggleButton>
+        </Tooltip>
       </ToggleButtonGroup>
 
       <Typography variant="subtitle2" gutterBottom>
