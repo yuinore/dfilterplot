@@ -71,7 +71,7 @@ function App() {
   // 設定状態
   const [enableSnap, setEnableSnap] = useState(true);
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
-  const [showZeroPoleTooltip, setShowZeroPoleTooltip] = useState(true);
+  const [showZeroPoleTooltip, setShowZeroPoleTooltip] = useState(false);
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
   const [gain, setGain] = useState<number>(1.0);
   const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('44100');
