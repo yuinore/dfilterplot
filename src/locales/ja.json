@@ -25,7 +25,7 @@
     "clear": "クリア",
     "duplicateAll": "全ての極と零点を複製",
     "doubleClickPoleOrZeroToRemove": "極または零点をダブルクリックすると削除できます。",
-    "poleZeroLimitExceeded": "極・零点の数の合計が上限（256個）を超えるため処理を中止しました。",
+    "poleZeroLimitExceeded": "極・零点の数の合計が上限（256 個）を超えるため処理を中止しました。",
     "poleCount": "極 : {{count}}個",
     "zeroCount": "零点 : {{count}}個"
   },
@@ -84,7 +84,7 @@
   "filters": {
     "firstorderiir": {
       "name": "一次 IIR フィルタ",
-      "description": "1次伝達関数で実現するIIRフィルタ。極・零点が各1個の実数で構成される。",
+      "description": "1 次伝達関数で実現する IIR フィルタ。極・零点が各 1 個の実数で構成される。",
       "type": "フィルタタイプ",
       "lpfHighFreqSuppress": "高域抑制型 LPF",
       "lowPass": "LPF",
@@ -97,7 +97,7 @@
     },
     "biquad": {
       "name": "双二次フィルタ",
-      "description": "音響信号処理で広く用いられているIIRフィルタ。2次伝達関数により実現され、直列接続することでより鋭い特性を持つフィルタを構成できる。Robert Bristow-JohnsonによるAudio EQ Cookbookに基づく実装。",
+      "description": "音響信号処理で広く用いられている IIR フィルタ。2 次伝達関数により実現され、直列接続することでより鋭い特性を持つフィルタを構成できる。Robert Bristow-Johnson による Audio EQ Cookbook に基づく実装。",
       "type": "フィルタタイプ",
       "lowPass": "LPF",
       "highPass": "HPF",
@@ -128,7 +128,7 @@
     },
     "delay": {
       "name": "遅延フィルタ",
-      "description": "指定した次数の極を原点に配置する純粋な遅延フィルタ。H(z)=z^(-n)。",
+      "description": "指定した次数の極を原点に配置する純粋な遅延フィルタ。H(z) = z^(-n)。",
       "order": "次数"
     },
     "comb": {
@@ -143,13 +143,13 @@
     },
     "movingAverage": {
       "name": "移動平均フィルタ",
-      "description": "過去N個のサンプルの平均を出力する最も単純なローパスFIRフィルタ。ノイズ除去や平滑化に使用される。",
+      "description": "過去 N 個のサンプルの平均を出力する最も単純なローパス FIR フィルタ。ノイズ除去や平滑化に使用される。",
       "length": "窓長",
       "samples": "サンプル"
     },
     "butterworth": {
       "name": "バターワースフィルタ",
-      "description": "通過域において最大限平坦な振幅特性を持つIIRフィルタ。単調性のある減衰特性を持つ。",
+      "description": "通過域において最大限平坦な振幅特性を持つ IIR フィルタ。単調性のある減衰特性を持つ。",
       "type": "フィルタタイプ",
       "lowPass": "LPF",
       "highPass": "HPF",
@@ -158,7 +158,7 @@
     },
     "linkwitzRiley": {
       "name": "Linkwitz-Riley フィルタ",
-      "description": "同一次数のバターワースフィルタを2段直列にしたクロスオーバーフィルタ。高域バンドと低域バンドの位相特性が一致するため、干渉が発生しない。",
+      "description": "同一次数のバターワースフィルタを 2 段直列にしたクロスオーバーフィルタ。高域バンドと低域バンドの位相特性が一致するため、干渉が発生しない。",
       "type": "フィルタタイプ",
       "lowPass": "LPF",
       "highPass": "HPF",
@@ -170,8 +170,8 @@
       "gainHigh": "ゲイン（高域）"
     },
     "sinc": {
-      "name": "Sincフィルタ（近似）",
-      "description": "理想的なローパスフィルタのインパルス応答（sinc関数）に基づくFIRフィルタ。理論的には理想的な矩形特性を持つが、有限長のため打ち切り誤差が発生する。",
+      "name": "Sinc フィルタ（近似）",
+      "description": "理想的なローパスフィルタのインパルス応答（sinc 関数）に基づく FIR フィルタ。理論的には理想的な矩形特性を持つが、有限長のため打ち切り誤差が発生する。",
       "cutoffFrequency": "カットオフ周波数",
       "taps": "タップ数",
       "windowFunction": "窓関数",
@@ -180,7 +180,7 @@
     },
     "gaussian": {
       "name": "ガウシアンフィルタ（近似）",
-      "description": "ガウス関数をインパルス応答とするFIRフィルタ。滑らかな周波数特性を持ち、時間領域では急速に減少する。",
+      "description": "ガウス関数をインパルス応答とする FIR フィルタ。滑らかな周波数特性を持ち、時間領域では急速に減少する。",
       "sigma": "標準偏差",
       "taps": "タップ数",
       "windowFunction": "窓関数",
@@ -194,9 +194,9 @@
   },
   "references": {
     "title": "参考文献",
-    "audioEqCookbook": "双二次フィルタの設計式を提供する標準的なリファレンス。バイリニア変換を用いた各種フィルタ（LPF、HPF、BPF、Notchなど）の係数計算式を掲載。",
+    "audioEqCookbook": "双二次フィルタの設計式を提供する標準的なリファレンス。バイリニア変換を用いた各種フィルタ（LPF、HPF、BPF、Notch など）の係数計算式を掲載。",
     "controlSystemsAcademy": "極と零点の配置によるボード線図の変化をインタラクティブに学習できる教育サイト。複素平面上での極・零点の移動と伝達関数の関係を視覚的に理解できる。",
-    "falstadFilter": "Paul Falstad氏によるデジタルフィルタシミュレータ。極・零点配置、周波数応答、インパルス応答などをリアルタイムに可視化。",
-    "wizardNotesCrossover": "2バンドのオーディオクロスオーバーを Butterworth・Linkwitz-Riley で実現するフィルタの Python 実装を解説。マルチバンド処理の基礎として参照できる。"
+    "falstadFilter": "Paul Falstad 氏によるデジタルフィルタシミュレータ。極・零点配置、周波数応答、インパルス応答などをリアルタイムに可視化。",
+    "wizardNotesCrossover": "2 バンドのオーディオクロスオーバーを Butterworth・Linkwitz-Riley で実現するフィルタの Python 実装を解説。マルチバンド処理の基礎として参照できる。"
   }
 }

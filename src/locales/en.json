@@ -128,7 +128,7 @@
     },
     "delay": {
       "name": "Delay Filter",
-      "description": "Pure delay filter with the specified number of poles at the origin. H(z)=z^(-n).",
+      "description": "Pure delay filter with the specified number of poles at the origin. H(z) = z^(-n).",
       "order": "Order"
     },
     "comb": {
