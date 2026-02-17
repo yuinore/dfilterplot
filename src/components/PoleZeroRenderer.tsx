@@ -65,6 +65,8 @@ interface PoleZeroRendererProps {
   showZeroPoleTooltip?: boolean;
   onPoleMouseDown?: (id: string) => (e: React.MouseEvent<SVGGElement>) => void;
   onZeroMouseDown?: (id: string) => (e: React.MouseEvent<SVGGElement>) => void;
+  onPoleTouchStart?: (id: string) => (e: React.TouchEvent<SVGGElement>) => void;
+  onZeroTouchStart?: (id: string) => (e: React.TouchEvent<SVGGElement>) => void;
   onPoleDoubleClick?: (
     id: string,
   ) => (e: React.MouseEvent<SVGGElement>) => void;
@@ -126,6 +128,8 @@ export const PoleZeroRenderer = ({
   showZeroPoleTooltip = true,
   onPoleMouseDown,
   onZeroMouseDown,
+  onPoleTouchStart,
+  onZeroTouchStart,
   onPoleDoubleClick,
   onZeroDoubleClick,
 }: PoleZeroRendererProps) => {
@@ -173,6 +177,11 @@ export const PoleZeroRenderer = ({
           <g
             key={zero.id}
             onMouseDown={interactive ? onZeroMouseDown?.(zero.id) : undefined}
+            onTouchStart={
+              interactive && onZeroTouchStart
+                ? (e) => onZeroTouchStart(zero.id)(e)
+                : undefined
+            }
             onDoubleClick={
               interactive ? onZeroDoubleClick?.(zero.id) : undefined
             }
@@ -233,6 +242,11 @@ export const PoleZeroRenderer = ({
           <g
             key={pole.id}
             onMouseDown={interactive ? onPoleMouseDown?.(pole.id) : undefined}
+            onTouchStart={
+              interactive && onPoleTouchStart
+                ? (e) => onPoleTouchStart(pole.id)(e)
+                : undefined
+            }
             onDoubleClick={
               interactive ? onPoleDoubleClick?.(pole.id) : undefined
             }

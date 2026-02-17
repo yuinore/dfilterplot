@@ -95,50 +95,74 @@ export const ComplexPlane = ({
     };
   };
 
+  const startDrag = useCallback((id: string, isPole: boolean) => {
+    setDraggingItem({ id, isPole });
+  }, []);
+
   const handleMouseDown = useCallback(
     (id: string, isPole: boolean) => (e: React.MouseEvent<SVGGElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      setDraggingItem({ id, isPole });
+      startDrag(id, isPole);
     },
-    [],
+    [startDrag],
   );
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+  const handleTouchStart = useCallback(
+    (id: string, isPole: boolean) => (e: React.TouchEvent<SVGGElement>) => {
+      e.preventDefault();
+      startDrag(id, isPole);
+    },
+    [startDrag],
+  );
+
+  // クライアント座標から極・零点の移動を適用（マウス・タッチ共通）
+  const applyDragPosition = useCallback(
+    (clientX: number, clientY: number) => {
       if (!draggingItem) return;
 
-      const { x: svgX, y: svgY } = getSvgCoordinates(e.clientX, e.clientY);
-      let real = fromSvgX(svgX, scale);
-      let imag = fromSvgY(svgY, scale);
+      const { x: svgX, y: svgY } = getSvgCoordinates(clientX, clientY);
+      const real = fromSvgX(svgX, scale);
+      const imag = fromSvgY(svgY, scale);
 
-      // 実軸上の点（ペアがない点）かどうかをチェック
-      let isRealAxisOnly = false;
-      if (draggingItem.isPole) {
-        const pole = poles.find((p) => p.id === draggingItem.id);
-        isRealAxisOnly = !!(pole && !pole.pairId);
-      } else {
-        const zero = zeros.find((z) => z.id === draggingItem.id);
-        isRealAxisOnly = !!(zero && !zero.pairId);
-      }
+      const item = draggingItem.isPole
+        ? poles.find((p) => p.id === draggingItem.id)
+        : zeros.find((z) => z.id === draggingItem.id);
+      const isRealAxisOnly = !!(item && !item.pairId);
 
-      // スナップを適用
       const snapped = applySnap(real, imag, enableSnap, isRealAxisOnly);
-      real = snapped.real;
-      imag = snapped.imag;
 
       if (draggingItem.isPole) {
-        onPoleMove?.(draggingItem.id, real, imag);
+        onPoleMove?.(draggingItem.id, snapped.real, snapped.imag);
       } else {
-        onZeroMove?.(draggingItem.id, real, imag);
+        onZeroMove?.(draggingItem.id, snapped.real, snapped.imag);
       }
     },
     [draggingItem, poles, zeros, enableSnap, onPoleMove, onZeroMove, scale],
   );
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      applyDragPosition(e.clientX, e.clientY);
+    },
+    [applyDragPosition],
+  );
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      e.preventDefault();
+      applyDragPosition(e.touches[0].clientX, e.touches[0].clientY);
+    },
+    [applyDragPosition],
+  );
+
+  const endDrag = useCallback(() => {
     setDraggingItem(null);
   }, []);
+
+  const handleMouseUp = endDrag;
+  const handleTouchEnd = endDrag;
 
   // 表示用 id（id または id_conj）を state の id に変換（ペアは1つの PoleOrZero で保持）
   const toActualId = (displayId: string) =>
@@ -166,12 +190,24 @@ export const ComplexPlane = ({
     if (draggingItem) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('touchmove', handleTouchMove, { passive: false });
+      window.addEventListener('touchend', handleTouchEnd);
+      window.addEventListener('touchcancel', handleTouchEnd);
       return () => {
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('mouseup', handleMouseUp);
+        window.removeEventListener('touchmove', handleTouchMove);
+        window.removeEventListener('touchend', handleTouchEnd);
+        window.removeEventListener('touchcancel', handleTouchEnd);
       };
     }
-  }, [draggingItem, handleMouseMove, handleMouseUp]);
+  }, [
+    draggingItem,
+    handleMouseMove,
+    handleMouseUp,
+    handleTouchMove,
+    handleTouchEnd,
+  ]);
 
   return (
     <CollapsiblePanel title={t('complexPlane.title')}>
@@ -191,6 +227,7 @@ export const ComplexPlane = ({
           height="100%"
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           preserveAspectRatio="xMidYMid meet"
+          style={{ touchAction: 'none' }}
         >
           {/* グリッド線 */}
           <defs>
@@ -279,6 +316,8 @@ export const ComplexPlane = ({
             showZeroPoleTooltip={showZeroPoleTooltip}
             onPoleMouseDown={(id) => handleMouseDown(id, true)}
             onZeroMouseDown={(id) => handleMouseDown(id, false)}
+            onPoleTouchStart={(id) => handleTouchStart(id, true)}
+            onZeroTouchStart={(id) => handleTouchStart(id, false)}
             onPoleDoubleClick={handlePoleDoubleClick}
             onZeroDoubleClick={handleZeroDoubleClick}
           />

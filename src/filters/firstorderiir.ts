@@ -45,7 +45,9 @@ export class FirstOrderIIRFilterDesign implements FilterDesignBase {
    * 高域抑制型 LPF: 極 z=α, 零点 z=-1, ゲイン (1-α)/2
    * ナイキストでゲイン -∞ dB。通常 LPF の出力を長さ2の移動平均で平滑化した形。
    */
-  private generateHighFreqSuppressLowPass(alpha: number): FilterGenerationResult {
+  private generateHighFreqSuppressLowPass(
+    alpha: number,
+  ): FilterGenerationResult {
     const poles: PoleOrZero[] = [];
     const zeros: PoleOrZero[] = [];
 
