@@ -22,20 +22,41 @@
 - フィルタ設計プリセット（双二次、移動平均、バターワースなど）
 - ボード線図（振幅・位相・群遅延）、インパルス応答、ステップ応答のリアルタイム表示
 
-## 開発
+## 開発コマンド
+
+### Install
 
 ```bash
-# 依存関係のインストール
-yarn
+yarn install
+```
 
-# 開発サーバーの起動
+### Development
+
+```bash
 yarn dev
+```
 
-# ビルド
+Then open the URL shown in the terminal (e.g. `http://localhost:5173`).
+
+### Build
+
+```bash
 yarn build
+```
 
-# プレビュー
+Output is in the `dist/` directory.
+
+### Preview production build
+
+```bash
 yarn preview
+```
+
+### Lint & format
+
+```bash
+yarn lint:fix
+yarn format
 ```
 
 ## 参考文献 / References
