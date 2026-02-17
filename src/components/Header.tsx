@@ -73,6 +73,13 @@ export const Header = () => {
       url: 'https://www.falstad.com/dfilter/',
       descriptionKey: 'references.falstadFilter',
     },
+    {
+      title:
+        'マルチバンド（オーディオクロスオーバー）処理を実現するフィルタ（Butterworth, Linkwitz-Riley）のPython実装（2バンド）',
+      author: 'Wizard Notes',
+      url: 'https://www.wizard-notes.com/entry/python/audio-crossover-filter-2-band',
+      descriptionKey: 'references.wizardNotesCrossover',
+    },
   ];
 
   return (

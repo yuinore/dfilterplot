@@ -43,6 +43,7 @@ yarn preview
 - [Audio EQ Cookbook by Robert Bristow-Johnson](https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt) - Biquad filter design equations
 - [Bode Plot - Interactive Pole/Zero Placement | Control Systems Academy](https://controlsystemsacademy.com/0019/0019.html) - Interactive visualization of pole/zero placement
 - [Digital Filter by Paul Falstad](https://www.falstad.com/dfilter/) - Interactive digital filter simulator
+- [マルチバンド（オーディオクロスオーバー）処理を実現するフィルタ（Butterworth, Linkwitz-Riley）のPython実装（2バンド） - Wizard Notes](https://www.wizard-notes.com/entry/python/audio-crossover-filter-2-band) - 2-band audio crossover filters (Butterworth, Linkwitz-Riley) in Python
 
 ## About This Project
 

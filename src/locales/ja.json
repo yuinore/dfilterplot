@@ -194,6 +194,7 @@
     "title": "参考文献",
     "audioEqCookbook": "双二次フィルタの設計式を提供する標準的なリファレンス。バイリニア変換を用いた各種フィルタ（LPF、HPF、BPF、Notchなど）の係数計算式を掲載。",
     "controlSystemsAcademy": "極と零点の配置によるボード線図の変化をインタラクティブに学習できる教育サイト。複素平面上での極・零点の移動と伝達関数の関係を視覚的に理解できる。",
-    "falstadFilter": "Paul Falstad氏によるデジタルフィルタシミュレータ。極・零点配置、周波数応答、インパルス応答などをリアルタイムに可視化。"
+    "falstadFilter": "Paul Falstad氏によるデジタルフィルタシミュレータ。極・零点配置、周波数応答、インパルス応答などをリアルタイムに可視化。",
+    "wizardNotesCrossover": "2バンドのオーディオクロスオーバーを Butterworth・Linkwitz-Riley で実現するフィルタの Python 実装を解説。マルチバンド処理の基礎として参照できる。"
   }
 }

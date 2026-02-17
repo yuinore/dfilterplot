@@ -194,6 +194,7 @@
     "title": "References",
     "audioEqCookbook": "Standard reference for biquad filter design equations. Provides coefficient calculation formulas for various filter types (LPF, HPF, BPF, Notch, etc.) using the Bilinear Transform.",
     "controlSystemsAcademy": "Educational site for learning Bode plot changes through interactive pole-zero placement. Visualizes the relationship between pole-zero movement on the complex plane and transfer functions.",
-    "falstadFilter": "Digital filter simulator by Paul Falstad. Real-time visualization of pole-zero placement, frequency response, impulse response, and more."
+    "falstadFilter": "Digital filter simulator by Paul Falstad. Real-time visualization of pole-zero placement, frequency response, impulse response, and more.",
+    "wizardNotesCrossover": "Python implementation of 2-band audio crossover filters (Butterworth, Linkwitz-Riley). A useful reference for multiband crossover design."
   }
 }
