@@ -72,6 +72,48 @@ interface PoleZeroRendererProps {
   ) => (e: React.MouseEvent<SVGGElement>) => void;
 }
 
+const ZeroPoleTooltip = ({
+  title,
+  interactive,
+}: {
+  title: string;
+  interactive: boolean;
+}) => {
+  return (
+    <Tooltip
+      title={title}
+      arrow
+      placement="top"
+      enterDelay={200}
+      enterNextDelay={200}
+      enterTouchDelay={200}
+      leaveDelay={50}
+      leaveTouchDelay={50}
+      slotProps={{
+        popper: {
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 10],
+              },
+            },
+          ],
+        },
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'auto',
+          cursor: interactive ? 'move' : 'default',
+        }}
+      />
+    </Tooltip>
+  );
+};
+
 export const PoleZeroRenderer = ({
   poles,
   zeros,
@@ -162,22 +204,10 @@ export const PoleZeroRenderer = ({
               height={20}
               style={{ overflow: 'visible', pointerEvents: 'none' }}
             >
-              <Tooltip
+              <ZeroPoleTooltip
                 title={formatTooltipText(zero, false)}
-                arrow
-                placement="top"
-                enterDelay={500}
-                leaveDelay={100}
-              >
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    pointerEvents: 'auto',
-                    cursor: interactive ? 'move' : 'default',
-                  }}
-                />
-              </Tooltip>
+                interactive={interactive}
+              />
             </foreignObject>
           </g>
         );
@@ -254,25 +284,10 @@ export const PoleZeroRenderer = ({
                 height={20}
                 style={{ overflow: 'visible', pointerEvents: 'none' }}
               >
-                <Tooltip
+                <ZeroPoleTooltip
                   title={formatTooltipText(pole, true)}
-                  arrow
-                  placement="top"
-                  enterDelay={200}
-                  enterNextDelay={200}
-                  enterTouchDelay={200}
-                  leaveDelay={200}
-                  leaveTouchDelay={200}
-                >
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      pointerEvents: 'auto',
-                      cursor: interactive ? 'move' : 'default',
-                    }}
-                  />
-                </Tooltip>
+                  interactive={interactive}
+                />
               </foreignObject>
             )}
           </g>
