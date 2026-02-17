@@ -9,8 +9,8 @@
   },
   "complexPlane": {
     "title": "Complex Plane",
-    "realAxis": "Real Axis",
-    "imagAxis": "Imaginary Axis",
+    "realAxis": "Re",
+    "imagAxis": "Im",
     "unitCircle": "Unit Circle"
   },
   "sPlane": {
@@ -23,7 +23,7 @@
     "addZeroPair": "Zero Pair",
     "addZeroReal": "Zero (Real)",
     "clear": "Clear",
-    "duplicateAll": "Duplicate all poles and zeros",
+    "duplicateAll": "Duplicate all",
     "doubleClickPoleOrZeroToRemove": "Double-click a pole or zero to remove it.",
     "poleZeroLimitExceeded": "Operation cancelled: the total pole/zero count would exceed the limit (256).",
     "poleCount": "Poles: {{count}}",
@@ -59,6 +59,7 @@
     "enableSnap": "Enable Snap to Grid",
     "logarithmicFrequency": "Logarithmic Scale (Frequency Axis)",
     "showZeroPoleTooltip": "Show zero/pole information in tooltip",
+    "complexPlaneAutoScale": "Complex plane auto scale",
     "octaves": "Octaves",
     "frequencyUnit": "Frequency Unit & Sample Rate",
     "radians": "Angular Frequency (rad/s)"

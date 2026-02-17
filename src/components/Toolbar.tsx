@@ -33,64 +33,90 @@ export const Toolbar = ({
 
   return (
     <CollapsiblePanel title={t('toolbar.title')}>
-      <Box
-        sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}
-      >
-        <Button
-          variant="contained"
-          color="error"
-          startIcon={<AddCircleOutlineIcon />}
-          onClick={onAddPolePair}
-          size="small"
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
         >
-          {t('toolbar.addPolePair')}
-        </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          startIcon={<AddCircleOutlineIcon />}
-          onClick={onAddPoleReal}
-          size="small"
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={onAddPolePair}
+            size="small"
+          >
+            {t('toolbar.addPolePair')}
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={onAddPoleReal}
+            size="small"
+          >
+            {t('toolbar.addPoleReal')}
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
         >
-          {t('toolbar.addPoleReal')}
-        </Button>
-        <Button
-          variant="contained"
-          color="success"
-          startIcon={<AddCircleOutlineIcon />}
-          onClick={onAddZeroPair}
-          size="small"
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={onAddZeroPair}
+            size="small"
+          >
+            {t('toolbar.addZeroPair')}
+          </Button>
+          <Button
+            variant="outlined"
+            color="success"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={onAddZeroReal}
+            size="small"
+          >
+            {t('toolbar.addZeroReal')}
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
         >
-          {t('toolbar.addZeroPair')}
-        </Button>
-        <Button
-          variant="outlined"
-          color="success"
-          startIcon={<AddCircleOutlineIcon />}
-          onClick={onAddZeroReal}
-          size="small"
-        >
-          {t('toolbar.addZeroReal')}
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          startIcon={<ClearIcon />}
-          onClick={onClear}
-          size="small"
-        >
-          {t('toolbar.clear')}
-        </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          startIcon={<ContentCopyIcon />}
-          onClick={onDuplicateAll}
-          size="small"
-        >
-          {t('toolbar.duplicateAll')}
-        </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={<ClearIcon />}
+            onClick={onClear}
+            size="small"
+          >
+            {t('toolbar.clear')}
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<ContentCopyIcon />}
+            onClick={onDuplicateAll}
+            size="small"
+          >
+            {t('toolbar.duplicateAll')}
+          </Button>
+        </Box>
       </Box>
+
       <Typography
         variant="body1"
         // color="text.secondary"

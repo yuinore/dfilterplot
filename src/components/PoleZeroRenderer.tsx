@@ -15,7 +15,7 @@ const DUPLICATE_LABEL_FONT_SIZE = 18;
 const OUT_OF_BOUNDS_OPACITY = 0.35;
 
 /** 画面内の極・零点の不透明度（重複が分かりやすくなるようやや半透明にしてもよい） */
-const IN_BOUNDS_OPACITY = 0.9;
+const IN_BOUNDS_OPACITY = 1.0;
 
 function getDuplicateKey(real: number, imag: number): string {
   const r = Math.round(real * DUPLICATE_DETERMINATION_GRID_WIDTH);
@@ -181,7 +181,7 @@ export const PoleZeroRenderer = ({
               cy={svgY}
               r={8}
               fill="white"
-              stroke="#2e7d32"
+              stroke="#499143"
               strokeWidth="3"
               style={{ cursor: interactive ? 'move' : 'default' }}
             />
@@ -190,25 +190,27 @@ export const PoleZeroRenderer = ({
                 x={svgX + 10}
                 y={svgY - 8}
                 fontSize={DUPLICATE_LABEL_FONT_SIZE}
-                fill="#2e7d32"
+                fill="#499143"
                 fontWeight="bold"
                 style={{ pointerEvents: 'none' }}
               >
                 {duplicateLabel}
               </text>
             )}
-            <foreignObject
-              x={svgX - 10}
-              y={svgY - 10}
-              width={20}
-              height={20}
-              style={{ overflow: 'visible', pointerEvents: 'none' }}
-            >
-              <ZeroPoleTooltip
-                title={formatTooltipText(zero, false)}
-                interactive={interactive}
-              />
-            </foreignObject>
+            {showZeroPoleTooltip && (
+              <foreignObject
+                x={svgX - 10}
+                y={svgY - 10}
+                width={20}
+                height={20}
+                style={{ overflow: 'visible', pointerEvents: 'none' }}
+              >
+                <ZeroPoleTooltip
+                  title={formatTooltipText(zero, false)}
+                  interactive={interactive}
+                />
+              </foreignObject>
+            )}
           </g>
         );
       })}
@@ -239,7 +241,7 @@ export const PoleZeroRenderer = ({
               y1={svgY - 8}
               x2={svgX + 8}
               y2={svgY + 8}
-              stroke="#c62828"
+              stroke="#db464b"
               strokeWidth="3"
               strokeLinecap="round"
               style={{ pointerEvents: 'none' }}
@@ -249,7 +251,7 @@ export const PoleZeroRenderer = ({
               y1={svgY + 8}
               x2={svgX + 8}
               y2={svgY - 8}
-              stroke="#c62828"
+              stroke="#db464b"
               strokeWidth="3"
               strokeLinecap="round"
               style={{ pointerEvents: 'none' }}
@@ -269,7 +271,7 @@ export const PoleZeroRenderer = ({
                 x={svgX + 10}
                 y={svgY - 8}
                 fontSize={DUPLICATE_LABEL_FONT_SIZE}
-                fill="#c62828"
+                fill="#db464b"
                 fontWeight="bold"
                 style={{ pointerEvents: 'none' }}
               >

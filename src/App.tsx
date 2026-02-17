@@ -36,6 +36,30 @@ function App() {
       createTheme({
         palette: {
           mode: 'light',
+          // サイト全体の色をここで一括変更
+          primary: {
+            main: '#5ba6f0', // メインのアクション色（ボタン・リンクなど）
+            contrastText: '#ffffff',
+          },
+          secondary: {
+            main: '#9c27b0',
+          },
+          error: {
+            main: '#db464b',
+            contrastText: '#ffffff',
+          },
+          success: {
+            main: '#499143',
+            contrastText: '#ffffff',
+          },
+          background: {
+            default: '#ffffff',
+            paper: '#ffffff',
+          },
+          text: {
+            primary: '#4e575c', // メインの文字色
+            secondary: '#919ba1', // 副次的な文字（キャプションなど）
+          },
         },
         breakpoints: {
           values: {
@@ -51,7 +75,7 @@ function App() {
   );
 
   // ID カウンター（初期状態では ref を読まないため、初期 ID は固定値）
-  const nextIdRef = useRef(3);
+  const nextIdRef = useRef(4);
 
   const getNextId = useCallback(() => {
     const id = nextIdRef.current.toString();
@@ -61,17 +85,19 @@ function App() {
 
   // 初期の極と零点（デモ用）。レンダー中に ref を読まないよう ID は固定
   const [poles, setPoles] = useState<PoleOrZero[]>([
-    { id: '1', real: 0.6, imag: 0.6, isPole: true } as PoleZeroPair,
+    { id: '1', real: 0.55, imag: 0.6, isPole: true } as PoleZeroPair,
   ]);
 
   const [zeros, setZeros] = useState<PoleOrZero[]>([
-    { id: '2', real: -0.3, isPole: false } as PoleZeroReal,
+    { id: '2', real: -0.125, isPole: false } as PoleZeroReal,
+    { id: '3', real: 0.5, isPole: false } as PoleZeroReal,
   ]);
 
   // 設定状態
   const [enableSnap, setEnableSnap] = useState(true);
   const [logarithmicFrequency, setLogarithmicFrequency] = useState(true);
   const [showZeroPoleTooltip, setShowZeroPoleTooltip] = useState(false);
+  const [complexPlaneAutoScale, setComplexPlaneAutoScale] = useState(false);
   const [octaves, setOctaves] = useState<number>(BODE_PLOT.DEFAULT_OCTAVES);
   const [gain, setGain] = useState<number>(1.0);
   const [frequencyUnit, setFrequencyUnit] = useState<FrequencyUnit>('44100');
@@ -291,6 +317,7 @@ function App() {
                   zeros={toPoleZeros(zeros)}
                   enableSnap={enableSnap}
                   showZeroPoleTooltip={showZeroPoleTooltip}
+                  autoScale={complexPlaneAutoScale}
                   onPoleMove={handlePoleMove}
                   onZeroMove={handleZeroMove}
                   onDeletePole={handleDeletePole}
@@ -328,6 +355,8 @@ function App() {
                 onLogarithmicFrequencyChange={setLogarithmicFrequency}
                 showZeroPoleTooltip={showZeroPoleTooltip}
                 onShowZeroPoleTooltipChange={setShowZeroPoleTooltip}
+                complexPlaneAutoScale={complexPlaneAutoScale}
+                onComplexPlaneAutoScaleChange={setComplexPlaneAutoScale}
                 octaves={octaves}
                 onOctavesChange={setOctaves}
                 frequencyUnit={frequencyUnit}

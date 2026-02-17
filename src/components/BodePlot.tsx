@@ -139,7 +139,7 @@ export const BodePlot = ({
     const magnitudeDataset = {
       label: t('bodePlot.magnitude'),
       data: frequencyResponse.magnitude,
-      borderColor: 'rgb(25, 118, 210)',
+      borderColor: 'rgb(54, 143, 232)',
       backgroundColor: 'rgba(25, 118, 210, 0.1)',
       borderWidth: 2,
       pointRadius: 0,
@@ -174,7 +174,7 @@ export const BodePlot = ({
         {
           label: t('bodePlot.phase'),
           data: frequencyResponse.phase,
-          borderColor: 'rgb(46, 125, 50)',
+          borderColor: 'rgb(74, 145, 78)',
           backgroundColor: 'rgba(46, 125, 50, 0.1)',
           borderWidth: 2,
           pointRadius: 0,
@@ -278,7 +278,7 @@ export const BodePlot = ({
     const groupDelayDataset = {
       label: t('bodePlot.groupDelay'),
       data: groupDelayResponse.groupDelay,
-      borderColor: 'rgb(211, 47, 47)',
+      borderColor: 'rgb(227, 88, 109)',
       backgroundColor: 'rgba(211, 47, 47, 0.1)',
       borderWidth: 2,
       pointRadius: 0,
@@ -327,8 +327,8 @@ export const BodePlot = ({
         {
           label: t('bodePlot.impulseResponse'),
           data: impulseResponse.amplitude,
-          borderColor: 'rgb(123, 31, 162)',
-          backgroundColor: 'rgb(123, 31, 162)',
+          borderColor: 'rgb(166, 101, 193)',
+          backgroundColor: 'rgb(166, 101, 193)',
           borderWidth: 2,
           pointRadius: 3,
           tension: 0.1,
@@ -393,8 +393,8 @@ export const BodePlot = ({
         {
           label: t('bodePlot.stepResponse'),
           data: stepResponse.amplitude,
-          borderColor: 'rgb(245, 124, 0)',
-          backgroundColor: 'rgb(245, 124, 0)',
+          borderColor: 'rgb(243, 143, 44)',
+          backgroundColor: 'rgb(243, 143, 44)',
           borderWidth: 2,
           pointRadius: 3,
           tension: 0.1,

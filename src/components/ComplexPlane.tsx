@@ -5,11 +5,19 @@ import { applySnap } from '../utils/snapUtils';
 import { PoleZeroRenderer } from './PoleZeroRenderer';
 import { CollapsiblePanel } from './CollapsiblePanel';
 
+const SVG_WIDTH = 500;
+const SVG_HEIGHT = 500;
+const SVG_CENTER_X = SVG_WIDTH / 2;
+const SVG_CENTER_Y = SVG_HEIGHT / 2;
+
+const MAX_ZOOM_RATIO = 5.0;
+
 interface ComplexPlaneProps {
   poles: PoleZero[];
   zeros: PoleZero[];
   enableSnap: boolean;
   showZeroPoleTooltip: boolean;
+  autoScale: boolean;
   onPoleMove?: (id: string, real: number, imag: number) => void;
   onZeroMove?: (id: string, real: number, imag: number) => void;
   onDeletePole?: (id: string) => void;
@@ -21,17 +29,25 @@ export const ComplexPlane = ({
   zeros,
   enableSnap,
   showZeroPoleTooltip,
+  autoScale = false,
   onPoleMove,
   onZeroMove,
   onDeletePole,
   onDeleteZero,
 }: ComplexPlaneProps) => {
   const { t } = useTranslation();
-  const width = 500;
-  const height = 500;
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const scale = 200; // 1 unit = 200 pixels
+
+  let scale = 200; // 1 unit = 200 pixels
+
+  if (autoScale) {
+    [...poles, ...zeros].forEach((p) => {
+      const distance = Math.sqrt(p.real ** 2 + p.imag ** 2);
+      if (1.2 / distance < scale / 200) {
+        scale = Math.max(200 / MAX_ZOOM_RATIO, (200 * 1.2) / distance);
+      }
+    });
+  }
+
   const svgRef = useRef<SVGSVGElement>(null);
   const [draggingItem, setDraggingItem] = useState<{
     id: string;
@@ -40,20 +56,20 @@ export const ComplexPlane = ({
 
   // 複素平面の座標を SVG 座標に変換
   const toSvgX = (real: number): number =>
-    Math.max(0, Math.min(width, centerX + real * scale));
+    Math.max(0, Math.min(SVG_WIDTH, SVG_CENTER_X + real * scale));
   const toSvgY = (imag: number): number =>
-    Math.max(0, Math.min(height, centerY - imag * scale));
+    Math.max(0, Math.min(SVG_HEIGHT, SVG_CENTER_Y - imag * scale));
 
   // 描画範囲内か（toSvgX/toSvgY でクランプされないか）
   const isInBounds = (real: number, imag: number): boolean => {
-    const rawX = centerX + real * scale;
-    const rawY = centerY - imag * scale;
-    return rawX >= 0 && rawX <= width && rawY >= 0 && rawY <= height;
+    const rawX = SVG_CENTER_X + real * scale;
+    const rawY = SVG_CENTER_Y - imag * scale;
+    return rawX >= 0 && rawX <= SVG_WIDTH && rawY >= 0 && rawY <= SVG_HEIGHT;
   };
 
   // SVG 座標を複素平面の座標に変換
-  const fromSvgX = (svgX: number): number => (svgX - centerX) / scale;
-  const fromSvgY = (svgY: number): number => (centerY - svgY) / scale;
+  const fromSvgX = (svgX: number): number => (svgX - SVG_CENTER_X) / scale;
+  const fromSvgY = (svgY: number): number => (SVG_CENTER_Y - svgY) / scale;
 
   // SVG 要素内の座標を取得（viewBox座標系に変換）
   const getSvgCoordinates = (
@@ -68,8 +84,8 @@ export const ComplexPlane = ({
     const relativeY = clientY - rect.top;
 
     // スケーリング係数を計算（viewBox座標系に変換）
-    const scaleX = width / rect.width;
-    const scaleY = height / rect.height;
+    const scaleX = SVG_WIDTH / rect.width;
+    const scaleY = SVG_HEIGHT / rect.height;
 
     return {
       x: relativeX * scaleX,
@@ -172,7 +188,7 @@ export const ComplexPlane = ({
           ref={svgRef}
           width="100%"
           height="100%"
-          viewBox={`0 0 ${width} ${height}`}
+          viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           preserveAspectRatio="xMidYMid meet"
         >
           {/* グリッド線 */}
@@ -191,47 +207,53 @@ export const ComplexPlane = ({
               />
             </pattern>
           </defs>
-          <rect width={width} height={height} fill="url(#grid)" />
+          <rect width={SVG_WIDTH} height={SVG_HEIGHT} fill="url(#grid)" />
 
           {/* 実軸 */}
           <line
             x1={0}
-            y1={centerY}
-            x2={width}
-            y2={centerY}
+            y1={SVG_CENTER_Y}
+            x2={SVG_WIDTH}
+            y2={SVG_CENTER_Y}
             stroke="#333"
             strokeWidth="2"
           />
-          <text x={width - 30} y={centerY + 20} fontSize="12" fill="#333">
+          <text
+            x={SVG_WIDTH - 30}
+            y={SVG_CENTER_Y + 20}
+            fontSize="12"
+            fill="#333"
+          >
             {t('complexPlane.realAxis')}
           </text>
 
           {/* 虚軸 */}
           <line
-            x1={centerX}
+            x1={SVG_CENTER_X}
             y1={0}
-            x2={centerX}
-            y2={height}
+            x2={SVG_CENTER_X}
+            y2={SVG_HEIGHT}
             stroke="#333"
             strokeWidth="2"
           />
-          <text x={centerX + 10} y={20} fontSize="12" fill="#333">
+          <text x={SVG_CENTER_X + 10} y={20} fontSize="12" fill="#333">
             {t('complexPlane.imagAxis')}
           </text>
 
           {/* 単位円 */}
           <circle
-            cx={centerX}
-            cy={centerY}
+            cx={SVG_CENTER_X}
+            cy={SVG_CENTER_Y}
             r={scale}
             fill="none"
             stroke="#1976d2"
             strokeWidth="2"
             strokeDasharray="5,5"
+            opacity={0.6}
           />
           <text
-            x={centerX + 10}
-            y={centerY + scale + 20}
+            x={SVG_CENTER_X + 10}
+            y={SVG_CENTER_Y + scale + 20}
             fontSize="12"
             fill="#1976d2"
           >
