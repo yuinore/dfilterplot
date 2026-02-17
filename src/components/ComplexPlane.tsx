@@ -44,6 +44,13 @@ export const ComplexPlane = ({
   const toSvgY = (imag: number): number =>
     Math.max(0, Math.min(height, centerY - imag * scale));
 
+  // 描画範囲内か（toSvgX/toSvgY でクランプされないか）
+  const isInBounds = (real: number, imag: number): boolean => {
+    const rawX = centerX + real * scale;
+    const rawY = centerY - imag * scale;
+    return rawX >= 0 && rawX <= width && rawY >= 0 && rawY <= height;
+  };
+
   // SVG 座標を複素平面の座標に変換
   const fromSvgX = (svgX: number): number => (svgX - centerX) / scale;
   const fromSvgY = (svgY: number): number => (centerY - svgY) / scale;
@@ -194,7 +201,7 @@ export const ComplexPlane = ({
             stroke="#333"
             strokeWidth="2"
           />
-          <text x={width - 30} y={centerY - 10} fontSize="12" fill="#333">
+          <text x={width - 30} y={centerY + 20} fontSize="12" fill="#333">
             {t('complexPlane.realAxis')}
           </text>
 
@@ -222,8 +229,8 @@ export const ComplexPlane = ({
             strokeDasharray="5,5"
           />
           <text
-            x={centerX + scale + 10}
-            y={centerY + 5}
+            x={centerX + 10}
+            y={centerY + scale + 20}
             fontSize="12"
             fill="#1976d2"
           >
@@ -236,6 +243,7 @@ export const ComplexPlane = ({
             zeros={zeros}
             toSvgX={toSvgX}
             toSvgY={toSvgY}
+            isInBounds={isInBounds}
             interactive={true}
             showZeroPoleTooltip={showZeroPoleTooltip}
             onPoleMouseDown={(id) => handleMouseDown(id, true)}
