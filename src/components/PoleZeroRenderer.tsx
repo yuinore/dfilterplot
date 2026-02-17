@@ -56,8 +56,9 @@ function computeDuplicateOrdinals(items: PoleZero[]): number[] {
 interface PoleZeroRendererProps {
   poles: PoleZero[];
   zeros: PoleZero[];
-  toSvgX: (real: number) => number;
-  toSvgY: (imag: number) => number;
+  scale: number;
+  toSvgX: (real: number, scale: number) => number;
+  toSvgY: (imag: number, scale: number) => number;
   /** 描画範囲内なら true。未指定時は常に不透明 */
   isInBounds?: (real: number, imag: number) => boolean;
   interactive?: boolean;
@@ -117,6 +118,7 @@ const ZeroPoleTooltip = ({
 export const PoleZeroRenderer = ({
   poles,
   zeros,
+  scale,
   toSvgX,
   toSvgY,
   isInBounds,
@@ -157,8 +159,8 @@ export const PoleZeroRenderer = ({
     <>
       {/* 零点 (○) */}
       {zeros.map((zero, idx) => {
-        const svgX = toSvgX(zero.real);
-        const svgY = toSvgY(zero.imag);
+        const svgX = toSvgX(zero.real, scale);
+        const svgY = toSvgY(zero.imag, scale);
         const inBounds = isInBounds?.(zero.real, zero.imag) ?? true;
         const isDuplicate = zeroDuplicateCounts[idx] >= 2;
         const showDuplicateLabel =
@@ -217,8 +219,8 @@ export const PoleZeroRenderer = ({
 
       {/* 極 (×) */}
       {poles.map((pole, idx) => {
-        const svgX = toSvgX(pole.real);
-        const svgY = toSvgY(pole.imag);
+        const svgX = toSvgX(pole.real, scale);
+        const svgY = toSvgY(pole.imag, scale);
         const inBounds = isInBounds?.(pole.real, pole.imag) ?? true;
         const isDuplicate = poleDuplicateCounts[idx] >= 2;
         const showDuplicateLabel =

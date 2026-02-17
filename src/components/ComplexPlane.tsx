@@ -12,6 +12,18 @@ const SVG_CENTER_Y = SVG_HEIGHT / 2;
 
 const MAX_ZOOM_RATIO = 5.0;
 
+// 複素平面の座標を SVG 座標に変換
+const toSvgX = (real: number, scale: number): number =>
+  Math.max(0, Math.min(SVG_WIDTH, SVG_CENTER_X + real * scale));
+const toSvgY = (imag: number, scale: number): number =>
+  Math.max(0, Math.min(SVG_HEIGHT, SVG_CENTER_Y - imag * scale));
+
+// SVG 座標を複素平面の座標に変換
+const fromSvgX = (svgX: number, scale: number): number =>
+  (svgX - SVG_CENTER_X) / scale;
+const fromSvgY = (svgY: number, scale: number): number =>
+  (SVG_CENTER_Y - svgY) / scale;
+
 interface ComplexPlaneProps {
   poles: PoleZero[];
   zeros: PoleZero[];
@@ -54,22 +66,12 @@ export const ComplexPlane = ({
     isPole: boolean;
   } | null>(null);
 
-  // 複素平面の座標を SVG 座標に変換
-  const toSvgX = (real: number): number =>
-    Math.max(0, Math.min(SVG_WIDTH, SVG_CENTER_X + real * scale));
-  const toSvgY = (imag: number): number =>
-    Math.max(0, Math.min(SVG_HEIGHT, SVG_CENTER_Y - imag * scale));
-
   // 描画範囲内か（toSvgX/toSvgY でクランプされないか）
   const isInBounds = (real: number, imag: number): boolean => {
     const rawX = SVG_CENTER_X + real * scale;
     const rawY = SVG_CENTER_Y - imag * scale;
     return rawX >= 0 && rawX <= SVG_WIDTH && rawY >= 0 && rawY <= SVG_HEIGHT;
   };
-
-  // SVG 座標を複素平面の座標に変換
-  const fromSvgX = (svgX: number): number => (svgX - SVG_CENTER_X) / scale;
-  const fromSvgY = (svgY: number): number => (SVG_CENTER_Y - svgY) / scale;
 
   // SVG 要素内の座標を取得（viewBox座標系に変換）
   const getSvgCoordinates = (
@@ -107,8 +109,8 @@ export const ComplexPlane = ({
       if (!draggingItem) return;
 
       const { x: svgX, y: svgY } = getSvgCoordinates(e.clientX, e.clientY);
-      let real = fromSvgX(svgX);
-      let imag = fromSvgY(svgY);
+      let real = fromSvgX(svgX, scale);
+      let imag = fromSvgY(svgY, scale);
 
       // 実軸上の点（ペアがない点）かどうかをチェック
       let isRealAxisOnly = false;
@@ -131,8 +133,7 @@ export const ComplexPlane = ({
         onZeroMove?.(draggingItem.id, real, imag);
       }
     },
-    // TODO: fromSvgX, fromSvgY を useCallback でラップした上で、この依存配列に追加する
-    [draggingItem, poles, zeros, enableSnap, onPoleMove, onZeroMove],
+    [draggingItem, poles, zeros, enableSnap, onPoleMove, onZeroMove, scale],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -270,6 +271,7 @@ export const ComplexPlane = ({
           <PoleZeroRenderer
             poles={poles}
             zeros={zeros}
+            scale={scale}
             toSvgX={toSvgX}
             toSvgY={toSvgY}
             isInBounds={isInBounds}
