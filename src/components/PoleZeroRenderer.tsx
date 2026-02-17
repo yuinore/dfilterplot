@@ -147,7 +147,6 @@ export const PoleZeroRenderer = ({
   );
   useEffect(() => {
     const m = window.matchMedia('(pointer: coarse)');
-    setCoarsePointer(m.matches);
     const handler = () => setCoarsePointer(m.matches);
     m.addEventListener('change', handler);
     return () => m.removeEventListener('change', handler);
