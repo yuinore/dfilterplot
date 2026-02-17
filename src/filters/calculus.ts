@@ -36,14 +36,14 @@ export class CalculusFilterDesign implements FilterDesignBase {
 
     // 零点: z = 1
     zeros.push({
-      id: generateFilterId(),
+      id: `calculus_zero_${generateFilterId()}`,
       real: 1.0,
       isPole: false,
     } as PoleZeroReal);
 
     // 極: z = 0（遅延因子）
     poles.push({
-      id: generateFilterId(),
+      id: `calculus_pole_${generateFilterId()}`,
       real: 0.0,
       isPole: true,
     } as PoleZeroReal);
@@ -65,14 +65,14 @@ export class CalculusFilterDesign implements FilterDesignBase {
 
     // 零点: z = 0（進み因子）
     zeros.push({
-      id: generateFilterId(),
+      id: `calculus_zero_${generateFilterId()}`,
       real: 0.0,
       isPole: false,
     } as PoleZeroReal);
 
     // 極: z = 1（単位円上なので不安定）
     poles.push({
-      id: generateFilterId(),
+      id: `calculus_pole_${generateFilterId()}`,
       real: 1.0,
       isPole: true,
     } as PoleZeroReal);

@@ -29,7 +29,7 @@ export class DelayFilterDesign implements FilterDesignBase {
 
     for (let i = 0; i < order; i++) {
       poles.push({
-        id: generateFilterId(),
+        id: `delay_pole_${generateFilterId()}`,
         real: 0.0,
         isPole: true,
       } as PoleZeroReal);

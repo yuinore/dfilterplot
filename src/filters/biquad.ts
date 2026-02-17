@@ -114,7 +114,7 @@ export class BiquadFilterDesign implements FilterDesignBase {
       // 複素共役ペア（正の虚部のみ保持）
       poles.push({
         type: 'pair',
-        id: generateFilterId(),
+        id: `biquad_pole_${generateFilterId()}`,
         real: poleRoots[0].real,
         imag: Math.abs(poleRoots[0].imag),
         isPole: true,
@@ -124,7 +124,7 @@ export class BiquadFilterDesign implements FilterDesignBase {
       for (const root of poleRoots) {
         poles.push({
           type: 'real',
-          id: generateFilterId(),
+          id: `biquad_pole_${generateFilterId()}`,
           real: root.real,
           isPole: true,
         } as PoleZeroReal);
@@ -136,7 +136,7 @@ export class BiquadFilterDesign implements FilterDesignBase {
       // 複素共役ペア（正の虚部のみ保持）
       zeros.push({
         type: 'pair',
-        id: generateFilterId(),
+        id: `biquad_zero_${generateFilterId()}`,
         real: zeroRoots[0].real,
         imag: Math.abs(zeroRoots[0].imag),
         isPole: false,
@@ -146,7 +146,7 @@ export class BiquadFilterDesign implements FilterDesignBase {
       for (const root of zeroRoots) {
         zeros.push({
           type: 'real',
-          id: generateFilterId(),
+          id: `biquad_zero_${generateFilterId()}`,
           real: root.real,
           isPole: false,
         } as PoleZeroReal);

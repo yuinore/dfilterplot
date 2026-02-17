@@ -47,13 +47,13 @@ export class FirstOrderIIRFilterDesign implements FilterDesignBase {
     const zeros: PoleOrZero[] = [];
 
     poles.push({
-      id: generateFilterId(),
+      id: `firstorderiir_pole_${generateFilterId()}`,
       real: alpha,
       isPole: true,
     } as PoleZeroReal);
 
     zeros.push({
-      id: generateFilterId(),
+      id: `firstorderiir_zero_${generateFilterId()}`,
       real: 0.0,
       isPole: false,
     } as PoleZeroReal);
@@ -69,13 +69,13 @@ export class FirstOrderIIRFilterDesign implements FilterDesignBase {
     const zeros: PoleOrZero[] = [];
 
     poles.push({
-      id: generateFilterId(),
+      id: `firstorderiir_pole_${generateFilterId()}`,
       real: alpha,
       isPole: true,
     } as PoleZeroReal);
 
     zeros.push({
-      id: generateFilterId(),
+      id: `firstorderiir_zero_${generateFilterId()}`,
       real: 1.0,
       isPole: false,
     } as PoleZeroReal);

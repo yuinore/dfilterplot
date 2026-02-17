@@ -8,6 +8,7 @@
 let nextFilterId = 1000;
 
 export function generateFilterId(): string {
+  // FIXME: App.tsx では別の方法で採番していて、あんまり意味がない
   return (nextFilterId++).toString();
 }
 
