@@ -23,8 +23,8 @@ def durand_kerner(
     Durand-Kerner法で多項式のすべての根を求める（高精度版）
 
     Args:
-        coefficients: 係数の配列（降べき順: [a_n, a_{n-1}, ..., a_1, a_0]）
-        max_iterations: 最大反復回数（デフォルト: 1000）
+        coefficients: 係数の配列（昇べき順: [a_0, a_1, ..., a_n]）
+        max_iterations: 最大反復回数（デフォルト: 1000。dps が大きいときは少なくとも dps*20 回まで自動で拡張）
         tolerance: 収束判定の許容誤差（デフォルト: 10^(-dps+5)）
         dps: 計算精度（10進数の桁数、デフォルト: 50）
 
@@ -38,24 +38,27 @@ def durand_kerner(
         # デフォルトの許容誤差: 精度より5桁小さい値
         tolerance = mpmath.mpf(10) ** (-dps + 5)
 
+    # 高精度のときは収束に必要な反復回数が増えるため、上限を緩和する
+    effective_max_iterations = max(max_iterations, dps * 20)
+
     # 係数をmpmath.mpfに変換
     coeffs = [mpmath.mpf(c) for c in coefficients]
     n = len(coeffs) - 1  # 多項式の次数
 
     if n <= 0:
-        raise ValueError('多項式の次数は1以上である必要があります')
+        raise ValueError("多項式の次数は1以上である必要があります")
 
-    # 最高次の係数が0でないことを確認
-    if abs(coeffs[0]) < tolerance:
-        raise ValueError('最高次の係数が0です')
+    # 最高次の係数が0でないことを確認（昇べきなので a_n = coeffs[n]）
+    if abs(coeffs[n]) < tolerance:
+        raise ValueError("最高次の係数が0です")
 
     # 定数項のみの場合
     if n == 0:
         return []
 
-    # 1次式の場合
+    # 1次式の場合: a_0 + a_1*x = 0 → x = -a_0/a_1
     if n == 1:
-        root = -coeffs[1] / coeffs[0]
+        root = -coeffs[0] / coeffs[1]
         return [mpmath.mpc(root, 0)]
 
     # 初期値の設定: 単位円上の等間隔の点
@@ -76,7 +79,7 @@ def durand_kerner(
         result = mpmath.mpc(0, 0)
         x_power = mpmath.mpc(1, 0)  # x^0 = 1
 
-        # 降べき順で計算: a_n * x^n + a_{n-1} * x^{n-1} + ... + a_0
+        # 昇べき順で計算: a_0 + a_1 * x + ... + a_n * x^n
         for i in range(n + 1):
             coeff = coeffs[i]
             result += x_power * coeff
@@ -85,7 +88,7 @@ def durand_kerner(
         return result
 
     # 反復計算
-    for iteration in range(max_iterations):
+    for iteration in range(effective_max_iterations):
         new_roots: List[mpmath.mpc] = []
         converged = True
 
@@ -95,11 +98,11 @@ def durand_kerner(
             # P(x_i) を計算
             p_x_i = evaluate_polynomial(x_i)
 
-            # 分母: a_n * ∏_{j≠i}(x_i - x_j)
-            denominator = mpmath.mpc(coeffs[0], 0)
+            # 分母: a_n * ∏_{j≠i}(x_i - x_j)（実装は昇べきなので a_n = coeffs[n]）
+            denominator = mpmath.mpc(coeffs[n], 0)
             for j in range(n):
                 if i != j:
-                    denominator *= (x_i - roots[j])
+                    denominator *= x_i - roots[j]
 
             # 更新: x_i^{(k+1)} = x_i^{(k)} - P(x_i^{(k)}) / (a_n * ∏_{j≠i}(x_i^{(k)} - x_j^{(k)}))
             correction = p_x_i / denominator
