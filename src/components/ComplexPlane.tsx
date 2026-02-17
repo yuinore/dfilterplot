@@ -200,7 +200,13 @@ export const ComplexPlane = ({
               patternUnits="userSpaceOnUse"
             >
               <path
-                d={`M ${scale / 5} 0 L 0 0 0 ${scale / 5}`}
+                d={`M ${scale / 5} ${SVG_CENTER_Y % (scale / 5)} L 0 ${SVG_CENTER_Y % (scale / 5)}`}
+                fill="none"
+                stroke="#d0d0d0"
+                strokeWidth="0.5"
+              />
+              <path
+                d={`M ${SVG_CENTER_X % (scale / 5)} 0 L ${SVG_CENTER_X % (scale / 5)} ${scale / 5}`}
                 fill="none"
                 stroke="#d0d0d0"
                 strokeWidth="0.5"
