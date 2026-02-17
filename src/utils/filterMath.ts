@@ -53,6 +53,13 @@ export class Complex {
   angle(): number {
     return Math.atan2(this.imag, this.real);
   }
+
+  static fromPolar(magnitude: number, phase: number): Complex {
+    return new Complex(
+      magnitude * Math.cos(phase),
+      magnitude * Math.sin(phase),
+    );
+  }
 }
 
 /**

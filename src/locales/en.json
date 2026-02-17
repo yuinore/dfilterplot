@@ -65,7 +65,9 @@
   },
   "gainControl": {
     "title": "Gain Control",
-    "gain": "Gain Factor"
+    "gain": "Gain Factor",
+    "phaseInvert": "Invert phase",
+    "reset": "Reset"
   },
   "filterDesign": {
     "title": "Filter Design",
@@ -150,6 +152,19 @@
       "highPass": "HPF",
       "order": "Order",
       "cutoffFrequency": "Cutoff Frequency"
+    },
+    "linkwitzRiley": {
+      "name": "Linkwitz-Riley Filter",
+      "description": "Crossover filter formed by cascading two Butterworth filters of the same order. The phase characteristics of the high and low bands match, so no interference occurs.",
+      "type": "Filter Type",
+      "lowPass": "LPF",
+      "highPass": "HPF",
+      "mixed": "Mixed",
+      "custom": "Custom",
+      "order": "Order",
+      "crossoverFrequency": "Crossover Frequency",
+      "gainLow": "Gain (Low)",
+      "gainHigh": "Gain (High)"
     },
     "sinc": {
       "name": "Sinc Filter (approximation)",

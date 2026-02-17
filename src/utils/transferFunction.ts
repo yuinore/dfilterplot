@@ -1,61 +1,12 @@
 import type { PoleZero, FrequencyResponse, PoleOrZero } from '../types';
 import { isPoleZeroPair, toPoleZeros } from '../types';
 import { FREQUENCY_RESPONSE, BODE_PLOT } from '../constants';
-
-/**
- * 複素数クラス
- */
-class Complex {
-  real: number;
-  imag: number;
-
-  constructor(real: number, imag: number) {
-    this.real = real;
-    this.imag = imag;
-  }
-
-  add(other: Complex): Complex {
-    return new Complex(this.real + other.real, this.imag + other.imag);
-  }
-
-  subtract(other: Complex): Complex {
-    return new Complex(this.real - other.real, this.imag - other.imag);
-  }
-
-  multiply(other: Complex): Complex {
-    return new Complex(
-      this.real * other.real - this.imag * other.imag,
-      this.real * other.imag + this.imag * other.real,
-    );
-  }
-
-  divide(other: Complex): Complex {
-    const denominator = other.real * other.real + other.imag * other.imag;
-    return new Complex(
-      (this.real * other.real + this.imag * other.imag) / denominator,
-      (this.imag * other.real - this.real * other.imag) / denominator,
-    );
-  }
-
-  magnitude(): number {
-    return Math.sqrt(this.real * this.real + this.imag * this.imag);
-  }
-
-  phase(): number {
-    return Math.atan2(this.imag, this.real);
-  }
-
-  static fromPolar(magnitude: number, phase: number): Complex {
-    return new Complex(
-      magnitude * Math.cos(phase),
-      magnitude * Math.sin(phase),
-    );
-  }
-}
+import { Complex } from './filterMath';
 
 /**
  * 伝達関数 H(z) を計算
  * H(z) = K * ∏(z - zi) / ∏(z - pi)
+ * 実数係数フィルタのためゲイン K は実数
  */
 function evaluateTransferFunction(
   z: Complex,
@@ -127,7 +78,6 @@ export function calculateFrequencyResponse(
   const magnitudes: number[] = [];
   const phases: number[] = [];
 
-  // ユーザー指定のゲインを使用
   const gain = userGain;
 
   // 周波数範囲: 0 から π (正規化周波数)
@@ -147,7 +97,7 @@ export function calculateFrequencyResponse(
     magnitudes.push(magnitudeDB);
 
     // 位相 (度)
-    const phaseDeg = (h.phase() * 180) / Math.PI;
+    const phaseDeg = (h.angle() * 180) / Math.PI;
     phases.push(phaseDeg);
   }
 
@@ -168,14 +118,12 @@ export function calculateFrequencyResponseLog(
   octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
   userGain: number = 1.0,
 ): FrequencyResponse {
-  // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
   const polesExpanded = toPoleZeros(poles);
   const frequencies: number[] = [];
   const magnitudes: number[] = [];
   const phases: number[] = [];
 
-  // ユーザー指定のゲインを使用
   const gain = userGain;
 
   // 対数周波数範囲: π / 2^octaves から π（ナイキスト周波数）
@@ -197,7 +145,7 @@ export function calculateFrequencyResponseLog(
     const magnitudeDB = magnitude > 1e-10 ? 20 * Math.log10(magnitude) : -200;
     magnitudes.push(magnitudeDB);
 
-    let phase = h.phase();
+    let phase = h.angle();
     if (magnitude < 1e-50) {
       // 振幅が小さすぎる場合は位相が正確に判定できないため、 0 にフォールバックする
       phase = 0.0;
@@ -225,13 +173,11 @@ export function calculateGroupDelay(
   octaves: number = BODE_PLOT.DEFAULT_OCTAVES,
   userGain: number = 1.0,
 ): { frequency: number[]; groupDelay: number[] } {
-  // PoleOrZero[] を展開して計算用のPoleZero[]に変換
   const zerosExpanded = toPoleZeros(zeros);
   const polesExpanded = toPoleZeros(poles);
   const frequencies: number[] = [];
   const groupDelays: number[] = [];
 
-  // ユーザー指定のゲインを使用（群遅延は振幅に依存しないが、一貫性のため）
   const gain = userGain;
 
   // 周波数範囲の設定
@@ -261,7 +207,7 @@ export function calculateGroupDelay(
 
     const z = Complex.fromPolar(1, omega);
     const h = evaluateTransferFunction(z, zerosExpanded, polesExpanded, gain);
-    phases.push(h.phase());
+    phases.push(h.angle());
   }
 
   // 位相アンラッピング: -π から π の境界でのジャンプを補正、
@@ -454,7 +400,6 @@ export function calculateImpulseResponse(
     signal = applyBiquadSection(signal, section);
   }
 
-  // ユーザー指定のゲインを適用
   for (let i = 0; i < signal.length; i++) {
     signal[i] *= userGain;
   }
@@ -479,7 +424,6 @@ export function calculateStepResponse(
   numPoints: number = 128,
   userGain: number = 1.0,
 ): { time: number[]; amplitude: number[] } {
-  // ユーザー指定のゲインでインパルス応答を計算
   const impulse = calculateImpulseResponse(zeros, poles, numPoints, userGain);
   const time: number[] = [];
   const amplitude: number[] = [];

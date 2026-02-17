@@ -65,7 +65,9 @@
   },
   "gainControl": {
     "title": "ゲイン調整",
-    "gain": "比例係数"
+    "gain": "比例係数",
+    "phaseInvert": "位相を反転",
+    "reset": "リセット"
   },
   "filterDesign": {
     "title": "フィルタ設計",
@@ -150,6 +152,19 @@
       "highPass": "HPF",
       "order": "次数",
       "cutoffFrequency": "カットオフ周波数"
+    },
+    "linkwitzRiley": {
+      "name": "Linkwitz-Riley フィルタ",
+      "description": "同一次数のバターワースフィルタを2段直列にしたクロスオーバーフィルタ。高域バンドと低域バンドの位相特性が一致するため、干渉が発生しない。",
+      "type": "フィルタタイプ",
+      "lowPass": "LPF",
+      "highPass": "HPF",
+      "mixed": "合成",
+      "custom": "カスタム",
+      "order": "次数",
+      "crossoverFrequency": "クロスオーバー周波数",
+      "gainLow": "ゲイン（低域）",
+      "gainHigh": "ゲイン（高域）"
     },
     "sinc": {
       "name": "Sincフィルタ（近似）",
