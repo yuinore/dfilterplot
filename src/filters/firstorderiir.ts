@@ -30,6 +30,8 @@ export class FirstOrderIIRFilterDesign implements FilterDesignBase {
     }
 
     switch (type) {
+      case 'lpf_high_freq_suppress':
+        return this.generateHighFreqSuppressLowPass(alpha);
       case 'lowpass':
         return this.generateLowPass(alpha);
       case 'highpass':
@@ -37,6 +39,29 @@ export class FirstOrderIIRFilterDesign implements FilterDesignBase {
       default:
         return this.generateLowPass(alpha);
     }
+  }
+
+  /**
+   * 高域抑制型 LPF: 極 z=α, 零点 z=-1, ゲイン (1-α)/2
+   * ナイキストでゲイン -∞ dB。通常 LPF の出力を長さ2の移動平均で平滑化した形。
+   */
+  private generateHighFreqSuppressLowPass(alpha: number): FilterGenerationResult {
+    const poles: PoleOrZero[] = [];
+    const zeros: PoleOrZero[] = [];
+
+    poles.push({
+      id: `firstorderiir_pole_${generateFilterId()}`,
+      real: alpha,
+      isPole: true,
+    } as PoleZeroReal);
+
+    zeros.push({
+      id: `firstorderiir_zero_${generateFilterId()}`,
+      real: -1.0,
+      isPole: false,
+    } as PoleZeroReal);
+
+    return { poles, zeros, gain: (1 - alpha) / 2 };
   }
 
   /**

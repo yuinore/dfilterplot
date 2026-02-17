@@ -86,9 +86,11 @@
       "name": "一次 IIR フィルタ",
       "description": "1次伝達関数で実現するIIRフィルタ。極・零点が各1個の実数で構成される。",
       "type": "フィルタタイプ",
+      "lpfHighFreqSuppress": "高域抑制型 LPF",
       "lowPass": "LPF",
       "highPass": "HPF",
-      "tooltipLowPass": "ローパスフィルタ",
+      "tooltipLpfHighFreqSuppress": "ナイキスト周波数でゲインが -∞ dB になる一次 IIR ローパスフィルタ。通常の LPF の出力を長さ 2 の移動平均で平滑化したもの。",
+      "tooltipLowPass": "t ≧ 0 でインパルス応答が単調減少なローパスフィルタ。制御系で言う「一次遅れ系」に相当する。",
       "tooltipHighPass": "ハイパスフィルタ",
       "cutoffFrequency": "カットオフ周波数",
       "feedbackCoefficient": "フィードバック係数 α"

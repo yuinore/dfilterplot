@@ -55,7 +55,7 @@ export const CombFilterPanel = ({ onChange }: CombFilterPanelProps) => {
       <Slider
         value={delay}
         onChange={(_, value) => setDelay(value as number)}
-        min={2}
+        min={1}
         max={32}
         step={1}
         marks

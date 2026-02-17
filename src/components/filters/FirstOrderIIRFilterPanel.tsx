@@ -139,6 +139,15 @@ export const FirstOrderIIRFilterPanel = ({
         <Tooltip
           placement="top"
           arrow
+          title={t('filters.firstorderiir.tooltipLpfHighFreqSuppress')}
+        >
+          <ToggleButton value="lpf_high_freq_suppress">
+            {t('filters.firstorderiir.lpfHighFreqSuppress')}
+          </ToggleButton>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
           title={t('filters.firstorderiir.tooltipLowPass')}
         >
           <ToggleButton value="lowpass">

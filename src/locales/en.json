@@ -86,9 +86,11 @@
       "name": "First-Order IIR Filter",
       "description": "IIR filter realized by a first-order transfer function. Composed of one real pole and one real zero.",
       "type": "Filter Type",
+      "lpfHighFreqSuppress": "HF-suppress LPF",
       "lowPass": "LPF",
       "highPass": "HPF",
-      "tooltipLowPass": "Low-pass filter",
+      "tooltipLpfHighFreqSuppress": "First-order IIR low-pass with −∞ dB gain at Nyquist. Equivalent to smoothing the standard LPF output with a length-2 moving average.",
+      "tooltipLowPass": "Low-pass with monotonically decreasing impulse response for t ≥ 0; corresponds to a first-order lag in control theory.",
       "tooltipHighPass": "High-pass filter",
       "cutoffFrequency": "Cutoff Frequency",
       "feedbackCoefficient": "Feedback coefficient α"
