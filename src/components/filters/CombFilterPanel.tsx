@@ -69,8 +69,8 @@ export const CombFilterPanel = ({ onChange }: CombFilterPanelProps) => {
       <Slider
         value={gain}
         onChange={(_, value) => setGain(value as number)}
-        min={-0.99}
-        max={0.99}
+        min={-0.95}
+        max={0.95}
         step={0.01}
         valueLabelDisplay="auto"
         valueLabelFormat={(value) => value.toFixed(2)}

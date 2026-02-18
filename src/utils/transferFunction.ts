@@ -96,8 +96,12 @@ export function calculateFrequencyResponse(
     const magnitudeDB = magnitude > 1e-10 ? 20 * Math.log10(magnitude) : -200;
     magnitudes.push(magnitudeDB);
 
-    // 位相 (度)
-    const phaseDeg = (h.angle() * 180) / Math.PI;
+    let phase = h.angle();
+    if (magnitude < 1e-50) {
+      // 振幅が小さすぎる場合は位相が正確に判定できないため、 0 にフォールバックする
+      phase = 0.0;
+    }
+    const phaseDeg = (phase * 180) / Math.PI;
     phases.push(phaseDeg);
   }
 
@@ -207,7 +211,9 @@ export function calculateGroupDelay(
 
     const z = Complex.fromPolar(1, omega);
     const h = evaluateTransferFunction(z, zerosExpanded, polesExpanded, gain);
-    phases.push(h.angle());
+    const magnitude = h.magnitude();
+    const phase = magnitude < 1e-50 ? 0.0 : h.angle();
+    phases.push(phase);
   }
 
   // 位相アンラッピング: -π から π の境界でのジャンプを補正、
@@ -236,7 +242,7 @@ export function calculateGroupDelay(
   for (let i = 0; i < numPoints; i++) {
     let groupDelay: number;
 
-    if (i === 0) {
+    if (i === 0 || i === 1) {
       // 前方差分
       groupDelay =
         -(unwrappedPhases[i + 1] - unwrappedPhases[i]) /
@@ -254,6 +260,13 @@ export function calculateGroupDelay(
     }
 
     groupDelays.push(groupDelay);
+  }
+
+  if (!logarithmic) {
+    // 直流での位相は安定しないため、最初の群遅延を2番目の群遅延に設定する。
+    // （バンドパスフィルタ等で、ω→0 の極限で位相が ±90° になることがあるため）
+    // 周波数軸は揃えたいので、最初の項目を unshift することはしない。
+    groupDelays[0] = groupDelays[1];
   }
 
   // 群遅延を 1e-8 の倍数に揃える (微小誤差の解消のため)
