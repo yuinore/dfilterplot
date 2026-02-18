@@ -93,6 +93,7 @@
       "tooltipLowPass": "t ≧ 0 でインパルス応答が単調減少なローパスフィルタ。制御系で言う「一次遅れ系」に相当する。",
       "tooltipHighPass": "ハイパスフィルタ",
       "cutoffFrequency": "カットオフ周波数",
+      "designCutoffFrequency": "双一次設計カットオフ周波数",
       "feedbackCoefficient": "フィードバック係数 α"
     },
     "biquad": {

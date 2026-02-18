@@ -18,16 +18,7 @@ export class FirstOrderIIRFilterDesign implements FilterDesignBase {
 
   generate(params: Record<string, any>): FilterGenerationResult {
     const type = params.type as string;
-    const cutoffFrequency = params.cutoffFrequency as number;
-
-    // const alpha = Math.exp(-cutoffFrequency);
-
-    // pre warping
-    const preWarpedCutoffFrequency = 2 * Math.tan(cutoffFrequency / 2);
-    let alpha = Math.exp(-preWarpedCutoffFrequency);
-    if (cutoffFrequency > Math.PI - 1e-9) {
-      alpha = 0;
-    }
+    const alpha = params.alpha as number;
 
     switch (type) {
       case 'lpf_high_freq_suppress':

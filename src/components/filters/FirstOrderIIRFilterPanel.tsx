@@ -11,9 +11,42 @@ import { useState, useEffect } from 'react';
 import type { FrequencyUnit } from '../Settings';
 
 interface FirstOrderIIRFilterPanelProps {
-  onChange: (params: { type: string; cutoffFrequency: number }) => void;
+  onChange: (params: { type: string; alpha: number }) => void;
   logarithmicFrequency?: boolean;
   frequencyUnit?: FrequencyUnit;
+}
+
+// α = exp(-2 tan(ω_A/2)) = (1 - tan(ω_D/2)) / (1 + tan(ω_D/2))
+
+function convertAnalogCutoffFrequencyToAlpha(cutoffFrequency: number): number {
+  if (cutoffFrequency > Math.PI - 1e-9) {
+    return 0;
+  }
+  return Math.exp(-2 * Math.tan(cutoffFrequency / 2));
+}
+
+function convertAlphaToAnalogCutoffFrequency(alpha: number): number {
+  if (alpha >= 1 - 1e-9) {
+    return 0;
+  }
+  if (alpha <= 1e-9) {
+    return Math.PI;
+  }
+  return 2 * Math.atan(-Math.log(alpha) / 2);
+}
+
+function convertDesignCutoffFrequencyToAlpha(cutoffFrequency: number): number {
+  return (
+    (1 - Math.tan(cutoffFrequency / 2)) / (1 + Math.tan(cutoffFrequency / 2))
+  );
+}
+
+function convertAlphaToDesignCutoffFrequency(alpha: number): number {
+  return 2 * Math.atan((1 - alpha) / (1 + alpha));
+}
+
+function convertBooleanToOverflowLabel(value: boolean): string {
+  return value ? '>' : '';
 }
 
 /**
@@ -54,28 +87,6 @@ function getFrequencyLabel(unit: FrequencyUnit = 'radians'): string {
   return 'Hz';
 }
 
-function cutoffFrequencyToFeedbackCoefficient(cutoffFrequency: number): number {
-  const preWarpedCutoffFrequency = 2 * Math.tan(cutoffFrequency / 2);
-  let alpha = Math.exp(-preWarpedCutoffFrequency);
-  if (cutoffFrequency > Math.PI - 1e-9) {
-    alpha = 0;
-  }
-  return alpha;
-}
-
-function feedbackCoefficientToCutoffFrequency(
-  feedbackCoefficient: number,
-): number {
-  if (feedbackCoefficient >= 1 - 1e-9) {
-    return 0;
-  }
-  if (feedbackCoefficient <= 1e-9) {
-    return Math.PI;
-  }
-  const preWarpedCutoffFrequency = -Math.log(feedbackCoefficient);
-  return 2 * Math.atan(preWarpedCutoffFrequency / 2);
-}
-
 export const FirstOrderIIRFilterPanel = ({
   onChange,
   logarithmicFrequency = false,
@@ -83,14 +94,13 @@ export const FirstOrderIIRFilterPanel = ({
 }: FirstOrderIIRFilterPanelProps) => {
   const { t } = useTranslation();
   const [type, setType] = useState<string>('lowpass');
-  const [cutoffFrequency, setCutoffFrequency] = useState<number>(Math.PI / 10);
-
-  const feedbackCoefficient =
-    cutoffFrequencyToFeedbackCoefficient(cutoffFrequency);
+  const [alpha, setAlpha] = useState<number>(() =>
+    convertAnalogCutoffFrequencyToAlpha(Math.PI / 10),
+  );
 
   useEffect(() => {
-    onChange({ type, cutoffFrequency });
-  }, [type, cutoffFrequency, onChange]);
+    onChange({ type, alpha });
+  }, [type, alpha, onChange]);
 
   const minFreqRad = 0.001 * Math.PI;
   const maxFreqRad = Math.PI;
@@ -166,16 +176,36 @@ export const FirstOrderIIRFilterPanel = ({
       </ToggleButtonGroup>
 
       <Typography variant="subtitle2" gutterBottom>
+        {t('filters.firstorderiir.feedbackCoefficient')}: {alpha.toFixed(4)}
+      </Typography>
+      <Slider
+        value={alpha}
+        onChange={(_, value) => setAlpha(value as number)}
+        min={0}
+        max={1}
+        step={0.01}
+        valueLabelDisplay="auto"
+        valueLabelFormat={(value) => value.toFixed(4)}
+        sx={{ mb: 2 }}
+      />
+
+      <Typography variant="subtitle2" gutterBottom>
         {t('filters.firstorderiir.cutoffFrequency')}:{' '}
-        {convertFrequencyToDisplay(cutoffFrequency, frequencyUnit).toFixed(
-          frequencyUnit === 'radians' ? 3 : 1,
-        )}{' '}
+        {convertBooleanToOverflowLabel(alpha < 0.0)}
+        {convertFrequencyToDisplay(
+          convertAlphaToAnalogCutoffFrequency(alpha),
+          frequencyUnit,
+        ).toFixed(frequencyUnit === 'radians' ? 3 : 1)}{' '}
         ({getFrequencyLabel(frequencyUnit)})
       </Typography>
       <Slider
-        value={getSliderValue(cutoffFrequency)}
+        value={getSliderValue(convertAlphaToAnalogCutoffFrequency(alpha))}
         onChange={(_, value) =>
-          setCutoffFrequency(getFreqFromSlider(value as number))
+          setAlpha(
+            convertAnalogCutoffFrequencyToAlpha(
+              getFreqFromSlider(value as number),
+            ),
+          )
         }
         min={logarithmicFrequency ? logMin : minFreqDisplay}
         max={logarithmicFrequency ? logMax : maxFreqDisplay}
@@ -189,23 +219,44 @@ export const FirstOrderIIRFilterPanel = ({
         }
         sx={{ mb: 2 }}
       />
-      <Typography variant="subtitle2" gutterBottom>
-        {t('filters.firstorderiir.feedbackCoefficient')}:{' '}
-        {feedbackCoefficient.toFixed(4)}
-      </Typography>
-      <Slider
-        value={feedbackCoefficient}
-        onChange={(_, value) => {
-          const freq = feedbackCoefficientToCutoffFrequency(value as number);
-          setCutoffFrequency(Math.max(minFreqRad, Math.min(maxFreqRad, freq)));
-        }}
-        min={0}
-        max={1}
-        step={0.01}
-        valueLabelDisplay="auto"
-        valueLabelFormat={(value) => value.toFixed(4)}
-        sx={{ mb: 2 }}
-      />
+
+      {type !== 'lowpass' && (
+        <>
+          <Typography variant="subtitle2" gutterBottom>
+            {t('filters.firstorderiir.designCutoffFrequency')}:{' '}
+            {convertFrequencyToDisplay(
+              convertAlphaToDesignCutoffFrequency(alpha),
+              frequencyUnit,
+            ).toFixed(frequencyUnit === 'radians' ? 3 : 1)}{' '}
+            ({getFrequencyLabel(frequencyUnit)})
+          </Typography>
+          <Slider
+            value={getSliderValue(convertAlphaToDesignCutoffFrequency(alpha))}
+            onChange={(_, value) =>
+              setAlpha(
+                convertDesignCutoffFrequencyToAlpha(
+                  getFreqFromSlider(value as number),
+                ),
+              )
+            }
+            min={logarithmicFrequency ? logMin : minFreqDisplay}
+            max={logarithmicFrequency ? logMax : maxFreqDisplay}
+            step={
+              logarithmicFrequency
+                ? 0.01
+                : frequencyUnit === 'radians'
+                  ? 0.001
+                  : 10
+            }
+            scale={logarithmicFrequency ? (x) => Math.pow(10, x) : undefined}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(value) =>
+              value.toFixed(frequencyUnit === 'radians' ? 3 : 0)
+            }
+            sx={{ mb: 2 }}
+          />
+        </>
+      )}
 
       <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
         {t('filters.firstorderiir.description')}

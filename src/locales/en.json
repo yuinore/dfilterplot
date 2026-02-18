@@ -93,6 +93,7 @@
       "tooltipLowPass": "Low-pass with monotonically decreasing impulse response for t ≥ 0; corresponds to a first-order lag in control theory.",
       "tooltipHighPass": "High-pass filter",
       "cutoffFrequency": "Cutoff Frequency",
+      "designCutoffFrequency": "Bilinear design cutoff frequency",
       "feedbackCoefficient": "Feedback coefficient α"
     },
     "biquad": {
